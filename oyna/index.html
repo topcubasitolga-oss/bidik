@@ -296,7 +296,7 @@ h1,h2,h3{text-wrap:balance}
 .xsel .xbtn{width:42px;height:42px;border-radius:12px;background:var(--sky);border:3px solid var(--panel-line);font-family:var(--display);font-weight:800;font-size:22px}
 .xsel .xbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .kpal{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-.kpb{display:flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:3px solid var(--panel-line);border-radius:16px;padding:6px 8px;box-shadow:0 4px 0 var(--panel-line);min-width:76px}
+.kpb{display:flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:3px solid var(--panel-line);border-radius:16px;padding:5px 5px;box-shadow:0 4px 0 var(--panel-line);min-width:60px}
 .kpb .blk{width:50px;height:50px}
 .kpb small{font-weight:800;font-size:11.5px}
 .kpb.undo svg{width:50px;height:50px;padding:10px}
@@ -381,6 +381,17 @@ h1,h2,h3{text-wrap:balance}
 .mi{display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:var(--sky);border:3px solid var(--panel-line);border-radius:16px;padding:10px 14px;color:inherit;text-decoration:none}
 .mi b{font-family:var(--display);font-size:19px}.mi small{font-weight:700;font-size:12.5px;color:var(--ink-soft)}
 .world.town .mlab{font-size:20px}
+
+/* görevli kodla sür */
+.gboard{width:min(100%,480px)!important}
+.kb3{width:44px;height:44px;border-radius:12px;padding:0;border:3px solid transparent;flex:none}
+.kb3 .blk{font-size:17px}
+.kb3.on{border-color:#ffc93c;transform:translateY(-3px)}
+.kb3.sel{border-color:var(--ink);box-shadow:0 0 0 3px #ffc93c}
+.energy{display:flex;align-items:center;gap:8px;width:min(100%,480px);font-weight:800}
+.ebar{flex:1;height:16px;border-radius:999px;background:#2b3a6e;overflow:hidden;border:2px solid #1e2a55}
+.ebar i{display:block;height:100%;background:linear-gradient(90deg,#ffe14d,#ffc93c);transition:width .3s}
+.lv-y4 .kpb .blk,.lv-y5 .kpb .blk{width:58px;height:58px}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -1878,7 +1889,13 @@ const AV={
   yaris:[0,0,4,8,8,8],
   kalem:[0,0,4,8,8,8],
   ikili:[0,0,4,8,8,8],
-  senlik:[3,3,5,5,5,5]
+  senlik:[3,3,5,5,5,5],
+  golet:[3,5,8,[4,5,6,7,8,9,10],[6,7,8,9,10,11,12],[6,7,8,9,10,11,12]],
+  cicek:[3,5,8,[4,5,6,7,8,9,10],[6,7,8,9,10,11,12],[6,7,8,9,10,11,12]],
+  orman:[3,5,8,[4,5,6,7,8,9,10],[6,7,8,9,10,11,12],[6,7,8,9,10,11,12]],
+  donusum:[3,5,8,[4,5,6,7,8,9,10],[6,7,8,9,10,11,12],[6,7,8,9,10,11,12]],
+  gece:[3,5,8,[4,5,6,7,8,9,10],[6,7,8,9,10,11,12],[6,7,8,9,10,11,12]],
+  tarla:[3,5,8,[4,5,6,7,8,9,10],[6,7,8,9,10,11,12],[6,7,8,9,10,11,12]]
 };
 function curLevel(d){ d=d||P(); return d.level||null }
 function levelObj(d){ return LEVELS[LVI(curLevel(d)||"s1")] }
@@ -2512,6 +2529,221 @@ regAct("kalem",{
   }
 });
 })();
+// ===== Görevli Kodla Sür: kasabanın 6 bölgesi için ortak oyun motoru =====
+// Aynı tahta, aynı bloklar (İleri, Geri, Sola dön, Sağa dön, 2×/3×/4×); her bölge kendi nesnesini ve görevini getirir.
+(function(){
+const DX=[0,1,0,-1], DY=[-1,0,1,0];
+const BL={F:["İleri","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],G:["Geri","gd",'<path d="M12 4v16M6 14l6 6 6-6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>'],
+  D:["Fidan dik","g",'<path d="M12 21v-8"/><path d="M12 14c-4 0-6-3-6-6 3 0 6 2 6 6zM12 12c0-4 2-7 6-7 0 4-2 7-6 7z" fill="currentColor"/>'],
+  "2":["2 kez","o","2×"],"3":["3 kez","o","3×"],"4":["4 kez","o","4×"]};
+const isPre=t=>t==="2"||t==="3"||t==="4";
+const bH=t=>{ const b=BL[t]; return `<span class="blk ${b[1]}" aria-label="${b[0]}">${isPre(t)?b[2]:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${b[2]}</svg>`}</span>` };
+const TIER=[null, // N, nesne, engel, en kısa program aralığı, dönüş gerekli mi
+  {N:3,k:1,o:0,min:2,max:3,turn:0},{N:3,k:1,o:0,min:3,max:5,turn:1},{N:3,k:2,o:1,min:4,max:6,turn:1},
+  {N:4,k:2,o:1,min:5,max:8,turn:1},{N:4,k:3,o:2,min:6,max:9,turn:1},{N:4,k:3,o:2,min:7,max:11,turn:2},
+  {N:5,k:3,o:3,min:8,max:12,turn:2},{N:5,k:4,o:3,min:9,max:14,turn:2},{N:5,k:4,o:4,min:10,max:15,turn:3},
+  {N:5,k:5,o:4,min:11,max:17,turn:3},{N:6,k:5,o:5,min:13,max:19,turn:3},{N:6,k:6,o:6,min:15,max:22,turn:4}];
+const LOOPS_FROM=6, BACK_FROM=7;
+// ---- bölgeler ----
+const COLS={sari:["#ffc93c","#d99a00","plastik","sarı"],mavi:["#2f7fd8","#1d5b9a","kâğıt","mavi"],yesil:["#22a165","#167a4a","cam","yeşil"]};
+const REG={
+  golet:{title:"Göleti Temizle",durak:2,mode:"collect",tile:["#9fdcf0","#8fd3ea"],edge:"#2f8fb8",obs:"tas",item:["sise","teneke","poset"],done:"Bütün çöpler toplandı",
+    goal:"Gölete atılan bütün çöpleri topla.",fail:{out:"Bidik gölün dışına çıktı!",obs:"Taşa çarptı!"},
+    intro:{title:"Göleti temizleyelim!",text:"Kurbağa Kuki'nin göleti çöple dolmuş. Bidik yaprak sandalıyla yüzüyor. Bloklarla yol yaz, <b>Çalıştır</b>'a bas: Bidik geçtiği yerdeki çöpü toplar."},
+    talk:"Bu çöpler göle nasıl gelmiş olabilir? Göletin temiz kalması için biz ne yapabiliriz? (Temiz su, sudaki yaşam)"},
+  cicek:{title:"Polen Yolu",durak:3,mode:"collect",tile:["#c8eab0","#bfe4a4"],edge:"#5a9a46",obs:"cali",item:["solcicek"],done:"Bütün çiçeklere uğrandı",
+    goal:"Arı Bal ile bütün solgun çiçeklere uğra. Uğradığın çiçek açar!",fail:{out:"Bidik tarlanın dışına çıktı!",obs:"Çalıya takıldı!"},
+    intro:{title:"Çiçekler susadı",text:"Arılar azalınca çiçekler tozlaşamıyor. Bidik'i bütün solgun çiçeklere götür, polen taşısın. Aynı hareket tekrar ediyorsa <b>2×, 3×, 4×</b> bloklarını dene!"},
+    talk:"Arılar olmasaydı meyve ve sebzelerimize ne olurdu? Aynı hareketi tekrarladığın yerleri kısaltabildin mi? (Karadaki yaşam, açlığa son)"},
+  orman:{title:"Fidan Dik",durak:4,mode:"plant",tile:["#d9c08f","#ceb47f"],edge:"#8a6a3a",obs:"kutuk",item:["cukur"],done:"Bütün fidanlar dikildi",
+    goal:"Her çukura git ve Fidan dik bloğunu kullan.",fail:{out:"Bidik ormanın dışına çıktı!",obs:"Kütüğe çarptı!",plant:"Burada çukur yok, fidan dikilemez!"},
+    intro:{title:"Orman yeniden büyüsün",text:"Sincap Fındık'ın ormanı kesilmiş. Bidik'i çukurlara götür, çukurun üstündeyken yeşil <b>Fidan dik</b> bloğunu koy. Yanlış yerde dikersen olmaz!"},
+    talk:"Ağaçlar bize ve hayvanlara neler verir? Bir ağacın büyümesi kaç yıl sürer, düşündün mü? (İklim eylemi, karadaki yaşam)"},
+  donusum:{title:"Kutusuna Taşı",durak:5,mode:"deliver",tile:["#e6ecf2","#dbe3ea"],edge:"#5f7489",obs:"koli",done:"Bütün atıklar doğru kutuda",
+    goal:"Atığı al, doğru renkli kutuya götür. Plastik sarıya, kâğıt maviye, cam yeşile!",fail:{out:"Bidik alanın dışına çıktı!",obs:"Kolilere çarptı!",wrong:"Yanlış kutu! Atığın rengine bak."},
+    intro:{title:"Doğru kutu hangisi?",text:"Karga Kara'nın sokağında atıklar karışmış. Bidik bir atığın üstünden geçince onu alır, <b>aynı renkli</b> kutuya gelince bırakır. Bidik bir seferde tek atık taşır."},
+    talk:"Evinde ya da okulunda geri dönüşüm kutusu var mı? Hangi atık hangi kutuya gider? (Sorumlu üretim ve tüketim)"},
+  gece:{title:"Lambaları Söndür",durak:6,mode:"collect",energy:true,tile:["#3b4c86","#35457c"],edge:"#1e2a55",obs:"bank",item:["lamba"],done:"Lambalar söndü, enerji korundu",
+    goal:"Boş sokaktaki bütün lambaları söndür. Her blok enerji harcar: enerjin bitmeden bitir!",fail:{out:"Bidik sokaktan çıktı!",obs:"Banka çarptı!",energy:"Enerji bitti! Daha kısa bir yol bul."},
+    intro:{title:"Enerjiyi koru",text:"Ateşböceği Işıl üzgün: boş sokakta lambalar boşuna yanıyor. Bidik'i lambalara götür, söndürsün. Ama dikkat: <b>her blok enerji harcar.</b> En kısa yolu bul!"},
+    talk:"Evde boşuna yanan bir ışık var mı? Enerjiyi korumak için neler yapabiliriz? En kısa yolu nasıl buldun? (Temiz enerji, iklim eylemi)"},
+  tarla:{title:"Sulama Robotu",durak:7,mode:"collect",debug:true,tile:["#e2c98f","#d8bd80"],edge:"#8a6a3a",obs:"tas",item:["kuru"],done:"Tarla sulandı",
+    goal:"Sulama programı bozuk! Programı çalıştır, nerede saptığını gör, hatalı bloğa dokun ve doğrusunu seç.",fail:{out:"Robot tarlanın dışına çıktı!",obs:"Taşa çarptı!"},
+    intro:{title:"Tarla susuz kaldı",text:"Tavşan Pıtır'ın sulama robotunun programı bozulmuş. Önce <b>Çalıştır</b>'a bas ve izle. Robot nerede yanlış yaptı? Hatalı bloğa dokun, aşağıdan doğrusunu seç."},
+    talk:"Robot nerede saptı? Hata, saptığı yerde mi başlamıştı, yoksa daha önce mi? Suyu boşa harcamadan sulamak neden önemli? (Temiz su, açlığa son)"}
+};
+// ---- küçük çizimler (100×100 hücre içinde) ----
+const ART={
+  tas:`<path d="M18 74 C14 56 28 36 48 34 C70 32 86 50 84 70 C82 82 24 86 18 74Z" fill="#9aa6b4" stroke="#5f7489" stroke-width="4"/>`,
+  cali:`<circle cx="36" cy="58" r="20" fill="#3d8a4a"/><circle cx="62" cy="54" r="22" fill="#2f7a3e"/><circle cx="50" cy="40" r="18" fill="#4a9a54"/><circle cx="44" cy="46" r="4" fill="#e8443a"/><circle cx="62" cy="58" r="4" fill="#e8443a"/>`,
+  kutuk:`<rect x="30" y="44" width="40" height="34" fill="#a8693d" stroke="#6b4226" stroke-width="3"/><ellipse cx="50" cy="44" rx="20" ry="9" fill="#e0b48a" stroke="#6b4226" stroke-width="3"/><ellipse cx="50" cy="44" rx="9" ry="4" fill="none" stroke="#b5743c" stroke-width="2"/>`,
+  koli:`<rect x="22" y="34" width="56" height="44" rx="4" fill="#c98a52" stroke="#8a5a2b" stroke-width="3"/><path d="M22 48 H78 M50 34 V48" stroke="#8a5a2b" stroke-width="3"/>`,
+  bank:`<rect x="18" y="44" width="64" height="10" rx="3" fill="#b5743c"/><rect x="18" y="58" width="64" height="8" rx="3" fill="#a8693d"/><path d="M26 66 V80 M74 66 V80" stroke="#3a4250" stroke-width="5"/>`,
+  sise:`<g transform="rotate(35 50 50)"><rect x="43" y="18" width="14" height="10" rx="2" fill="#2f7fd8"/><path d="M41 28 H59 V36 C66 40 66 44 66 50 V80 a6 6 0 0 1 -6 6 H40 a6 6 0 0 1 -6 -6 V50 C34 44 34 40 41 36Z" fill="#cdeefa" stroke="#4a9cc4" stroke-width="3"/></g>`,
+  teneke:`<g transform="rotate(-20 50 50)"><rect x="34" y="26" width="32" height="50" rx="5" fill="#e8443a" stroke="#a8261e" stroke-width="3"/><rect x="34" y="26" width="32" height="8" fill="#c9d3de"/><path d="M40 50 H60" stroke="#fff" stroke-width="4"/></g>`,
+  poset:`<path d="M28 82 L24 40 H76 L72 82Z" fill="#f4f4f4" stroke="#9fb4c9" stroke-width="3"/><path d="M36 40 C36 24 46 24 46 40 M54 40 C54 24 64 24 64 40" stroke="#9fb4c9" stroke-width="3" fill="none"/>`,
+  solcicek:`<path d="M50 84 C50 70 52 62 58 56" stroke="#a89a6a" stroke-width="4" fill="none"/><g transform="translate(60 48)">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-10" rx="7" ry="10" fill="#d9cfc0" transform="rotate(${a})"/>`).join("")}<circle r="7" fill="#c9b98a"/></g>`,
+  cicek:`<path d="M50 86 V54" stroke="#22a165" stroke-width="4"/><path d="M50 72 q-14 -4 -16 -14 q12 0 16 10Z" fill="#7cc35a"/><g transform="translate(50 42)">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-12" rx="9" ry="13" fill="#e0457b" stroke="#fff" stroke-width="2" transform="rotate(${a})"/>`).join("")}<circle r="9" fill="#ffc93c"/></g>`,
+  cukur:`<ellipse cx="50" cy="58" rx="28" ry="16" fill="#7a5a2b"/><ellipse cx="50" cy="56" rx="22" ry="11" fill="#5a3f1c"/>`,
+  fidan:`<ellipse cx="50" cy="74" rx="24" ry="8" fill="#7a5a2b"/><path d="M50 74 V44" stroke="#6b4226" stroke-width="5"/><circle cx="50" cy="36" r="16" fill="#3fae5f"/><circle cx="38" cy="46" r="10" fill="#22a165"/><circle cx="62" cy="46" r="10" fill="#22a165"/>`,
+  lamba:`<circle cx="50" cy="30" r="24" fill="#fff38a" opacity=".45"/><path d="M50 86 V36" stroke="#2b2f3a" stroke-width="6"/><path d="M36 36 H64 L58 22 H42Z" fill="#ffe14d" stroke="#2b2f3a" stroke-width="3" stroke-linejoin="round"/>`,
+  lambaoff:`<path d="M50 86 V36" stroke="#2b2f3a" stroke-width="6"/><path d="M36 36 H64 L58 22 H42Z" fill="#9aa6b4" stroke="#2b2f3a" stroke-width="3" stroke-linejoin="round"/>`,
+  kuru:`<rect x="14" y="14" width="72" height="72" rx="12" fill="#c9a66b"/><path d="M26 34 l12 8 l-6 10 l10 6 M60 26 l-4 12 l12 6 M58 66 l10 -4 l4 10" stroke="#8a6a3a" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+  islak:`<rect x="14" y="14" width="72" height="72" rx="12" fill="#6f9e3a"/>${[30,50,70].map(x=>`<path d="M${x} 70 V48 M${x} 56 q-8 -2 -9 -9 q7 0 9 7Z M${x} 52 q8 -2 9 -9 q-7 0 -9 7Z" stroke="#bdeaa0" stroke-width="3" fill="#bdeaa0"/>`).join("")}`,
+  yaprak:`<ellipse cx="50" cy="56" rx="38" ry="30" fill="#3fae5f"/><path d="M50 56 L82 40" stroke="#2f7a3e" stroke-width="3"/>`
+};
+function binArt(c){ const C=COLS[c]; return `<rect x="20" y="30" width="60" height="56" rx="6" fill="${C[0]}" stroke="${C[1]}" stroke-width="4"/><rect x="14" y="20" width="72" height="12" rx="5" fill="${C[0]}" stroke="${C[1]}" stroke-width="4"/><path d="M38 56 l12 -12 l12 12 M62 64 l-12 12 l-12 -12" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` }
+function wasteArt(c){ return c==="sari"?ART.sise.replace("#cdeefa","#ffe9a3").replace("#4a9cc4","#d99a00").replace("#2f7fd8","#d99a00"):c==="mavi"?`<rect x="24" y="26" width="52" height="50" rx="3" fill="#cfe2f7" stroke="#2f7fd8" stroke-width="4" transform="rotate(-8 50 50)"/><path d="M32 40 H66 M32 50 H66 M32 60 H56" stroke="#2f7fd8" stroke-width="3" transform="rotate(-8 50 50)"/>`:`<path d="M42 16 H58 V30 C70 36 72 44 72 54 V80 a6 6 0 0 1 -6 6 H34 a6 6 0 0 1 -6 -6 V54 C28 44 30 36 42 30Z" fill="#bfe8c9" stroke="#22a165" stroke-width="4"/>` }
+// ---- kural motoru ----
+function expand(prog){ const out=[], map=[]; for(let i=0;i<prog.length;i++){ const t=prog[i]; if(isPre(t)){ const nx=prog[i+1]; if(!nx||isPre(nx)) return {err:"Tekrar bloğundan (2×, 3×, 4×) sonra bir hareket bloğu koy."}; for(let k=0;k<+t;k++){ out.push(nx); map.push(i+1) } i++ } else { out.push(t); map.push(i) } } return {cmds:out,map} }
+function initState(L){ return {x:L.sx,y:L.sy,d:L.sd,got:new Set(),carry:-1,used:0} }
+function key(x,y){ return x+","+y }
+function stepRun(L,s,c){
+  if(L.energy&&s.used>=L.budget) return "energy";
+  s.used++;
+  if(c==="L") { s.d=(s.d+3)%4; return null }
+  if(c==="R") { s.d=(s.d+1)%4; return null }
+  if(c==="D"){ const i=L.items.findIndex(it=>it.x===s.x&&it.y===s.y); if(i<0||s.got.has(i)) return "plant"; s.got.add(i); return null }
+  const m=c==="F"?1:-1, nx=s.x+DX[s.d]*m, ny=s.y+DY[s.d]*m;
+  if(nx<0||ny<0||nx>=L.N||ny>=L.N) return "out";
+  if(L.obsSet.has(key(nx,ny))) return "obs";
+  s.x=nx; s.y=ny;
+  if(L.mode==="collect"){ const i=L.items.findIndex(it=>it.x===nx&&it.y===ny); if(i>=0) s.got.add(i) }
+  if(L.mode==="deliver"){
+    const bi=L.bins.findIndex(b=>b.x===nx&&b.y===ny);
+    if(bi>=0&&s.carry>=0){ if(L.items[s.carry].c!==L.bins[bi].c) return "wrong"; s.got.add(s.carry); s.carry=-1 }
+    const ii=L.items.findIndex((it,j)=>it.x===nx&&it.y===ny&&!s.got.has(j)&&j!==s.carry);
+    if(ii>=0&&s.carry<0) s.carry=ii;
+  }
+  return null;
+}
+const isDone=(L,s)=>s.got.size===L.items.length;
+function simulate(L,prog){ const e=expand(prog); if(e.err) return {err:e.err}; const s=initState(L); for(const c of e.cmds){ const f=stepRun(L,s,c); if(f) return {fail:f,s} } return {ok:isDone(L,s),s} }
+// en kısa komut dizisi (BFS) — çözülebilirlik ve “en az blok” için
+function bfs(L,allowG){
+  const cmds=["F","L","R"].concat(allowG?["G"]:[]).concat(L.mode==="plant"?["D"]:[]);
+  const enc=s=>[s.x,s.y,s.d,[...s.got].sort().join("."),s.carry].join("|");
+  const st=initState(L); const seen=new Map([[enc(st),null]]); let q=[[st,[]]];
+  while(q.length){ const nq=[]; for(const [s,path] of q){ for(const c of cmds){ const n={x:s.x,y:s.y,d:s.d,got:new Set(s.got),carry:s.carry,used:0}; if(stepRun({...L,energy:false},n,c)) continue; const k=enc(n); if(seen.has(k)) continue; seen.set(k,1); const p=path.concat(c); if(isDone(L,n)) return p; nq.push([n,p]) } } q=nq; if(q.length>40000) return null }
+  return null;
+}
+function compress(p){ const out=[]; for(let i=0;i<p.length;){ let j=i; while(j<p.length&&p[j]===p[i]&&j-i<4) j++; const k=j-i; if(k>=2&&p[i]!=="D") out.push(String(k),p[i]); else for(let t=0;t<k;t++) out.push(p[i]); i=j } return out }
+function gen(id,n){
+  const R=REG[id], T=TIER[n];
+  for(let seed=0;seed<6000;seed++){
+    const r=mkRng(n*7919+seed*31+id.length*101), ri=k=>Math.floor(r()*k);
+    const N=T.N, L={N,mode:R.mode,sx:ri(N),sy:ri(N),sd:ri(4),items:[],bins:[],obs:[],energy:!!R.energy};
+    if(n<=2) L.sd=0;
+    const used=new Set([key(L.sx,L.sy)]); const free=()=>{ let x,y,g=0; do{ x=ri(N); y=ri(N) }while(used.has(key(x,y))&&g++<60); used.add(key(x,y)); return [x,y] };
+    if(R.mode==="deliver"){
+      const nIt=Math.max(1,Math.ceil(T.k/2)), colors=shuffle(["sari","mavi","yesil"],r).slice(0,Math.min(3,nIt));
+      for(let i=0;i<nIt;i++){ const [x,y]=free(); L.items.push({x,y,c:colors[i%colors.length]}) }
+      [...new Set(L.items.map(i=>i.c))].forEach(c=>{ const [x,y]=free(); L.bins.push({x,y,c}) });
+      if(n>=7&&colors.length<3){ const extra=["sari","mavi","yesil"].find(c=>!colors.includes(c)); const [x,y]=free(); L.bins.push({x,y,c:extra}) }
+    } else for(let i=0;i<T.k;i++){ const [x,y]=free(); L.items.push({x,y,k:R.item[i%R.item.length]}) }
+    for(let i=0;i<T.o;i++){ const [x,y]=free(); L.obs.push({x,y}) }
+    L.obsSet=new Set(L.obs.map(o=>key(o.x,o.y)));
+    if(L.items.some(it=>it.x===L.sx&&it.y===L.sy)) continue;
+    const sol=bfs(L,n>=BACK_FROM);
+    if(!sol) continue;
+    const moves=sol.length, turns=sol.filter(c=>c==="L"||c==="R").length;
+    if(moves<T.min||moves>T.max||turns<T.turn) continue;
+    L.sol=sol; L.ideal=n>=LOOPS_FROM?compress(sol).length:sol.length;
+    if(R.energy) L.budget=moves+(n<=5?3:n<=8?1:0);
+    if(R.debug){
+      // 1-2 bloğu boz: program başarısız olmalı
+      let bad=null; for(let g=0;g<40&&!bad;g++){ const p=sol.slice(); const cnt=n>=8?2:1; const idx=new Set(); while(idx.size<cnt) idx.add(ri(p.length));
+        idx.forEach(i=>{ const alt=["F","L","R"].filter(c=>c!==p[i]); p[i]=alt[ri(alt.length)] }); if(!simulate(L,p).ok) bad=p }
+      if(!bad) continue; L.pre=bad;
+    }
+    return L;
+  }
+  throw new Error("görev üretilemedi "+id+" "+n);
+}
+const CACHE={};
+function reg(id){
+  const R=REG[id];
+  regAct(id,{
+    title:R.title, durak:R.durak, N:12, speed:true,
+    parts:[{name:"Kolay",sub:"Okul öncesi",from:1,to:5},{name:"Orta",sub:"1-2. sınıf · 2×, 3×, 4× tekrar blokları",from:6,to:10},{name:"Usta",sub:"3-4. sınıf · büyük tahta",from:11,to:12}],
+    doneText:R.done, talk:()=>R.talk,
+    intro:n=> n===1?{key:"g1",kicker:WORLD[R.durak].kita,title:R.intro.title,art:`<g transform="translate(0 0)">${ANIMALS[WORLD[R.durak].anim]}</g>`,text:R.intro.text}
+      : n===LOOPS_FROM&&!R.debug?{key:"g2",kicker:"Yeni blok",title:"Tekrar blokları",art:`<rect x="14" y="30" width="34" height="40" rx="8" fill="#f08a24"/><text x="31" y="60" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">3×</text><rect x="54" y="30" width="34" height="40" rx="8" fill="#22a165"/><path d="M71 62V40M64 47l7-7 7 7" stroke="#fff" stroke-width="4" fill="none"/>`,text:"<b>3×</b> bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. İleri, İleri, İleri yerine 3× İleri!"}:null,
+    setup(n){ const L=CACHE[id+n]||(CACHE[id+n]=gen(id,n)); return {n,L,prog:R.debug?L.pre.slice():[],sel:-1,run:null,runAt:-1,fail:null,pos:[L.sx,L.sy,L.sd]} },
+    goal(st){ return R.goal },
+    checkLabel(){ return "Çalıştır" },
+    info(st){ return `Blok: ${st.prog.length}`+(st.L.energy?` · Enerji: ${st.L.budget}`:"") },
+    render(st){
+      const L=st.L, N=L.N, cs=100, W=N*cs+16, s0=st.run||initState(L);
+      let s=`<svg class="board agrid gboard" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="${R.edge}"/><g transform="translate(8 8)">`;
+      for(let y=0;y<N;y++) for(let x=0;x<N;x++) s+=`<rect x="${x*cs+3}" y="${y*cs+3}" width="${cs-6}" height="${cs-6}" rx="14" fill="${R.tile[(x+y)%2]}"/>`;
+      if(id==="golet") for(let y=0;y<N;y++) for(let x=0;x<N;x++) if((x*7+y*3)%5===0) s+=`<path d="M${x*cs+22} ${y*cs+70} q10 -7 20 0 t20 0" stroke="#d6f3fb" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+      const at=(x,y,art)=>`<svg x="${x*cs}" y="${y*cs}" width="${cs}" height="${cs}" viewBox="0 0 100 100">${art}</svg>`;
+      L.obs.forEach(o=>s+=at(o.x,o.y,ART[R.obs]));
+      L.bins.forEach(b=>s+=at(b.x,b.y,binArt(b.c)));
+      L.items.forEach((it,i)=>{ const got=s0.got.has(i);
+        if(L.mode==="deliver"){ if(!got&&s0.carry!==i) s+=at(it.x,it.y,`<g transform="translate(10 10) scale(.8)">${wasteArt(it.c)}</g>`) }
+        else if(id==="cicek") s+=at(it.x,it.y,got?ART.cicek:ART.solcicek);
+        else if(id==="orman") s+=at(it.x,it.y,got?ART.fidan:ART.cukur);
+        else if(id==="gece") s+=at(it.x,it.y,got?ART.lambaoff:ART.lamba);
+        else if(id==="tarla") s+=at(it.x,it.y,got?ART.islak:ART.kuru);
+        else if(!got) s+=at(it.x,it.y,`<g transform="translate(14 14) scale(.72)">${ART[it.k]}</g>`); });
+      const p=st.pos;
+      s+=`<g transform="translate(${p[0]*cs+50} ${p[1]*cs+50})">${id==="golet"?`<g transform="scale(1.1)">${ART.yaprak.replace('cx="50" cy="56"','cx="0" cy="4"').replace('M50 56 L82 40','M0 4 L32 -12')}</g>`:""}<g transform="rotate(${p[2]*90-90}) scale(.82)">${ROBOT}</g>${L.mode==="deliver"&&s0.carry>=0?`<g transform="translate(14 -42) scale(.34)">${wasteArt(L.items[s0.carry].c)}</g>`:""}</g>`;
+      if(st.fail){ s+=`<g transform="translate(${p[0]*cs+80} ${p[1]*cs+18})"><circle r="16" fill="#e8443a" stroke="#fff" stroke-width="3"/><path d="M-6 -6l12 12M6 -6l-12 12" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g>` }
+      s+=`</g></svg>`;
+      let h="";
+      if(L.energy){ const left=L.budget-(st.run?st.run.used:0); h+=`<div class="energy"><span>Enerji</span><div class="ebar"><i style="width:${Math.max(0,left)/L.budget*100}%"></i></div><b>${left}</b></div>` }
+      h+=s;
+      h+=`<div class="kprog">${st.prog.length?st.prog.map((t,i)=>`<button class="kb3 ${st.runAt===i?"on":""} ${st.sel===i?"sel":""}" data-i="${i}" aria-label="${BL[t][0]}">${bH(t)}</button>`).join(""):`<span class="ahelp">Program boş. Aşağıdaki bloklara dokun.</span>`}</div>`;
+      const pal=["F","L","R"].concat(st.n>=BACK_FROM?["G"]:[]).concat(L.mode==="plant"?["D"]:[]).concat(st.n>=LOOPS_FROM?["2","3","4"]:[]);
+      h+=`<div class="kpal">${pal.map(t=>`<button class="kpb" data-t="${t}" aria-label="${BL[t][0]}">${bH(t)}<small>${BL[t][0]}</small></button>`).join("")}<button class="kpb undo" data-t="-" aria-label="Sil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg><small>${st.sel>=0?"Seçileni sil":"Sil"}</small></button></div>`;
+      if(R.debug) h+=`<p class="ahelp">Bir bloğa dokun, sonra aşağıdan doğrusunu seç.</p>`;
+      const body=$("aBody"); body.innerHTML=h;
+      body.querySelectorAll(".kb3").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.i; st.sel=st.sel===i?-1:i; sfx.click(); this.clearRun(st); aRefresh() });
+      body.querySelectorAll(".kpb").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
+        if(t==="-"){ if(st.sel>=0){ st.prog.splice(st.sel,1); st.sel=-1 } else st.prog.pop(); sfx.erase() }
+        else if(st.sel>=0){ st.prog[st.sel]=t; st.sel=-1; sfx.place() }
+        else { if(st.prog.length>=24){ aGoal("En fazla 24 blok. Tekrar bloklarını dene!","bad"); return } st.prog.push(t); sfx.place() }
+        this.clearRun(st); aRefresh() });
+    },
+    clearRun(st){ st.run=null; st.fail=null; st.runAt=-1; st.pos=[st.L.sx,st.L.sy,st.L.sd] },
+    check(st){
+      if(!st.prog.length) return "Önce program yaz.";
+      const e=expand(st.prog); if(e.err) return e.err;
+      this.play(st).then(res=>{
+        if(res.ok){ const used=st.prog.length, best=st.L.ideal;
+          aWin(R.debug?null:{stars:A.tries===0&&A.hints===0&&used<=best?3:A.tries<=2?2:1,
+            checks:[[true,R.done],[A.tries===0,"İlk denemede"],[used<=best,`En az blokla (${used} / ${best})`]],
+            msg:used<=best?"Harika, en kısa program!":"Daha kısa bir program yazabilir misin?"+(st.n>=LOOPS_FROM?" Tekrar bloklarını dene.":"")}) }
+        else if(res.fail) aBad(R.fail[res.fail]||"Olmadı, bir daha dene.");
+        else aBad(L_left(st)) });
+      return null;
+    },
+    async play(st){
+      A.busy=true; this.clearRun(st); const e=expand(st.prog), L=st.L, s=initState(L); st.run=s; aRefresh(); await aWait(250);
+      let fail=null;
+      for(let k=0;k<e.cmds.length;k++){ st.runAt=e.map[k]; const c=e.cmds[k], before=s.got.size;
+        fail=stepRun(L,s,c); st.pos=[s.x,s.y,s.d];
+        if(fail){ st.fail=fail; sfx.fail(); aRefresh(); break }
+        if(s.got.size>before) sfx.coin(); else if(c==="L"||c==="R") sfx.turn(); else sfx.step();
+        aRefresh(); await aWait(480);
+      }
+      st.runAt=-1; A.busy=false; aRefresh();
+      return {fail, ok:!fail&&isDone(L,s)};
+    },
+    solved(st){ return !!simulate(st.L,st.prog).ok },
+    auto(st){ st.prog=st.n>=LOOPS_FROM?compress(st.L.sol):st.L.sol.slice(); return true },
+    async solve(st){
+      if(R.debug){ const sol=st.L.sol; for(let i=0;i<sol.length;i++) if(st.prog[i]!==sol[i]){ st.sel=i; aRefresh(); aGoal(`${i+1}. blok hatalı: ${BL[st.prog[i]][0]} yerine ${BL[sol[i]][0]}`); await aWait(1100); st.prog[i]=sol[i]; st.sel=-1; sfx.place(); aRefresh(); await aWait(600) } }
+      else { const p=st.n>=LOOPS_FROM?compress(st.L.sol):st.L.sol; st.prog=[]; for(const t of p){ st.prog.push(t); sfx.click(); aRefresh(); await aWait(300) } }
+      await this.play(st); A.busy=true;
+    }
+  });
+  function L_left(st){ const n=st.L.items.length-(st.run?st.run.got.size:0); return st.L.mode==="deliver"?`Program bitti ama ${n} atık hâlâ kutusunda değil.`:`Program bitti ama ${n} görev kaldı. Programı uzat ya da yolu değiştir.` }
+}
+Object.keys(REG).forEach(reg);
+})();
 // ===== Final: Büyük Çiçek Şenliği (Türkiye · Bidik'in Bahçesi) — kitapta “Bidik'in Bir Günü” =====
 Object.assign(ICONS,{
   para:`<circle cx="44" cy="54" r="26" fill="#ffd23f" stroke="#d99a00" stroke-width="4"/><circle cx="58" cy="42" r="26" fill="#ffe27a" stroke="#d99a00" stroke-width="4"/><text x="58" y="52" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="28" fill="#a87700">₺</text>`,
@@ -2758,18 +2990,24 @@ const DURAKS=[
  {no:1,name:"Mahalle",kid:"Büyük işi küçük parçalara böl.",code:"B1 · Ayrıştırma",color:"#c98f2c",acts:[
    {t:"Yol Kur",d:"Mahalleye yol yap: evleri okula, parka bağla. Büyük yolu altın, anahtar, kapı gibi küçük hedeflere bölerek kur.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openLevels("yol"),prog:(d=P())=>lvlProg("yol",1,40,d),play:{mode:"yol",from:1,to:40}}]},
  {no:2,name:"Gölet",kid:"Önce ne, sonra ne?",code:"B4 · Algoritma",color:"#2f8fb8",acts:[
+   {t:"Göleti Temizle",d:"Bidik yaprak sandalıyla yüzüyor. Bloklarla yol yaz, gölete atılan çöpleri topla.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("golet"),prog:(d=P())=>actProgL("golet",d),play:{mode:"golet",from:1,to:12}},
    {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik'i adım adım kodla.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>lvlProg("kod",1,10,d),play:{mode:"kod",from:1,to:10}},
    {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:(d=P())=>lvlProg("kod",11,20,d),play:{mode:"kod",from:11,to:20}}]},
  {no:3,name:"Çiçek Tarlası",kid:"Ne tekrar ediyor?",code:"B2 · Örüntü",color:"#c4507f",acts:[
+   {t:"Polen Yolu",d:"Arı Bal ile bütün solgun çiçeklere uğra, çiçekler açsın. Tekrar eden adımları 2×, 3×, 4× ile kısalt.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("cicek"),prog:(d=P())=>actProgL("cicek",d),play:{mode:"cicek",from:1,to:12}},
    {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt. Arı gibi her çiçeğe aynı düzenle uğra.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>lvlProg("kod",21,30,d),play:{mode:"kod",from:21,to:30}}]},
  {no:4,name:"Orman",kid:"Tekrar eden parçaya ad ver.",code:"B3 · Soyutlama",color:"#3d8a4a",acts:[
+   {t:"Fidan Dik",d:"Çukurlara git, Fidan dik bloğuyla orman kur. Yanlış yerde dikilmez!",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("orman"),prog:(d=P())=>actProgL("orman",d),play:{mode:"orman",from:1,to:12}},
    {t:"Kalem Bidik",d:"Bidik yürüdüğü yere iz bırakır: kodla çizgi, kare, merdiven çiz. Tekrarla büyük şekiller yap.",lvl:"●●",age:"6-9 yaş",open:()=>openActLevels("kalem"),prog:(d=P())=>actProgL("kalem",d),play:{mode:"kalem",from:1,to:8}},
    {t:"Kodla Sür: Fonksiyonlar",d:"Tekrar eden hareket grubunu kendi bloğuna koy, istediğin yerde kullan.",lvl:"●●●",age:"7-10 yaş",open:()=>openLevels("kod",{ch:[3]}),prog:(d=P())=>lvlProg("kod",31,40,d),play:{mode:"kod",from:31,to:40}}]},
  {no:5,name:"Geri Dönüşüm",kid:"Ne olursa ne yapmalı?",code:"B5 · Koşul",color:"#5f7489",acts:[
+   {t:"Kutusuna Taşı",d:"Atığı al, aynı renkli kutuya götür: plastik sarıya, kâğıt maviye, cam yeşile.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("donusum"),prog:(d=P())=>actProgL("donusum",d),play:{mode:"donusum",from:1,to:12}},
    {t:"Kodla Sür: Koşullar",d:"“Eğer pembe kare”, “eğer önü kapalı”: duruma göre karar veren tek bir akıllı kural yaz.",lvl:"●●●",age:"8-10 yaş",open:()=>openLevels("kod",{ch:[4]}),prog:(d=P())=>lvlProg("kod",41,50,d),play:{mode:"kod",from:41,to:50}}]},
  {no:6,name:"Gece Sokakları",kid:"En kısa yol, en az enerji.",code:"B4 · Verimli algoritma",color:"#2b3a6e",acts:[
+   {t:"Lambaları Söndür",d:"Boş sokaktaki lambaları söndür. Her blok enerji harcar: en kısa programı bul!",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("gece"),prog:(d=P())=>actProgL("gece",d),play:{mode:"gece",from:1,to:12}},
    {t:"Kodla Sür: Usta",d:"Döngü ve fonksiyon birlikte. En kısa programı bul: en az blok, en az enerji. Büyükler de dene!",lvl:"●●●",age:"9-10 yaş",open:()=>openLevels("kod",{ch:[5]}),prog:(d=P())=>lvlProg("kod",51,60,d),play:{mode:"kod",from:51,to:60}}]},
  {no:7,name:"Tarla",kid:"Nerede takıldı? Nasıl düzelir?",code:"B6 · Hata ayıklama",color:"#8a6a3a",acts:[
+   {t:"Sulama Robotu",d:"Sulama programı bozuk. Çalıştır, nerede saptığını gör, hatalı bloğu düzelt.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("tarla"),prog:(d=P())=>actProgL("tarla",d),play:{mode:"tarla",from:1,to:12}},
    {t:"Hata Avcısı",d:"Hazır programda bir hata var. Adım adım çalıştır, hatalı bloğu bul ve düzelt.",lvl:"● ●● ●●●",age:"5-10 yaş",open:()=>openLevels("kod",{list:BUG_LEVELS,title:"Hata Avcısı"}),prog:(d=P())=>lvlProgList("kod",BUG_LEVELS,d),play:{mode:"kod",list:BUG_LEVELS}},
    {t:"İki Kod Yarışıyor",d:"İki program aynı hedefe gidiyor; biri takılacak. Tahmin et, iki kodu karşılaştır, hatalı bloğu bul ve düzelt.",lvl:"●●",age:"6-9 yaş",open:()=>openActLevels("yaris"),prog:(d=P())=>actProgL("yaris",d),play:{mode:"yaris",from:1,to:8}}]}
 ];
