@@ -5,7 +5,7 @@
 <link rel="icon" href="../simgeler/simge-192.png">
 <link rel="apple-touch-icon" href="../simgeler/apple-touch-icon.png">
 <link rel="manifest" href="../manifest.webmanifest">
-<title>Bidik</title>
+<!doctype html><html lang='tr'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head><body><title>Bidik</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
 <style>
@@ -384,7 +384,11 @@ h1,h2,h3{text-wrap:balance}
 .world.town .mlab{font-size:20px}
 
 /* görevli kodla sür */
-.gboard{width:min(100%,480px)!important}
+.gboard{width:min(100%,500px)!important;height:auto}
+#gCar.blink-L .bl-L,#gCar.blink-R .bl-R{animation:wave .3s ease-in-out 3}
+#gProg.running .slot.filled:not(.on):not(.err) .blk,#kalProg.running .slot.filled:not(.on) .blk{opacity:.35}
+.slot.sel .blk{box-shadow:0 0 0 3px #fff,0 0 0 7px #ffc93c;transform:translateY(-3px)}
+#aBody .palette{width:min(100%,500px)}
 .kb3{width:44px;height:44px;border-radius:12px;padding:0;border:3px solid transparent;flex:none}
 .kb3 .blk{font-size:17px}
 .kb3.on{border-color:#ffc93c;transform:translateY(-3px)}
@@ -2466,7 +2470,7 @@ regAct("kalem",{
   talk:n=> n<=4?"Kare biçiminde orman kurmak için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi? Ağaçlar kasabaya ne kazandırır?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık nasıl bir desen çıkardı? (İklim eylemi)",
   intro:n=> n===1?{key:"p1",kicker:"Orman",title:"Fidanlarla desen",art:`<path d="M30 80 V30 H70" stroke="#a8693d" stroke-width="8" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Sincap Fındık Bidik'e fidan dolu bir çanta verdi! Bidik <b>İleri</b> gidince geçtiği yere sıra sıra fidan diker. Kesikli çizgideki orman desenini kuracak kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
         : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını 4 kez tekrarla: kare olur!"}:null,
-  setup(n){ const L=LV[n], tg=run(L,L.sol.split(""),L.x); return {n,L,target:new Set(tg.segs.map(key)),tsegs:tg.segs,prog:[],x:L.rep?1:1,drawn:[],pos:[L.s[0],L.s[1],0],running:false,err:null} },
+  setup(n){ const L=LV[n], tg=run(L,L.sol.split(""),L.x); return {n,L,runAt:-1,target:new Set(tg.segs.map(key)),tsegs:tg.segs,prog:[],x:L.rep?1:1,drawn:[],pos:[L.s[0],L.s[1],0],running:false,err:null} },
   goal(st){ return st.L.rep?`${st.L.name} biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.`:`${st.L.name} biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.` },
   checkLabel(){ return "Çiz" },
   info(st){ return `Blok: ${st.prog.length}` },
@@ -2481,12 +2485,17 @@ regAct("kalem",{
     s+=`<circle cx="${P(st.L.s[0])}" cy="${P(st.L.s[1])}" r="12" fill="none" stroke="#7a5eb0" stroke-width="3" stroke-dasharray="4 4"/>`;
     s+=`<g transform="translate(${P(st.pos[0])} ${P(st.pos[1])}) rotate(${st.pos[2]*90-90}) scale(.8)">${ROBOT}</g></svg>`;
     let h=s;
-    h+=`<div class="kprog">${st.prog.length?st.prog.map((t,i)=>`<span class="kb2 ${st.runAt===i?"on":""}">${bHTML(t)}</span>`).join(""):`<span class="ahelp">Kod boş. Aşağıdaki bloklara dokun.</span>`}${st.L.rep?`<span class="xsel">×${[1,2,3,4].map(x=>`<button class="xbtn" data-x="${x}" aria-pressed="${st.x===x}">${x}</button>`).join("")}</span>`:""}</div>`;
-    h+=`<div class="kpal">${Object.keys(B).map(t=>`<button class="kpb" data-t="${t}" aria-label="${B[t][0]}">${bHTML(t)}<small>${B[t][0]}</small></button>`).join("")}<button class="kpb undo" data-t="-" aria-label="Son bloğu sil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg><small>Sil</small></button></div>`;
+    const cur=st.runAt>=0?st.prog[st.runAt]:null;
+    h+=cur?`<div class="nowbar"><span class="lbl">Şimdi çalışan</span><span class="nb">${bHTML(cur)}</span><span class="txt">${B[cur][0]}${st.L.rep&&st.x>1?`<small>${st.x} kez tekrar</small>`:""}</span></div>`:`<div class="nowbar idle"><span class="lbl">Şimdi çalışan</span><span class="txt">Çiz'e bas: Bidik yürürken o an çalışan blok burada görünecek.</span></div>`;
+    let sl=""; for(let i=0;i<12;i++){ const t=st.prog[i]; sl+=`<button class="slot${t?" filled":""}${st.runAt===i?" on":""}" data-i="${i}" aria-label="${t?B[t][0]+", silmek için dokun":"Boş yer"}">${t?bHTML(t):""}</button>` }
+    h+=`<div class="prog${st.runAt>=0?" running":""}" id="kalProg"><div class="row active" id="kalRow"><div class="row-head"><b>${st.L.rep?"Tekrarlanacak kod":"Ana program"}</b><span>${st.prog.length} / 12</span></div><div class="slots">${sl}</div>${st.L.rep?`<div class="row-head"><b>Kaç kez tekrar?</b><span class="xsel">${[1,2,3,4].map(x=>`<button class="xbtn" data-x="${x}" aria-pressed="${st.x===x}">${x}</button>`).join("")}</span></div>`:""}</div></div>`;
+    h+=`<div class="palette" style="grid-template-columns:repeat(5,1fr)">${Object.keys(B).map(t=>`<button class="palbtn" data-t="${t}" aria-label="${B[t][0]}">${bHTML(t)}<span>${B[t][0]}</span></button>`).join("")}</div>`;
     const body=$("aBody"); body.innerHTML=h;
-    body.querySelectorAll(".kpb").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
-      if(t==="-") st.prog.pop(); else { if(st.prog.length>=12){ aGoal("En fazla 12 blok. Tekrar kullanmayı dene!","bad"); return } st.prog.push(t) }
-      st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.click(); aRefresh() });
+    body.querySelectorAll(".palbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
+      if(st.prog.length>=12){ aGoal("Programda yer kalmadı. Tekrar kullanmayı dene!","bad"); sfx.no(); const r=$("kalRow"); if(r){r.classList.remove("shake");void r.offsetWidth;r.classList.add("shake")} return }
+      st.prog.push(t); st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.click(); aGoal(); aRefresh() });
+    body.querySelectorAll("#kalProg .slot").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.i; if(i>=st.prog.length) return;
+      st.prog.splice(i,1); st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.erase(); aGoal(); aRefresh() });
     body.querySelectorAll(".xbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.x=+b.dataset.x; st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.click(); aRefresh() });
   },
   check(st){
@@ -2687,82 +2696,150 @@ function reg(id){
     intro:n=> cfg(id,n).li?{key:"s"+n,kicker:"Kasaba Şenliği · "+n+" / 5",title:cfg(id,n).li.title,art:FLOWER,text:cfg(id,n).li.text}
       : n===1?{key:"g1",kicker:WORLD[R.durak].kita,title:R.intro.title,art:`<g transform="translate(0 0)">${ANIMALS[WORLD[R.durak].anim]}</g>`,text:R.intro.text}
       : n===LOOPS_FROM&&!cfg(id,n).debug?{key:"g2",kicker:"Yeni blok",title:"Tekrar blokları",art:`<rect x="14" y="30" width="34" height="40" rx="8" fill="#f08a24"/><text x="31" y="60" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">3×</text><rect x="54" y="30" width="34" height="40" rx="8" fill="#22a165"/><path d="M71 62V40M64 47l7-7 7 7" stroke="#fff" stroke-width="4" fill="none"/>`,text:"<b>3×</b> bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. İleri, İleri, İleri yerine 3× İleri!"}:null,
-    setup(n){ const L=CACHE[id+n]||(CACHE[id+n]=gen(id,n)); return {n,L,prog:L.C.debug?L.pre.slice():[],sel:-1,run:null,runAt:-1,fail:null,pos:[L.sx,L.sy,L.sd]} },
+    setup(n){ const L=CACHE[id+n]||(CACHE[id+n]=gen(id,n)); const lim=L.C.debug?L.pre.length:L.ideal+(L.t<=5?3:L.t<=10?2:1);
+      return {n,L,lim,prog:L.C.debug?L.pre.slice():[],sel:-1,run:null,runAt:-1,fail:null,errAt:-1,built:false} },
     goal(st){ return st.L.C.goal },
     checkLabel(){ return "Çalıştır" },
-    info(st){ return `Blok: ${st.prog.length}`+(st.L.energy?` · Enerji: ${st.L.budget}`:"") },
+    info(st){ return `Blok: ${st.prog.length} · En iyi: ${st.L.C.debug?st.L.pre.length:st.L.ideal}`+(st.L.energy?` · Enerji: ${st.L.budget}`:"") },
     render(st){
-      const L=st.L, C=L.C, N=L.N, cs=100, W=N*cs+16, s0=st.run||initState(L);
-      let s=`<svg class="board agrid gboard" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="${C.edge}"/><g transform="translate(8 8)">`;
-      for(let y=0;y<N;y++) for(let x=0;x<N;x++) s+=`<rect x="${x*cs+3}" y="${y*cs+3}" width="${cs-6}" height="${cs-6}" rx="14" fill="${C.tile[(x+y)%2]}"/>`;
-      if(C.kind==="cop") for(let y=0;y<N;y++) for(let x=0;x<N;x++) if((x*7+y*3)%5===0) s+=`<path d="M${x*cs+22} ${y*cs+70} q10 -7 20 0 t20 0" stroke="#d6f3fb" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-      const at=(x,y,art)=>`<svg x="${x*cs}" y="${y*cs}" width="${cs}" height="${cs}" viewBox="0 0 100 100">${art}</svg>`;
-      L.obs.forEach(o=>s+=at(o.x,o.y,ART[C.obs]));
-      L.bins.forEach(b=>s+=at(b.x,b.y,binArt(b.c)));
-      L.items.forEach((it,i)=>{ const got=s0.got.has(i);
-        if(L.mode==="deliver"){ if(!got&&s0.carry!==i) s+=at(it.x,it.y,`<g transform="translate(10 10) scale(.8)">${wasteArt(it.c)}</g>`) }
-        else if(C.kind==="cicek") s+=at(it.x,it.y,got?ART.cicek:ART.solcicek);
-        else if(C.kind==="fidan") s+=at(it.x,it.y,got?ART.fidan:ART.cukur);
-        else if(C.kind==="saksi") s+=at(it.x,it.y,got?ART.saksicicek:ART.saksi);
-        else if(C.kind==="lamba") s+=at(it.x,it.y,got?ART.lambaoff:ART.lamba);
-        else if(C.kind==="lambayak") s+=at(it.x,it.y,got?ART.lamba:ART.lambaoff);
-        else if(C.kind==="sula") s+=at(it.x,it.y,got?ART.islak:ART.kuru);
-        else if(C.kind==="bayrak") { if(!got) s+=at(it.x,it.y,ART.bayrak) }
-        else if(C.kind==="balon") s+=at(it.x,it.y,got?ART.balonok:ART.balon);
-        else if(!got) s+=at(it.x,it.y,`<g transform="translate(14 14) scale(.72)">${ART[it.k]}</g>`); });
-      const p=st.pos;
-      s+=`<g transform="translate(${p[0]*cs+50} ${p[1]*cs+50})">${C.kind==="cop"?`<g transform="scale(1.1)">${ART.yaprak.replace('cx="50" cy="56"','cx="0" cy="4"').replace('M50 56 L82 40','M0 4 L32 -12')}</g>`:""}<g transform="rotate(${p[2]*90-90}) scale(.82)">${ROBOT}</g>${L.mode==="deliver"&&s0.carry>=0?`<g transform="translate(14 -42) scale(.34)">${wasteArt(L.items[s0.carry].c)}</g>`:""}</g>`;
-      if(st.fail){ s+=`<g transform="translate(${p[0]*cs+80} ${p[1]*cs+18})"><circle r="16" fill="#e8443a" stroke="#fff" stroke-width="3"/><path d="M-6 -6l12 12M6 -6l-12 12" stroke="#fff" stroke-width="4" stroke-linecap="round"/></g>` }
-      s+=`</g></svg>`;
-      let h="";
-      if(L.energy){ const left=L.budget-(st.run?st.run.used:0); h+=`<div class="energy"><span>Enerji</span><div class="ebar"><i style="width:${Math.max(0,left)/L.budget*100}%"></i></div><b>${left}</b></div>` }
-      h+=s;
-      h+=`<div class="kprog">${st.prog.length?st.prog.map((t,i)=>`<button class="kb3 ${st.runAt===i?"on":""} ${st.sel===i?"sel":""}" data-i="${i}" aria-label="${BL[t][0]}">${bH(t)}</button>`).join(""):`<span class="ahelp">Program boş. Aşağıdaki bloklara dokun.</span>`}</div>`;
-      const pal=["F","L","R"].concat(L.t>=BACK_FROM?["G"]:[]).concat(L.mode==="plant"?["D"]:[]).concat(L.t>=LOOPS_FROM?["2","3","4"]:[]);
-      h+=`<div class="kpal">${pal.map(t=>`<button class="kpb" data-t="${t}" aria-label="${BL[t][0]}">${bH(t)}<small>${BL[t][0]}</small></button>`).join("")}<button class="kpb undo" data-t="-" aria-label="Sil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg><small>${st.sel>=0?"Seçileni sil":"Sil"}</small></button></div>`;
-      if(C.debug) h+=`<p class="ahelp">Bir bloğa dokun, sonra aşağıdan doğrusunu seç.</p>`;
-      const body=$("aBody"); body.innerHTML=h;
-      body.querySelectorAll(".kb3").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.i; st.sel=st.sel===i?-1:i; sfx.click(); this.clearRun(st); aRefresh() });
-      body.querySelectorAll(".kpb").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
-        if(t==="-"){ if(st.sel>=0){ st.prog.splice(st.sel,1); st.sel=-1 } else st.prog.pop(); sfx.erase() }
-        else if(st.sel>=0){ st.prog[st.sel]=t; st.sel=-1; sfx.place() }
-        else { if(st.prog.length>=24){ aGoal("En fazla 24 blok. Tekrar bloklarını dene!","bad"); return } st.prog.push(t); sfx.place() }
-        this.clearRun(st); aRefresh() });
+      const L=st.L, C=L.C;
+      if(!st.built||!$("gBoard")){
+        $("aBody").innerHTML=(L.energy?`<div class="energy"><span>Enerji</span><div class="ebar"><i id="gEnI"></i></div><b id="gEnB"></b></div>`:"")
+          +`<svg id="gBoard" class="board gboard" xmlns="http://www.w3.org/2000/svg"></svg>`
+          +`<div class="nowbar idle" id="gNow" aria-live="polite"></div><div class="prog" id="gProg"></div><div class="palette" id="gPal"></div>`
+          +(C.debug?`<p class="tip">Önce Çalıştır'a bas ve izle. Sonra hatalı bloğa dokun, aşağıdan doğrusunu seç.</p>`:"");
+        st.built=true; buildBoard(st); renderPal(st); resetVis(st);
+      }
+      renderProg(st);
     },
-    clearRun(st){ st.run=null; st.fail=null; st.runAt=-1; st.pos=[st.L.sx,st.L.sy,st.L.sd] },
+    clearRun(st){ clearRun(st) },
     check(st){
       if(!st.prog.length) return "Önce program yaz.";
       const e=expand(st.prog); if(e.err) return e.err;
-      const C=st.L.C; this.play(st).then(res=>{
+      const C=st.L.C; play(st).then(res=>{
         if(res.ok){ const used=st.prog.length, best=st.L.ideal;
           aWin(C.debug?null:{stars:A.tries===0&&A.hints===0&&used<=best?3:A.tries<=2?2:1,
             checks:[[true,C.done],[A.tries===0,"İlk denemede"],[used<=best,`En az blokla (${used} / ${best})`]],
             msg:used<=best?"Harika, en kısa program!":"Daha kısa bir program yazabilir misin?"+(st.L.t>=LOOPS_FROM?" Tekrar bloklarını dene.":"")}) }
-        else if(res.fail) aBad(C.fail[res.fail]||"Olmadı, bir daha dene.");
+        else if(res.fail) aBad((C.fail[res.fail]||"Olmadı, bir daha dene.")+" Kırmızı blok hatanın olduğu yer.");
         else aBad(L_left(st)) });
       return null;
     },
-    async play(st){
-      A.busy=true; this.clearRun(st); const e=expand(st.prog), L=st.L, s=initState(L); st.run=s; aRefresh(); await aWait(250);
-      let fail=null;
-      for(let k=0;k<e.cmds.length;k++){ st.runAt=e.map[k]; const c=e.cmds[k], before=s.got.size;
-        fail=stepRun(L,s,c); st.pos=[s.x,s.y,s.d];
-        if(fail){ st.fail=fail; sfx.fail(); aRefresh(); break }
-        if(s.got.size>before) sfx.coin(); else if(c==="L"||c==="R") sfx.turn(); else sfx.step();
-        aRefresh(); await aWait(480);
-      }
-      st.runAt=-1; A.busy=false; aRefresh();
-      return {fail, ok:!fail&&isDone(L,s)};
-    },
+    play(st){ return play(st) },
     solved(st){ return !!simulate(st.L,st.prog).ok },
     auto(st){ st.prog=st.L.t>=LOOPS_FROM?compress(st.L.sol):st.L.sol.slice(); return true },
     async solve(st){
       if(st.L.C.debug){ const sol=st.L.sol; for(let i=0;i<sol.length;i++) if(st.prog[i]!==sol[i]){ st.sel=i; aRefresh(); aGoal(`${i+1}. blok hatalı: ${BL[st.prog[i]][0]} yerine ${BL[sol[i]][0]}`); await aWait(1100); st.prog[i]=sol[i]; st.sel=-1; sfx.place(); aRefresh(); await aWait(600) } }
       else { const p=st.L.t>=LOOPS_FROM?compress(st.L.sol):st.L.sol; st.prog=[]; for(const t of p){ st.prog.push(t); sfx.click(); aRefresh(); await aWait(300) } }
-      await this.play(st); A.busy=true;
+      await play(st); A.busy=true;
     }
   });
   function L_left(st){ const n=st.L.items.length-(st.run?st.run.got.size:0); return st.L.mode==="deliver"?`Program bitti ama ${n} atık hâlâ kutusunda değil.`:`Program bitti ama ${n} görev kaldı. Programı uzat ya da yolu değiştir.` }
+}
+// ---- Kodla Sür ile aynı arayüz: sabit tahta, akıcı hareket, program kutuları, şimdi çalışan ----
+const CS=100;
+const atCell=(x,y,art)=>`<svg x="${x*CS}" y="${y*CS}" width="${CS}" height="${CS}" viewBox="0 0 100 100">${art}</svg>`;
+function itemArt(L,C,i,got,carry){
+  const it=L.items[i];
+  if(L.mode==="deliver") return (!got&&carry!==i)?`<g transform="translate(10 10) scale(.8)">${wasteArt(it.c)}</g>`:"";
+  switch(C.kind){
+    case "cicek": return got?ART.cicek:ART.solcicek;
+    case "fidan": return got?ART.fidan:ART.cukur;
+    case "saksi": return got?ART.saksicicek:ART.saksi;
+    case "lamba": return got?ART.lambaoff:ART.lamba;
+    case "lambayak": return got?ART.lamba:ART.lambaoff;
+    case "sula": return got?ART.islak:ART.kuru;
+    case "bayrak": return got?"":ART.bayrak;
+    case "balon": return got?ART.balonok:ART.balon;
+    default: return got?"":`<g transform="translate(14 14) scale(.72)">${ART[it.k]}</g>`;
+  }
+}
+function buildBoard(st){
+  const L=st.L, C=L.C, N=L.N, W=N*CS+16, svg=$("gBoard");
+  svg.setAttribute("viewBox",`-8 -8 ${W} ${W}`);
+  let s=`<rect x="-8" y="-8" width="${W}" height="${W}" rx="22" fill="${C.edge}"/>`;
+  for(let y=0;y<N;y++) for(let x=0;x<N;x++) s+=`<rect x="${x*CS+4}" y="${y*CS+4}" width="${CS-8}" height="${CS-8}" rx="14" fill="${C.tile[(x+y)%2]}"/>`;
+  if(C.kind==="cop") for(let y=0;y<N;y++) for(let x=0;x<N;x++) if((x*7+y*3)%5===0) s+=`<path d="M${x*CS+22} ${y*CS+70} q10 -7 20 0 t20 0" stroke="#d6f3fb" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  s+=`<g transform="translate(${L.sx*CS} ${L.sy*CS})" opacity=".9">${star8("#22a165").replace("#a8261e","#16794a")}</g>`;
+  L.obs.forEach(o=>s+=atCell(o.x,o.y,ART[C.obs]));
+  L.bins.forEach(b=>s+=atCell(b.x,b.y,binArt(b.c)));
+  L.items.forEach((it,i)=>s+=`<g data-it="${i}"></g>`);
+  s+=`<polyline id="gTrail" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 16" opacity=".85" points=""/>`;
+  s+=`<rect id="gFail" x="3" y="3" width="94" height="94" rx="14" fill="none" stroke="#e8443a" stroke-width="6" stroke-dasharray="10 6" style="display:none"/>`;
+  const leaf=C.kind==="cop"?`<g transform="scale(1.25)">${ART.yaprak.replace('cx="50" cy="56"','cx="0" cy="4"').replace('M50 56 L82 40','M0 4 L32 -12')}</g>`:"";
+  s+=`<g id="gCar">${leaf}<g id="gRot"><g transform="scale(1.45)">${ROBOT}</g></g><g id="gCarry"></g></g>`;
+  svg.innerHTML=s;
+}
+function placeCar(x,y,ang){ const c=$("gCar"), r=$("gRot"); if(!c||!r) return; c.setAttribute("transform",`translate(${x*CS+50} ${y*CS+50})`); r.setAttribute("transform",`rotate(${ang})`) }
+function setItems(st,s){
+  const L=st.L;
+  L.items.forEach((it,i)=>{ const g=document.querySelector(`#gBoard [data-it="${i}"]`); if(!g) return;
+    const got=s.got.has(i), k=got+"|"+(s.carry===i); if(g.dataset.k===k) return; g.dataset.k=k;
+    const a=itemArt(L,L.C,i,got,s.carry); g.innerHTML=a?atCell(it.x,it.y,a):"" });
+  const cg=$("gCarry"); if(cg) cg.innerHTML=L.mode==="deliver"&&s.carry>=0?`<g transform="translate(14 -66) scale(.42)">${wasteArt(L.items[s.carry].c)}</g>`:"";
+}
+function setEnergy(st,used){ const L=st.L; if(!L.energy) return; const i=$("gEnI"), b=$("gEnB"); if(!i) return; const left=Math.max(0,L.budget-used); i.style.width=left/L.budget*100+"%"; b.textContent=left }
+function setTrail(pts){ const t=$("gTrail"); if(t) t.setAttribute("points",pts.map(p=>`${p[0]*CS+50},${p[1]*CS+50}`).join(" ")) }
+function failAt(x,y){ const f=$("gFail"); if(!f) return; f.setAttribute("x",x*CS+3); f.setAttribute("y",y*CS+3); f.style.display="" }
+function setNow(c,pre){
+  const el=$("gNow"); if(!el) return;
+  if(!c){ el.className="nowbar idle"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="txt">Çalıştır'a bas: Bidik hareket ederken o an çalışan blok burada görünecek.</span>`; return }
+  el.className="nowbar"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="nb">${bH(c)}</span><span class="txt">${BL[c][0]}${pre?`<small>${pre} kez tekrar</small>`:""}</span>`;
+}
+function hl(idx){ document.querySelectorAll("#gProg .slot.on").forEach(e=>e.classList.remove("on")); idx.forEach(i=>{ if(i<0) return; const e=document.querySelector(`#gProg .slot[data-i="${i}"]`); if(e) e.classList.add("on") }) }
+function blink(dir){ const c=$("gCar"); if(!c) return; c.classList.remove("blink-L","blink-R"); void c.getBBox; c.classList.add("blink-"+dir); clearTimeout(blink.t); blink.t=setTimeout(()=>c.classList.remove("blink-"+dir),900) }
+function resetVis(st){
+  const L=st.L;
+  placeCar(L.sx,L.sy,L.sd*90-90); setItems(st,initState(L)); setTrail([]); setEnergy(st,0); setNow(null);
+  const f=$("gFail"); if(f) f.style.display="none"; const p=$("gProg"); if(p) p.classList.remove("running");
+}
+function clearRun(st){ st.run=null; st.fail=null; st.runAt=-1; st.errAt=-1; if(st.built&&$("gBoard")) resetVis(st) }
+function renderProg(st){
+  const box=$("gProg"); if(!box) return; const L=st.L, dbg=!!L.C.debug;
+  let sl=""; for(let i=0;i<st.lim;i++){ const t=st.prog[i];
+    sl+=`<button class="slot${t?" filled":""}${st.sel===i?" sel":""}${st.errAt===i?" err":""}${st.runAt===i?" on":""}" data-i="${i}" aria-label="${t?BL[t][0]+(dbg?", değiştirmek için dokun":", silmek için dokun"):"Boş yer"}">${t?bH(t):""}</button>` }
+  box.innerHTML=`<div class="row active" id="gRow"><div class="row-head"><b>Ana program</b><span>${st.prog.length} / ${st.lim}</span></div><div class="slots">${sl}</div></div>`;
+  box.querySelectorAll(".slot").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.i; if(i>=st.prog.length) return;
+    if(dbg){ st.sel=st.sel===i?-1:i; sfx.click() } else { st.prog.splice(i,1); st.sel=-1; sfx.erase() }
+    clearRun(st); aGoal(); aRefresh() });
+}
+function renderPal(st){
+  const L=st.L, p=$("gPal"); if(!p) return;
+  const pal=["F","L","R"].concat(L.t>=BACK_FROM?["G"]:[]).concat(L.mode==="plant"?["D"]:[]).concat(L.t>=LOOPS_FROM?["2","3","4"]:[]);
+  p.style.gridTemplateColumns=`repeat(${Math.min(8,Math.max(5,pal.length))},1fr)`;
+  p.innerHTML=pal.map(t=>`<button class="palbtn" data-t="${t}" aria-label="${BL[t][0]}">${bH(t)}<span>${BL[t][0]}</span></button>`).join("");
+  p.querySelectorAll(".palbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
+    if(st.sel>=0){ st.prog[st.sel]=t; st.sel=-1; sfx.place() }
+    else if(L.C.debug){ aGoal("Önce değiştirmek istediğin bloğa dokun.","bad"); sfx.no(); return }
+    else if(st.prog.length>=st.lim){ aGoal(L.t>=LOOPS_FROM?"Programda yer kalmadı. Tekrar bloklarıyla (2×, 3×, 4×) kısaltabilir misin?":"Programda yer kalmadı. Daha kısa bir yol dene.","bad"); sfx.no(); const r=$("gRow"); if(r){ r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake") } return }
+    else { st.prog.push(t); sfx.click() }
+    clearRun(st); aGoal(); aRefresh() });
+}
+const dur=()=>((window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)?80:380)/getSpeed();
+function tween(a,b,ms){ return new Promise(res=>{ let t0=null; const fr=ts=>{ if(t0==null) t0=ts; const t=Math.min(1,(ts-t0)/ms), e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+  placeCar(a.x+(b.x-a.x)*e,a.y+(b.y-a.y)*e,a.ang+(b.ang-a.ang)*e); if(t<1&&$("gCar")) requestAnimationFrame(fr); else res() }; requestAnimationFrame(fr) }) }
+async function play(st){
+  A.busy=true; clearRun(st); const e=expand(st.prog), L=st.L, s=initState(L); st.run=s;
+  const pg=$("gProg"); if(pg) pg.classList.add("running");
+  let ang=L.sd*90-90, fail=null; const trail=[[s.x,s.y]];
+  await aWait(120);
+  for(let k=0;k<e.cmds.length;k++){
+    const c=e.cmds[k], i=e.map[k], pi=i>0&&isPre(st.prog[i-1])?i-1:-1;
+    st.runAt=i; hl([i,pi]); setNow(c,pi>=0?st.prog[pi]:null);
+    const a={x:s.x,y:s.y,ang}, before=s.got.size, bc=s.carry;
+    fail=stepRun(L,s,c);
+    if(fail==="out"||fail==="obs"){ const m=c==="G"?-1:1, b={x:a.x+DX[s.d]*m*.3,y:a.y+DY[s.d]*m*.3,ang}; await tween(a,b,dur()*.5); await tween(b,a,dur()*.4) }
+    else if(fail&&fail!=="energy") await tween(a,{x:s.x,y:s.y,ang},dur());
+    if(fail){ st.fail=fail; st.errAt=i; if(fail==="obs") failAt(s.x+DX[s.d]*(c==="G"?-1:1),s.y+DY[s.d]*(c==="G"?-1:1)); else failAt(s.x,s.y); sfx.fail(); break }
+    if(c==="L"){ ang-=90; blink("L"); sfx.turn() } else if(c==="R"){ ang+=90; blink("R"); sfx.turn() }
+    await tween(a,{x:s.x,y:s.y,ang},c==="D"?dur()*.6:dur());
+    const moved=s.x!==a.x||s.y!==a.y;
+    if(moved){ trail.push([s.x,s.y]); setTrail(trail) }
+    if(s.got.size!==before||s.carry!==bc){ setItems(st,s); sfx.coin() } else if(moved) sfx.step();
+    setEnergy(st,s.used);
+  }
+  st.runAt=-1; hl([]); if(pg) pg.classList.remove("running"); A.busy=false; aRefresh();
+  return {fail, ok:!fail&&isDone(L,s)};
 }
 Object.keys(REG).forEach(reg);
 window.__gorev={REG,cfg};
@@ -3010,6 +3087,6 @@ $("mascot").innerHTML=MASCOT_FRONT;
 goHome();
 })();
 </script>
-
+</body></html>
 <script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let done=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!done){done=true;location.reload()}});window.addEventListener("load",()=>navigator.serviceWorker.register("../sw.js",{scope:"../",updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}))}</script>
 </body></html>
