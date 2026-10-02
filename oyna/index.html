@@ -1853,15 +1853,16 @@ const LVI=id=>Math.max(0,LEVELS.findIndex(l=>l.id===id));
 const AV={
   yol:[10,20,30,40,40,40],
   kod:[5,10,20,30,50,60],
-  piknik:[3,6,6,6,6,6],
-  boncuk:[3,8,12,15,15,15],
-  yavru:[2,6,10,10,10,10],
-  sira:[4,8,10,10,10,10],
-  kural:[[1,3,5,6],6,8,10,10,10],
+  // okul öncesi etkinlikleri: 1. sınıftan itibaren kapanır ya da yalnızca zor bölümleri kalır
+  piknik:[4,6,0,0,0,0],
+  sira:[4,10,0,0,0,0],
+  boncuk:[3,8,[9,10,11,12,13,14,15],[10,11,12,13,14,15],[10,11,12,13,14,15],[10,11,12,13,14,15]],
+  yavru:[3,10,[7,8,9,10],[7,8,9,10],[7,8,9,10],[7,8,9,10]],
+  kural:[[1,3,5,6],6,[5,6,7,8,9,10],[7,8,9,10],[7,8,9,10],[7,8,9,10]],
+  koord:[1,2,10,[6,7,8,9,10,11,12,13,14,15],[11,12,13,14,15],[11,12,13,14,15]],
   yaris:[0,0,4,8,8,8],
-  koord:[0,2,10,15,15,15],
   kalem:[0,0,4,8,8,8],
-  ikili:[0,0,4,7,8,8],
+  ikili:[0,0,4,8,8,8],
   senlik:[3,3,5,5,5,5]
 };
 function curLevel(d){ d=d||P(); return d.level||null }
@@ -3488,7 +3489,7 @@ const BUG_LEVELS=[5,10,15,20,25,30,35,40,45,50,55,60];
 const DURAKS=[
  {no:1,name:"Yapboz Adası",kid:"Büyük işi küçük parçalara böl.",code:"B1 · Ayrıştırma",color:"#f08a24",acts:[
    {t:"Yol Kur",d:"Parçaları seç, yolu kur. Altın, anahtar ve kapı gibi küçük hedeflere bölerek çiçeğe ulaş.",lvl:"● ●●",age:"4-8 yaş",open:()=>openLevels("yol"),prog:(d=P())=>lvlProg("yol",1,40,d)},
-   {t:"Piknik Ağacı",d:"Fil Pofi pikniğe hazırlanıyor. Eşyaları dallara böl, gerekmeyenleri ayır.",lvl:"●",age:"4-6 yaş",page:11,open:()=>openActLevels("piknik"),prog:(d=P())=>actProgL("piknik",d)},
+   {t:"Piknik Ağacı",d:"Fil Pofi pikniğe hazırlanıyor. Eşyaları dallara böl, gerekmeyenleri ayır.",lvl:"●",age:"4-5 yaş",page:11,open:()=>openActLevels("piknik"),prog:(d=P())=>actProgL("piknik",d)},
    {soon:1,t:"Eksik Parça Hangisi?",d:"Bir işin adımlarından biri eksik. Hangisi?",lvl:"●●",page:14}]},
  {no:2,name:"Boncuk Adası",kid:"Ne tekrar ediyor? Sırada ne var?",code:"B2 · Örüntü tanıma",color:"#14a89a",acts:[
    {t:"Boncuk Atölyesi",d:"Tuki'nin bileziklerini tamamla, ritmini dinle, uzun diziyi “birim × sayı” ile kısalt.",lvl:"● ●●",age:"4-8 yaş",page:"16-22",open:()=>openActLevels("boncuk"),prog:(d=P())=>actProgL("boncuk",d)}]},
@@ -3499,7 +3500,7 @@ const DURAKS=[
  {no:4,name:"Pusula Adası",kid:"Önce ne, sonra ne?",code:"B4 · Algoritma",color:"#e0a100",acts:[
    {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik yukarı bakarak başlar.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>lvlProg("kod",1,10,d)},
    {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:(d=P())=>lvlProg("kod",11,20,d)},
-   {t:"Önce Ne, Sonra Ne?",d:"Panda Pati'nin günü karışmış. Resimli adımları sıraya diz, eksik adımı bul.",lvl:"●",age:"4-7 yaş",page:35,open:()=>openActLevels("sira"),prog:(d=P())=>actProgL("sira",d)},
+   {t:"Önce Ne, Sonra Ne?",d:"Panda Pati'nin günü karışmış. Resimli adımları sıraya diz, eksik adımı bul.",lvl:"●",age:"4-5 yaş",page:35,open:()=>openActLevels("sira"),prog:(d=P())=>actProgL("sira",d)},
    {soon:1,t:"Aynı Hedefe İki Yol",d:"İki yol bul; hangisi daha kısa?",lvl:"●●",page:41}]},
  {no:5,name:"Değirmen Adası",kid:"Kaç kez? Ne olursa ne yapayım?",code:"B5 · Döngü ve koşul",color:"#22a165",acts:[
    {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>lvlProg("kod",21,30,d)},
@@ -3655,6 +3656,7 @@ window.bidikBack=function(){
   goHome(); return true;
 };
 window.__bidik={Yol,Kod,Daily,ACT,
+  lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
   actStart:startAct};
 if($("miniBot")) $("miniBot").innerHTML=MASCOT;
