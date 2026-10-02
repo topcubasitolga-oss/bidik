@@ -233,6 +233,24 @@ h1,h2,h3{text-wrap:balance}
 .clue:active:not([disabled]){transform:translateY(3px);box-shadow:0 1px 0 #b85a26}
 .clue.used{background:#fde3d2;opacity:.7;box-shadow:none;text-decoration:line-through}
 .clue[disabled]:not(.used){opacity:.5}
+
+.seq{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;width:100%}
+.seq .arr{font-family:var(--display);font-size:30px;color:var(--ink-soft);font-weight:800}
+.sq{position:relative;width:104px;min-height:124px;background:#fff;border:3px solid #a8d77a;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 4px 6px;box-shadow:0 4px 0 #6aa443}
+.sq.empty{border-style:dashed;background:#f6fbef;box-shadow:none}
+.sq.wrong{border-color:var(--red);box-shadow:0 4px 0 #a8261e}
+.sq .no{position:absolute;top:-12px;left:-8px;width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font-family:var(--display);font-weight:800;display:grid;place-items:center;font-size:16px}
+.sq small,.tcard small{font-weight:800;font-size:12.5px;line-height:1.15;text-align:center}
+.sq .qm{font-family:var(--display);font-size:40px;font-weight:800;color:#a8d77a;height:72px;display:grid;place-items:center}
+.tray{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;min-height:90px;width:100%;background:rgba(255,255,255,.55);border-radius:20px;padding:10px}
+.tcard{flex:none;width:100px;background:#fff;border:3px solid var(--panel-line);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:6px 4px;box-shadow:0 4px 0 var(--panel-line)}
+.tcard.sel{border-color:var(--ink);background:#fff7dc;transform:translateY(-4px)}
+.tcard:active{transform:translateY(3px);box-shadow:0 1px 0 var(--panel-line)}
+.ptree{width:min(100%,640px);height:auto;display:block}
+.ptree .pb{cursor:pointer}
+.ptree .ptitle{font-family:var(--display);font-weight:800;font-size:26px;fill:#fff;letter-spacing:2px}
+.ptree .pbl{font-family:var(--display);font-weight:800;font-size:19px;fill:#fff}
+@media (max-width:420px){.sq{width:76px;min-height:104px}.sq svg{width:54px;height:54px}.tcard{width:84px}}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -2185,6 +2203,57 @@ regAct("koord",{
   }
 });
 })();
+// ===== Resimli kartlar için ikonlar (100×100, düz renk + koyu kenar) =====
+Object.assign(ICONS,{
+  // yiyecek, içecek
+  sandvic:`<path d="M14 56 L50 30 L86 56Z" fill="#f3c98b" stroke="#b07a45" stroke-width="4" stroke-linejoin="round"/><path d="M14 60 Q30 54 50 60 T86 60 L86 66 L14 66Z" fill="#7cc35a"/><rect x="14" y="64" width="72" height="8" fill="#ffd23f"/><path d="M14 72 L86 72 L50 82Z" fill="#f3c98b" stroke="#b07a45" stroke-width="4" stroke-linejoin="round"/>`,
+  ekmek:`<path d="M18 46 C18 24 82 24 82 46 C82 52 76 54 74 54 V78 H26 V54 C24 54 18 52 18 46Z" fill="#f3c98b" stroke="#b07a45" stroke-width="4" stroke-linejoin="round"/><path d="M30 54 V74 H70 V54" fill="#fff1dc"/>`,
+  peynir:`<path d="M16 66 L76 34 L86 54 L86 74 L16 74Z" fill="#ffd23f" stroke="#d99a00" stroke-width="4" stroke-linejoin="round"/><circle cx="40" cy="64" r="5" fill="#f2b41f"/><circle cx="62" cy="58" r="4" fill="#f2b41f"/><circle cx="72" cy="68" r="3" fill="#f2b41f"/>`,
+  su:`<rect x="36" y="14" width="28" height="10" rx="3" fill="#2f7fd8"/><path d="M34 26 H66 L70 36 V82 a6 6 0 0 1 -6 6 H36 a6 6 0 0 1 -6 -6 V36Z" fill="#cdeefa" stroke="#4a9cc4" stroke-width="4" stroke-linejoin="round"/><path d="M32 52 H68 V82 a4 4 0 0 1 -4 4 H36 a4 4 0 0 1 -4 -4Z" fill="#7fd0ea"/>`,
+  meyvesuyu:`<path d="M28 30 H72 L66 86 H34Z" fill="#fff" stroke="#9fb4c9" stroke-width="4" stroke-linejoin="round"/><path d="M31 46 H69 L66 84 H34Z" fill="#ff9b2f"/><path d="M58 30 L66 10 L74 12" stroke="#e8443a" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="34" cy="30" r="8" fill="#ffd23f" stroke="#d99a00" stroke-width="3"/>`,
+  muz:`<path d="M22 30 C24 60 46 80 80 72 C84 70 84 66 80 66 C54 68 38 52 32 30 C30 24 22 24 22 30Z" fill="#ffd23f" stroke="#d99a00" stroke-width="4" stroke-linejoin="round"/><path d="M24 26 L28 18" stroke="#7a4a20" stroke-width="5" stroke-linecap="round"/>`,
+  kek:`<path d="M22 54 H78 L72 84 H28Z" fill="#e0457b" stroke="#a82a5c" stroke-width="4" stroke-linejoin="round"/><path d="M30 58 L34 82 M42 58 L44 82 M58 58 L56 82 M70 58 L66 82" stroke="#f49ac1" stroke-width="3"/><path d="M18 54 C18 34 34 28 50 28 C66 28 82 34 82 54Z" fill="#fff1dc" stroke="#d9b56a" stroke-width="4"/><circle cx="50" cy="24" r="7" fill="#e8443a"/>`,
+  // oyun, giysi
+  ucurtma:`<path d="M50 10 L78 40 L50 74 L22 40Z" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="4" stroke-linejoin="round"/><path d="M50 10 L50 74 M22 40 H78" stroke="#ffc93c" stroke-width="3"/><path d="M50 74 C44 82 56 86 50 94" stroke="#16324a" stroke-width="2.5" fill="none"/><path d="M46 84 l8 -4 M44 92 l8 -3" stroke="#e8443a" stroke-width="4" stroke-linecap="round"/>`,
+  ip:`<path d="M30 30 C10 60 30 90 50 70 C70 50 90 60 70 30" stroke="#e8443a" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="22" y="14" width="12" height="22" rx="5" fill="#2f7fd8" transform="rotate(-15 28 25)"/><rect x="66" y="14" width="12" height="22" rx="5" fill="#2f7fd8" transform="rotate(15 72 25)"/>`,
+  ceket:`<path d="M34 16 L50 26 L66 16 L84 28 L90 62 L78 64 L76 86 H24 L22 64 L10 62 L16 28Z" fill="#22a165" stroke="#167a4a" stroke-width="4" stroke-linejoin="round"/><path d="M50 26 V86" stroke="#167a4a" stroke-width="3"/><circle cx="56" cy="44" r="3" fill="#fff"/><circle cx="56" cy="60" r="3" fill="#fff"/><circle cx="56" cy="76" r="3" fill="#fff"/>`,
+  sapka:`<ellipse cx="50" cy="66" rx="40" ry="11" fill="#ffd23f" stroke="#d99a00" stroke-width="4"/><path d="M28 64 C28 34 72 34 72 64Z" fill="#ffd23f" stroke="#d99a00" stroke-width="4"/><path d="M29 56 H71" stroke="#e8443a" stroke-width="6"/>`,
+  gozluk:`<circle cx="30" cy="52" r="15" fill="#16324a" stroke="#e0457b" stroke-width="5"/><circle cx="70" cy="52" r="15" fill="#16324a" stroke="#e0457b" stroke-width="5"/><path d="M45 50 Q50 44 55 50 M15 48 L6 40 M85 48 L94 40" stroke="#e0457b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M22 46 l6 -4" stroke="#fff" stroke-width="3" opacity=".6"/>`,
+  tv:`<rect x="12" y="22" width="76" height="52" rx="8" fill="#16324a"/><rect x="18" y="28" width="64" height="40" rx="4" fill="#7fd0ea"/><path d="M38 74 L32 88 M62 74 L68 88" stroke="#16324a" stroke-width="5" stroke-linecap="round"/><path d="M40 14 L50 22 L60 12" stroke="#16324a" stroke-width="3" fill="none"/>`,
+  yastik:`<path d="M14 34 Q50 24 86 34 Q92 50 86 66 Q50 76 14 66 Q8 50 14 34Z" fill="#b59be0" stroke="#7a5eb0" stroke-width="4"/><path d="M30 50 h40" stroke="#efe6fb" stroke-width="4" stroke-linecap="round" stroke-dasharray="2 8"/>`,
+  terlik:`<path d="M20 70 C20 40 40 22 56 22 C74 22 82 40 82 54 C82 70 70 80 50 80 H30 C24 80 20 76 20 70Z" fill="#f49ac1" stroke="#a82a5c" stroke-width="4"/><path d="M36 44 C40 34 66 30 76 44 C66 52 46 52 36 44Z" fill="#e0457b"/>`,
+  // sabah, temizlik
+  firca:`<rect x="14" y="56" width="58" height="12" rx="6" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="3" transform="rotate(-20 43 62)"/><rect x="62" y="30" width="22" height="14" rx="3" fill="#fff" stroke="#9fb4c9" stroke-width="3" transform="rotate(-20 73 37)"/>`,
+  macun:`<rect x="14" y="56" width="58" height="12" rx="6" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="3" transform="rotate(-20 43 62)"/><rect x="62" y="30" width="22" height="14" rx="3" fill="#fff" stroke="#9fb4c9" stroke-width="3" transform="rotate(-20 73 37)"/><path d="M62 24 C66 16 74 18 78 14 C82 18 86 22 84 26" stroke="#e0457b" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M64 24 C68 18 74 20 78 17" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
+  kopuk:`<circle cx="50" cy="56" r="34" fill="#fff6ee" stroke="#e1c7b0" stroke-width="3"/><path d="M30 60 Q50 76 70 60" stroke="#e8443a" stroke-width="6" fill="#fff" stroke-linecap="round"/><g fill="#fff" stroke="#9fd8f0" stroke-width="2.5"><circle cx="28" cy="38" r="7"/><circle cx="40" cy="30" r="5"/><circle cx="68" cy="34" r="8"/><circle cx="78" cy="48" r="5"/></g><rect x="56" y="58" width="36" height="8" rx="4" fill="#2f7fd8" transform="rotate(-20 74 62)"/>`,
+  bardak:`<path d="M28 26 H72 L66 86 H34Z" fill="#e3f7fd" stroke="#4a9cc4" stroke-width="4" stroke-linejoin="round"/><path d="M31 48 H69 L66 84 H34Z" fill="#7fd0ea"/><path d="M40 60 q3 -4 6 0" stroke="#fff" stroke-width="3" fill="none"/>`,
+  lavabo:`<path d="M14 50 H86 C86 70 72 82 50 82 C28 82 14 70 14 50Z" fill="#fff" stroke="#9fb4c9" stroke-width="4"/><path d="M50 20 V34 H62" stroke="#9fb4c9" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M62 38 v6 M62 50 v6" stroke="#7fd0ea" stroke-width="4" stroke-linecap="round"/><ellipse cx="50" cy="56" rx="26" ry="6" fill="#cdeefa"/>`,
+  yatak:`<rect x="10" y="50" width="80" height="20" rx="5" fill="#2f7fd8"/><rect x="10" y="30" width="10" height="50" rx="3" fill="#b5743c"/><rect x="80" y="40" width="10" height="40" rx="3" fill="#b5743c"/><rect x="22" y="40" width="20" height="12" rx="5" fill="#fff"/><path d="M60 22 a12 12 0 1 0 10 20 a10 10 0 1 1 -10 -20Z" fill="#ffd23f"/>`,
+  gunes:`<circle cx="50" cy="50" r="18" fill="#ffc93c" stroke="#d99a00" stroke-width="4"/>${[0,45,90,135,180,225,270,315].map(a=>`<path d="M50 22 V12" stroke="#ffc93c" stroke-width="6" stroke-linecap="round" transform="rotate(${a} 50 50)"/>`).join("")}`,
+  tabak:`<ellipse cx="50" cy="60" rx="40" ry="16" fill="#fff" stroke="#9fb4c9" stroke-width="4"/><circle cx="38" cy="54" r="10" fill="#fff" stroke="#e1d6c6" stroke-width="2"/><circle cx="38" cy="54" r="5" fill="#ffc93c"/><path d="M52 52 h18" stroke="#e8443a" stroke-width="6" stroke-linecap="round"/><path d="M54 62 h14" stroke="#7cc35a" stroke-width="6" stroke-linecap="round"/>`,
+  canta:`<rect x="20" y="30" width="60" height="56" rx="12" fill="#e8443a" stroke="#a8261e" stroke-width="4"/><path d="M36 30 V22 a6 6 0 0 1 6 -6 H58 a6 6 0 0 1 6 6 V30" stroke="#a8261e" stroke-width="4" fill="none"/><rect x="30" y="50" width="40" height="22" rx="6" fill="#ff8a7a"/><path d="M30 58 H70" stroke="#a8261e" stroke-width="3"/>`,
+  okul:`<path d="M10 44 L50 18 L90 44Z" fill="#e8443a" stroke="#a8261e" stroke-width="4" stroke-linejoin="round"/><rect x="18" y="44" width="64" height="42" fill="#ffd9a8" stroke="#c98f2c" stroke-width="4"/><rect x="42" y="62" width="16" height="24" fill="#7a5eb0"/><rect x="24" y="52" width="12" height="12" fill="#7fd0ea"/><rect x="64" y="52" width="12" height="12" fill="#7fd0ea"/><path d="M50 18 V6 L62 10 L50 14" fill="#ffc93c" stroke="#16324a" stroke-width="2"/>`,
+  corap:`<path d="M36 12 H60 V54 L74 66 C82 74 74 88 64 84 L36 70Z" fill="#fff" stroke="#9fb4c9" stroke-width="4" stroke-linejoin="round"/><path d="M36 22 H60 M36 30 H60" stroke="#e8443a" stroke-width="5"/>`,
+  ayakkabi:`<path d="M14 66 V48 C24 48 32 40 36 32 H50 C52 44 62 50 76 52 C86 54 90 60 90 66Z" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="4" stroke-linejoin="round"/><rect x="12" y="66" width="80" height="10" rx="4" fill="#fff" stroke="#9fb4c9" stroke-width="3"/>`,
+  bagcik:`<path d="M14 66 V48 C24 48 32 40 36 32 H50 C52 44 62 50 76 52 C86 54 90 60 90 66Z" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="4" stroke-linejoin="round"/><rect x="12" y="66" width="80" height="10" rx="4" fill="#fff" stroke="#9fb4c9" stroke-width="3"/><path d="M44 40 C30 26 34 18 46 34 C58 18 64 26 48 40" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  kapi:`<rect x="24" y="12" width="52" height="78" rx="4" fill="#b5743c" stroke="#7a4a20" stroke-width="4"/><rect x="32" y="20" width="36" height="26" rx="3" fill="#c98a52"/><rect x="32" y="52" width="36" height="30" rx="3" fill="#c98a52"/><circle cx="66" cy="52" r="4" fill="#ffd23f"/>`,
+  // doğa
+  tohum:`<path d="M10 70 C30 60 70 60 90 70 V88 H10Z" fill="#a8693d"/><path d="M50 40 C60 48 60 62 50 66 C40 62 40 48 50 40Z" fill="#a0682c" stroke="#7a4a20" stroke-width="3"/><path d="M32 30 L40 38 M68 30 L60 38 M50 22 V32" stroke="#16324a" stroke-width="3" stroke-linecap="round" opacity=".35"/>`,
+  sulama:`<path d="M20 44 H64 V80 a6 6 0 0 1 -6 6 H26 a6 6 0 0 1 -6 -6Z" fill="#22a165" stroke="#167a4a" stroke-width="4"/><path d="M64 52 L88 34" stroke="#167a4a" stroke-width="7" stroke-linecap="round"/><path d="M28 44 C28 30 56 30 56 44" stroke="#167a4a" stroke-width="5" fill="none"/><path d="M90 40 v8 M84 44 v10 M94 46 v8" stroke="#7fd0ea" stroke-width="3.5" stroke-linecap="round"/>`,
+  filiz:`<path d="M10 72 C30 62 70 62 90 72 V88 H10Z" fill="#a8693d"/><path d="M50 70 V44" stroke="#22a165" stroke-width="5" stroke-linecap="round"/><path d="M50 50 C40 36 26 40 24 46 C34 52 44 52 50 50Z M50 46 C58 32 74 34 76 40 C66 48 56 48 50 46Z" fill="#7cc35a" stroke="#22a165" stroke-width="2.5"/>`,
+  fidan:`<path d="M10 76 C30 68 70 68 90 76 V90 H10Z" fill="#a8693d"/><path d="M50 76 V36" stroke="#7a4a20" stroke-width="5" stroke-linecap="round"/><circle cx="50" cy="30" r="16" fill="#22a165"/><circle cx="38" cy="38" r="10" fill="#3fae5f"/><circle cx="62" cy="38" r="10" fill="#3fae5f"/>`,
+  kurek:`<path d="M30 12 L54 60" stroke="#b5743c" stroke-width="7" stroke-linecap="round"/><path d="M24 10 h14" stroke="#b5743c" stroke-width="7" stroke-linecap="round"/><path d="M46 56 L66 46 L78 72 C80 82 70 88 62 82Z" fill="#9fb4c9" stroke="#5f7489" stroke-width="4" stroke-linejoin="round"/><path d="M8 88 C30 78 70 78 92 88" stroke="#a8693d" stroke-width="8" fill="none" stroke-linecap="round"/>`,
+  toprak:`<path d="M10 66 C30 56 70 56 90 66 V88 H10Z" fill="#a8693d"/><path d="M50 60 V38" stroke="#7a4a20" stroke-width="5"/><circle cx="50" cy="32" r="12" fill="#22a165"/><g fill="#7a4a20"><circle cx="24" cy="54" r="4"/><circle cx="76" cy="52" r="4"/><circle cx="34" cy="46" r="3"/></g><path d="M18 46 C26 40 34 44 40 48" stroke="#a8693d" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+  yumurta:`<ellipse cx="50" cy="54" rx="24" ry="30" fill="#fff6e6" stroke="#e1c7b0" stroke-width="4"/><path d="M30 50 L38 44 L46 52 L54 44 L62 52 L70 46" stroke="#e1c7b0" stroke-width="3" fill="none"/>`,
+  kase:`<path d="M12 44 H88 C88 70 72 84 50 84 C28 84 12 70 12 44Z" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="4"/><ellipse cx="50" cy="44" rx="38" ry="8" fill="#fff1dc" stroke="#1d5b9a" stroke-width="4"/><path d="M60 40 L80 10" stroke="#b5743c" stroke-width="6" stroke-linecap="round"/><path d="M36 44 q8 -6 16 0" stroke="#d9b56a" stroke-width="3" fill="none"/>`,
+  firin:`<rect x="14" y="16" width="72" height="72" rx="8" fill="#9fb4c9" stroke="#5f7489" stroke-width="4"/><rect x="22" y="36" width="56" height="42" rx="5" fill="#16324a"/><rect x="28" y="42" width="44" height="30" rx="3" fill="#ff9b2f" opacity=".75"/><circle cx="30" cy="26" r="4" fill="#16324a"/><circle cx="44" cy="26" r="4" fill="#16324a"/><path d="M54 26 H76" stroke="#16324a" stroke-width="4"/>`,
+  yaprakyum:`<path d="M10 66 C30 30 70 22 92 34 C80 70 44 84 10 66Z" fill="#7cc35a" stroke="#22a165" stroke-width="4"/><path d="M14 64 C40 54 64 44 88 36" stroke="#22a165" stroke-width="3" fill="none"/><g fill="#fff6e6" stroke="#e1c7b0" stroke-width="2"><circle cx="46" cy="50" r="5"/><circle cx="58" cy="46" r="5"/><circle cx="52" cy="58" r="5"/></g>`,
+  tirtil:`${[20,34,48,62].map((x,i)=>`<circle cx="${x}" cy="${60-(i%2)*4}" r="11" fill="${i%2?"#7cc35a":"#22a165"}" stroke="#167a4a" stroke-width="3"/>`).join("")}<circle cx="78" cy="50" r="14" fill="#22a165" stroke="#167a4a" stroke-width="3"/><circle cx="82" cy="46" r="3.5" fill="#16324a"/><path d="M76 36 L72 26 M84 36 L88 26" stroke="#16324a" stroke-width="3" stroke-linecap="round"/>`,
+  koza:`<path d="M50 8 V20" stroke="#7a4a20" stroke-width="4"/><path d="M20 10 H80" stroke="#7a4a20" stroke-width="6" stroke-linecap="round"/><path d="M50 20 C70 24 72 60 58 84 C54 90 46 90 42 84 C28 60 30 24 50 20Z" fill="#c9a66b" stroke="#8a6a3a" stroke-width="4"/><path d="M38 40 C46 44 54 44 62 40 M36 56 C46 60 54 60 64 56 M40 72 C46 74 54 74 60 72" stroke="#8a6a3a" stroke-width="2.5" fill="none"/>`,
+  kelebek:`<path d="M48 50 C30 18 8 22 12 42 C14 54 30 56 48 52Z" fill="#e0457b" stroke="#a82a5c" stroke-width="3"/><path d="M52 50 C70 18 92 22 88 42 C86 54 70 56 52 52Z" fill="#e0457b" stroke="#a82a5c" stroke-width="3"/><path d="M48 54 C32 60 22 76 34 80 C42 82 48 70 48 56Z" fill="#ffc93c" stroke="#d99a00" stroke-width="3"/><path d="M52 54 C68 60 78 76 66 80 C58 82 52 70 52 56Z" fill="#ffc93c" stroke="#d99a00" stroke-width="3"/><ellipse cx="50" cy="54" rx="4" ry="20" fill="#16324a"/><path d="M48 36 L42 24 M52 36 L58 24" stroke="#16324a" stroke-width="2.5" stroke-linecap="round"/><circle cx="28" cy="38" r="5" fill="#fff" opacity=".6"/><circle cx="72" cy="38" r="5" fill="#fff" opacity=".6"/>`,
+  cicekacan:`<path d="M10 74 C30 64 70 64 90 74 V90 H10Z" fill="#a8693d"/><path d="M50 72 V40" stroke="#22a165" stroke-width="5"/><path d="M50 60 C40 50 30 54 28 58 C38 64 44 62 50 60Z" fill="#7cc35a"/><g transform="translate(50 32)">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-11" rx="8" ry="11" fill="#e0457b" transform="rotate(${a})"/>`).join("")}<circle r="7" fill="#ffc93c"/></g>`,
+});
+function cardIcon(name,size){ return `<svg viewBox="0 0 100 100" width="${size||64}" height="${size||64}" aria-hidden="true">${ICONS[name]||""}</svg>` }
 // ===== Boncuk Atölyesi (Güney Amerika · Tukan Tuki) =====
 (function(){
 const BEAD={K:["#e8443a","#a8261e","kırmızı"],M:["#2f7fd8","#1d5b9a","mavi"],S:["#ffc93c","#d99a00","sarı"],Y:["#22a165","#167a4a","yeşil"],P:["#e0457b","#a82a5c","pembe"]};
@@ -2441,6 +2510,131 @@ regAct("yavru",{
   }
 });
 })();
+// ===== Önce Ne, Sonra Ne? (Asya · Panda Pati) =====
+(function(){
+const SC={
+  1:{name:"Diş fırçalama",say:"Pati dişlerini fırçalayacak.",steps:[["macun","Fırçaya macun sür"],["kopuk","Dişlerini fırçala"],["bardak","Ağzını çalkala"]]},
+  2:{name:"Sandviç",say:"Pati pikniğe sandviç hazırlıyor.",steps:[["ekmek","Ekmeği koy"],["peynir","Peyniri koy"],["sandvic","Üstünü kapat"]]},
+  3:{name:"Bitki büyüyor",say:"Pati bambu tohumu ekti. Sonra ne oldu?",steps:[["tohum","Tohumu ek"],["sulama","Sula"],["filiz","Filiz çıkar"],["cicekacan","Çiçek açar"]]},
+  4:{name:"Giyinme",say:"Pati dışarı çıkmak için hazırlanıyor.",steps:[["corap","Çorabını giy"],["ayakkabi","Ayakkabını giy"],["bagcik","Bağcığını bağla"],["kapi","Kapıdan çık"]]},
+  5:{name:"Kek yapalım",say:"Pati arkadaşları için kek yapıyor.",steps:[["yumurta","Yumurtayı kır"],["kase","Karıştır"],["firin","Fırına koy"],["kek","Kek hazır!"]]},
+  6:{name:"Kelebeğin hayatı",say:"Bambu yaprağında minik bir yumurta var.",steps:[["yaprakyum","Yaprakta yumurta"],["tirtil","Tırtıl çıkar"],["koza","Koza örer"],["kelebek","Kelebek olur"]]},
+  7:{name:"Fidan dikelim",say:"Pati bahçeye fidan dikecek.",steps:[["kurek","Çukur kaz"],["fidan","Fidanı koy"],["toprak","Toprakla ört"],["sulama","Sula"]]},
+  8:{name:"Okul sabahı",say:"Pati'nin okul sabahı.",steps:[["yatak","Uyan"],["lavabo","Yüzünü yıka"],["tabak","Kahvaltı yap"],["canta","Çantanı al"],["okul","Okula git"]]},
+  9:{name:"Eksik parça",say:"Pati sandviç yaparken bir adımı atladı!",steps:[["ekmek","Ekmeği koy"],["peynir","Peyniri koy"],["sandvic","Üstünü kapat"]],miss:1,opts:["peynir","tv","kapi"]},
+  10:{name:"Eksik parça",say:"Kelebeğin hikâyesinde bir resim kayıp!",steps:[["yaprakyum","Yaprakta yumurta"],["tirtil","Tırtıl çıkar"],["koza","Koza örer"],["kelebek","Kelebek olur"]],miss:2,opts:["kek","koza","filiz"]}
+};
+const LBL={peynir:"Peyniri koy",tv:"Televizyon",kapi:"Kapıdan çık",kek:"Kek",koza:"Koza örer",filiz:"Filiz çıkar"};
+regAct("sira",{
+  title:"Önce Ne, Sonra Ne?", durak:4, N:10,
+  parts:[{name:"Sıraya Diz",sub:"Resimli adımları doğru sıraya koy",from:1,to:8},{name:"Eksik Parça",sub:"Bir adım kayıp. Hangisi?",from:9,to:10}],
+  doneText:"Adımlar doğru sırada",
+  talk:n=> n<=8?"Sırayı değiştirseydik ne olurdu? Örneğin ayakkabıyı çoraptan önce giyseydin? Hangi adımların yeri değişebilir, hangileri değişemez?"
+        :"Eksik adımı nasıl buldun? Önceki ve sonraki resme baktın mı? Bir tarifte adım eksik olursa ne olur?",
+  intro:n=> n===1?{key:"p1",kicker:"Asya",title:"Pati'nin karışık sabahı",art:ICONS.kopuk,text:"Resimli kartlar karışmış! Kartlara <b>sırayla</b> dokun: ilk dokunduğun 1. kutuya, sonraki 2. kutuya gider. Yanlış koyduğun karta kutudayken dokunursan geri gelir."}
+        : n===9?{key:"p2",kicker:"Yeni görev",title:"Eksik parça",art:ICONS.sandvic,text:"Bu sefer bir kutu boş. Öncesine ve sonrasına bak: aradaki adım hangisi?"}:null,
+  setup(n){
+    const S=SC[n], r=mkRng(n*53+11);
+    if(S.miss!=null) return {n,type:"miss",S,choice:null,opts:shuffle(S.opts,r)};
+    let order; do{ order=shuffle(S.steps.map((_,i)=>i),r) }while(order.every((v,i)=>v===i));
+    return {n,type:"order",S,tray:order,slots:S.steps.map(()=>null),wrong:[]};
+  },
+  goal(st){ return st.type==="miss"?`${st.S.say} Boş kutuya hangi resim gelmeli?`:`${st.S.say} Kartları sıraya diz.` },
+  checkLabel(){ return "Kontrol et" },
+  info(st){ return st.type==="order"?`${st.slots.filter(x=>x!=null).length} / ${st.slots.length} kart yerleşti`:"" },
+  render(st){
+    const body=$("aBody"); let h="";
+    if(st.type==="miss"){
+      h+=`<div class="seq">${st.S.steps.map((s,i)=>`<div class="sq ${i===st.S.miss?"empty":""}"><span class="no">${i+1}</span>${i===st.S.miss?(st.choice!=null?cardIcon(st.opts[st.choice],72):`<span class="qm">?</span>`):cardIcon(s[0],72)}<small>${i===st.S.miss?(st.choice!=null?LBL[st.opts[st.choice]]:"&nbsp;"):s[1]}</small></div>`).join(`<span class="arr">›</span>`)}</div>`;
+      h+=`<div class="tray">${st.opts.map((o,i)=>`<button class="tcard ${st.choice===i?"sel":""}" data-i="${i}">${cardIcon(o,64)}<small>${LBL[o]}</small></button>`).join("")}</div>`;
+      body.innerHTML=h;
+      body.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.choice=+b.dataset.i; sfx.place(); aRefresh() });
+      return;
+    }
+    h+=`<div class="seq">${st.slots.map((v,i)=>`<button class="sq ${v==null?"empty":""} ${st.wrong.includes(i)?"wrong":""}" data-s="${i}"><span class="no">${i+1}</span>${v!=null?cardIcon(st.S.steps[v][0],72)+`<small>${st.S.steps[v][1]}</small>`:`<span class="qm"></span><small>&nbsp;</small>`}</button>`).join(`<span class="arr">›</span>`)}</div>`;
+    h+=`<div class="tray">${st.tray.map(v=>`<button class="tcard" data-v="${v}">${cardIcon(st.S.steps[v][0],64)}<small>${st.S.steps[v][1]}</small></button>`).join("")||`<p class="ahelp">Bütün kartlar yerleşti. Kontrol et!</p>`}</div>`;
+    body.innerHTML=h;
+    body.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const v=+b.dataset.v, j=st.slots.indexOf(null); if(j<0) return; st.slots[j]=v; st.tray=st.tray.filter(x=>x!==v); st.wrong=[]; sfx.place(); aRefresh() });
+    body.querySelectorAll(".sq[data-s]").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.s, v=st.slots[i]; if(v==null) return; st.slots[i]=null; st.tray.push(v); st.wrong=[]; sfx.erase(); aRefresh() });
+  },
+  check(st){
+    if(st.type==="miss") return st.choice==null?"Önce bir resim seç.":st.opts[st.choice]===st.S.steps[st.S.miss][0]?true:"Bu resim araya uymuyor. Öncesine ve sonrasına bak.";
+    if(st.slots.includes(null)) return "Önce bütün kartları kutulara yerleştir.";
+    st.wrong=st.slots.map((v,i)=>v!==i?i:-1).filter(i=>i>=0);
+    return st.wrong.length?`${st.wrong.map(i=>i+1).join(", ")}. kutudaki kart yanlış yerde. Ona dokun, geri al.`:true;
+  },
+  solved(st){ return this.check(st)===true },
+  auto(st){ if(st.type==="miss") st.choice=st.opts.indexOf(st.S.steps[st.S.miss][0]); else { st.slots=st.S.steps.map((_,i)=>i); st.tray=[] } return true },
+  async solve(st){
+    if(st.type==="miss"){ aGoal("Öncesinde ne var, sonrasında ne var? Aradaki adım…"); await aWait(1300); st.choice=st.opts.indexOf(st.S.steps[st.S.miss][0]); sfx.place(); aRefresh(); await aWait(1000); return }
+    for(let i=0;i<st.slots.length;i++){ aGoal(`${i+1}. adım: ${st.S.steps[i][1]}`); st.slots[i]=i; st.tray=st.tray.filter(x=>x!==i); sfx.place(); aRefresh(); await aWait(1000) }
+  }
+});
+})();
+// ===== Piknik Ağacı (Afrika · Fil Pofi) =====
+(function(){
+const BR={yiyecek:["Yiyecek","#f08a24"],oyun:["Oyun","#2f7fd8"],giysi:["Giysi","#22a165"],icecek:["İçecek","#14a89a"],gerekmez:["Gerekmez","#9aa6b4"]};
+const IT={sandvic:["Sandviç","yiyecek"],elma:["Elma","yiyecek"],muz:["Muz","yiyecek"],kek:["Kek","yiyecek"],
+  top:["Top","oyun"],ucurtma:["Uçurtma","oyun"],ip:["Atlama ipi","oyun"],
+  ceket:["Ceket","giysi"],sapka:["Şapka","giysi"],gozluk:["Güneş gözlüğü","giysi"],
+  su:["Su","icecek"],meyvesuyu:["Meyve suyu","icecek"],
+  tv:["Televizyon","gerekmez"],yastik:["Yastık","gerekmez"],terlik:["Terlik","gerekmez"]};
+const LV={
+  1:{b:["yiyecek","oyun"],i:["sandvic","elma","top","ucurtma"]},
+  2:{b:["yiyecek","oyun","giysi"],i:["sandvic","ip","ceket","su","ucurtma","sapka"],water:"yiyecek"},
+  3:{b:["yiyecek","oyun","giysi"],i:["muz","kek","top","ip","gozluk","ceket"]},
+  4:{b:["yiyecek","icecek","oyun","giysi"],i:["sandvic","elma","su","meyvesuyu","ucurtma","top","sapka","ceket"]},
+  5:{b:["yiyecek","oyun","giysi","gerekmez"],i:["kek","muz","ucurtma","ip","sapka","gozluk","tv","yastik"]},
+  6:{b:["yiyecek","icecek","oyun","giysi","gerekmez"],i:["sandvic","elma","su","meyvesuyu","top","ucurtma","ceket","sapka","tv","terlik"]}
+};
+function home(st,it){ const k=IT[it][1]; return k==="icecek"&&!st.b.includes("icecek")?(st.water||"yiyecek"):k }
+regAct("piknik",{
+  title:"Piknik Ağacı", durak:1, N:6,
+  parts:[{name:"Dallara Böl",sub:"Büyük işi dallara ayır",from:1,to:4},{name:"Gerekmez Kutusu",sub:"Pikniğe gerekmeyenleri ayır",from:5,to:6}],
+  doneText:"Her şey kendi dalında",
+  talk:n=> n<=4?"Dallar olmasaydı piknik çantasını nasıl hazırlardın? Büyük işi böldüğümüzde ne kolaylaştı?":"Televizyonu neden pikniğe götürmedik? Bir işe başlarken gereksiz şeyleri ayırmak neden önemli?",
+  intro:n=> n===1?{key:"p1",kicker:"Afrika",title:"Pofi'nin piknik ağacı",art:ICONS.sandvic,text:"Fil Pofi pikniğe hazırlanıyor. Büyük işi dallara böldü! Önce bir eşyaya dokun, sonra onun dalına dokun."}
+        : n===5?{key:"p2",kicker:"Yeni dal",title:"Gerekmez kutusu",art:ICONS.tv,text:"Bazı eşyalar pikniğe hiç gerekmez. Onları gri <b>Gerekmez</b> kutusuna koy."}:null,
+  setup(n){ const L=LV[n], r=mkRng(n*71+3); return {n,b:L.b,water:L.water,items:shuffle(L.i,r),place:{},sel:null,wrong:[]} },
+  goal(st){ return st.sel?`${IT[st.sel][0]} hangi dala? Dala dokun.`:"Bir eşyaya dokun, sonra dalına dokun." },
+  checkLabel(){ return "Kontrol et" },
+  info(st){ return `${Object.keys(st.place).length} / ${st.items.length} eşya yerleşti` },
+  render(st){
+    const body=$("aBody"), nb=st.b.length, W=640, H=330, trunkX=W/2;
+    const xs=st.b.map((_,i)=>nb===1?W/2:60+i*(W-120)/(nb-1));
+    let s=`<svg class="ptree" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="${W/2}" cy="${H-8}" rx="250" ry="12" fill="#c98f2c" opacity=".35"/>
+      <path d="M${trunkX-22} ${H-12} C${trunkX-14} 220 ${trunkX-16} 150 ${trunkX-10} 90 L${trunkX+10} 90 C${trunkX+16} 150 ${trunkX+14} 220 ${trunkX+22} ${H-12}Z" fill="#8a5a2b"/>
+      <ellipse cx="${trunkX}" cy="62" rx="${120+nb*24}" ry="52" fill="#6f9e3a"/><ellipse cx="${trunkX-30}" cy="48" rx="${80+nb*14}" ry="30" fill="#86b84a"/>
+      <text x="${trunkX}" y="70" text-anchor="middle" class="ptitle">PİKNİK</text>`;
+    st.b.forEach((k,i)=>{ const x=xs[i], c=BR[k][1];
+      s+=`<path d="M${trunkX} 120 Q${(trunkX+x)/2} ${110} ${x} 150" stroke="#8a5a2b" stroke-width="12" fill="none" stroke-linecap="round"/>
+        <g class="pb" data-k="${k}"><path d="M${x} 150 V164" stroke="#7a4a20" stroke-width="3"/><rect x="${x-58}" y="164" width="116" height="140" rx="18" fill="#fff" stroke="${c}" stroke-width="${st.sel?6:4}" ${st.sel?`stroke-dasharray="10 6"`:""}/>
+        <rect x="${x-58}" y="164" width="116" height="30" rx="14" fill="${c}"/><text x="${x}" y="186" text-anchor="middle" class="pbl">${BR[k][0]}</text>`;
+      const here=st.items.filter(it=>st.place[it]===k);
+      here.forEach((it,j)=>{ const col=j%2, row=Math.floor(j/2); s+=`<g class="pi" data-it="${it}"><svg x="${x-52+col*54}" y="${198+row*52}" width="50" height="50" viewBox="0 0 100 100">${ICONS[it]}</svg>${st.wrong.includes(it)?`<circle cx="${x-52+col*54+44}" cy="${202+row*52}" r="9" fill="#e8443a"/><path d="M${x-52+col*54+40} ${198+row*52}l8 8m0 -8l-8 8" stroke="#fff" stroke-width="2.5"/>`:""}</g>` });
+      s+=`</g>`; });
+    s+=`</svg>`;
+    const left=st.items.filter(it=>!st.place[it]);
+    let h=s+`<div class="tray">${left.map(it=>`<button class="tcard ${st.sel===it?"sel":""}" data-it="${it}">${cardIcon(it,56)}<small>${IT[it][0]}</small></button>`).join("")||`<p class="ahelp">Hepsi dallarda. Kontrol et!</p>`}</div>`;
+    body.innerHTML=h;
+    body.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.sel=st.sel===b.dataset.it?null:b.dataset.it; sfx.click(); aRefresh(); aGoal() });
+    body.querySelectorAll(".pb").forEach(g=>g.addEventListener("click",e=>{
+      if(A.busy||A.won) return;
+      const pi=e.target.closest(".pi"); if(pi&&!st.sel){ delete st.place[pi.dataset.it]; st.wrong=st.wrong.filter(x=>x!==pi.dataset.it); sfx.erase(); aRefresh(); return }
+      if(!st.sel){ aGoal("Önce aşağıdan bir eşya seç."); return }
+      st.place[st.sel]=g.dataset.k; st.sel=null; sfx.place(); aRefresh(); aGoal() }));
+  },
+  check(st){
+    if(st.items.some(it=>!st.place[it])) return "Önce bütün eşyaları dallara yerleştir.";
+    st.wrong=st.items.filter(it=>st.place[it]!==home(st,it));
+    return st.wrong.length?`İşaretli ${st.wrong.length===1?"eşya":"eşyalar"} yanlış dalda. Üstüne dokun, geri al.`:true;
+  },
+  solved(st){ return this.check(st)===true },
+  auto(st){ st.items.forEach(it=>st.place[it]=home(st,it)); return true },
+  async solve(st){ for(const it of st.items){ st.sel=it; aRefresh(); aGoal(`${IT[it][0]} → ${BR[home(st,it)][0]}`); await aWait(700); st.place[it]=home(st,it); st.sel=null; sfx.place(); aRefresh(); await aWait(450) } }
+});
+})();
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
@@ -2462,7 +2656,7 @@ const BUG_LEVELS=[5,10,15,20,25,30,35,40,45,50,55,60];
 const DURAKS=[
  {no:1,name:"Yapboz Adası",kid:"Büyük işi küçük parçalara böl.",code:"B1 · Ayrıştırma",color:"#f08a24",acts:[
    {t:"Yol Kur",d:"Parçaları seç, yolu kur. Altın, anahtar ve kapı gibi küçük hedeflere bölerek çiçeğe ulaş.",lvl:"● ●●",age:"4-8 yaş",open:()=>openLevels("yol"),prog:(d=P())=>[sumStars(d.yol,1,40),120]},
-   {soon:1,t:"Piknik Ağacı",d:"Pikniğe gereken eşyaları doğru dala yerleştir.",lvl:"●",page:11},
+   {t:"Piknik Ağacı",d:"Fil Pofi pikniğe hazırlanıyor. Eşyaları dallara böl, gerekmeyenleri ayır.",lvl:"●",age:"4-6 yaş",page:11,open:()=>openActLevels("piknik"),prog:(d=P())=>actProg("piknik",d)},
    {soon:1,t:"Eksik Parça Hangisi?",d:"Bir işin adımlarından biri eksik. Hangisi?",lvl:"●●",page:14}]},
  {no:2,name:"Boncuk Adası",kid:"Ne tekrar ediyor? Sırada ne var?",code:"B2 · Örüntü tanıma",color:"#14a89a",acts:[
    {t:"Boncuk Atölyesi",d:"Tuki'nin bileziklerini tamamla, ritmini dinle, uzun diziyi “birim × sayı” ile kısalt.",lvl:"● ●●",age:"4-8 yaş",page:"16-22",open:()=>openActLevels("boncuk"),prog:(d=P())=>actProg("boncuk",d)}]},
@@ -2473,7 +2667,7 @@ const DURAKS=[
  {no:4,name:"Pusula Adası",kid:"Önce ne, sonra ne?",code:"B4 · Algoritma",color:"#e0a100",acts:[
    {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik yukarı bakarak başlar.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>[sumStars(d.kod,1,10),30]},
    {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:(d=P())=>[sumStars(d.kod,11,20),30]},
-   {soon:1,t:"Önce Ne, Sonra Ne?",d:"Resimli adımları doğru sıraya diz.",lvl:"●",page:35},
+   {t:"Önce Ne, Sonra Ne?",d:"Panda Pati'nin günü karışmış. Resimli adımları sıraya diz, eksik adımı bul.",lvl:"●",age:"4-7 yaş",page:35,open:()=>openActLevels("sira"),prog:(d=P())=>actProg("sira",d)},
    {soon:1,t:"Aynı Hedefe İki Yol",d:"İki yol bul; hangisi daha kısa?",lvl:"●●",page:41}]},
  {no:5,name:"Değirmen Adası",kid:"Kaç kez? Ne olursa ne yapayım?",code:"B5 · Döngü ve koşul",color:"#22a165",acts:[
    {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>[sumStars(d.kod,21,30),30]},
