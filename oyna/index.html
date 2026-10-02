@@ -102,7 +102,7 @@ h1,h2,h3{text-wrap:balance}
 .beta b{color:var(--ink)}
 .beta .pill{flex:none;background:var(--rail);color:var(--ink);font-weight:800;font-size:12px;letter-spacing:.6px;text-transform:uppercase;border-radius:999px;padding:3px 10px}
 /* Bidik Haritası */
-.mapwrap{width:100%;display:flex;flex-direction:column;gap:8px}
+.mapwrap{width:min(1000px,calc(100vw - 32px));display:flex;flex-direction:column;gap:8px}
 .mapwrap h2{font-family:var(--display);font-size:26px;margin:0;line-height:1}
 .mapwrap>p{margin:0;font-weight:700;color:var(--ink-soft);font-size:14px}
 .map{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -117,36 +117,64 @@ h1,h2,h3{text-wrap:balance}
 .stop.final{grid-column:1/-1;flex-direction:row;justify-content:center;gap:14px;text-align:left}
 .stop.final svg{width:58px;height:58px;flex:none}
 
-/* Ada yolculuğu */
-.map{display:block!important;width:100%}
-.map svg.sea{width:100%;height:auto;display:block;border-radius:28px;box-shadow:0 6px 0 #7cc3d8}
-.isle{cursor:pointer;outline:none}
-.isle .lift{transition:transform .15s}
-.isle:hover .lift,.isle:focus-visible .lift{transform:translateY(-5px)}
-.isle:focus-visible .ring{stroke:#16324a;stroke-width:5;stroke-dasharray:8 6}
-.isle.soonisle .land{filter:saturate(.55)}
-.boat{animation:bob 2.6s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-5px) rotate(-2deg)}}
-.seedglow{animation:glow 1.8s ease-in-out infinite}
-@keyframes glow{50%{opacity:.35}}
+/* Dünya turu */
+.map{display:flex!important;flex-direction:column;gap:12px;width:100%}
+.map svg.world{width:100%;height:auto;display:block;border-radius:30px;box-shadow:0 7px 0 #2d7fa3,0 14px 30px rgba(22,50,74,.18)}
+.world .mlab{font-family:var(--display);font-weight:800;font-size:19px;fill:#16324a;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
+.world .pin,.world .hub,.world .land{cursor:pointer;outline:none}
+.world .pin .ring{transition:stroke-width .15s}
+.world .pin:hover .ring,.world .pin:focus-visible .ring{stroke-width:8}
+.world .pin:focus-visible .ring,.world .hub:focus-visible circle{stroke:#16324a}
+.balloon{animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-7px)}}
+@media (prefers-reduced-motion:reduce){.balloon,.seedglow{animation:none}}
+.conts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:700px){.conts{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.cont{position:relative;display:flex;align-items:center;gap:8px;text-align:left;background:var(--panel);border-radius:20px;padding:8px 10px 8px 8px;border:3px solid var(--shade);box-shadow:0 4px 0 var(--shade);min-width:0}
+.cont:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shade)}
+.cont .pic{width:52px;height:52px;flex:none;border-radius:50%;background:var(--land);display:grid;place-items:center;overflow:hidden}
+.cont .pic svg{width:50px;height:50px;margin-top:4px}
+.cont .tx{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+.cont b{font-family:var(--display);font-size:17px;overflow-wrap:anywhere}
+@media (max-width:420px){.cont b{font-size:15.5px}.cont .pic{width:44px;height:44px}.cont .pic svg{width:42px;height:42px}}
+.cont small{font-weight:800;font-size:12.5px;color:var(--ink-soft)}
+.cont em{font-style:normal;font-weight:700;font-size:11px;color:var(--ink-soft);opacity:.85}
+.cont .stamp{position:absolute;top:-8px;right:-6px;width:26px;height:26px;border-radius:50%;background:#ffc93c;border:3px solid #fff;display:grid;place-items:center;font-weight:900;font-size:13px}
+.cont .cnt{position:absolute;top:-9px;right:-4px;font-size:11px;font-weight:800;background:#fff;border:2px solid var(--land);border-radius:999px;padding:0 7px}
+.cont .cnt.soon{color:var(--ink-soft)}
+.cont.home{--land:#f49ac1;--shade:#d6409f;grid-column:1/-1;justify-content:center}
+@media (min-width:700px){.cont.home{grid-column:auto}}
+.cont.home .pic{background:#fff0f6}
 .garden{width:100%;background:var(--panel);border:3px solid var(--panel-line);border-radius:22px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 0 var(--panel-line)}
 .garden h3{margin:0;font-family:var(--display);font-size:20px;line-height:1}
 .garden p{margin:0;font-size:13px;font-weight:700;color:var(--ink-soft)}
-.garden .pots{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;align-items:end}
-.garden .pots svg{width:100%;height:auto;max-height:84px}
-.daily .cal.bottle{background:#e9f8fb;position:relative;width:56px;height:64px}
-.daily .cal.bottle svg{position:absolute;inset:4px 8px;width:40px;height:56px}
-.daily .cal.bottle b{position:relative;font-size:17px;margin-top:16px;color:var(--ink)}
-.daily .cal.bottle small{position:relative;font-size:9px}
-.dhead .num svg{width:46px;height:46px}
-.dhead .seed{display:inline-block;margin:6px 0 0 6px;font-size:12px;font-weight:800;background:#fff;color:var(--ink);border-radius:999px;padding:2px 10px}
+.garden .gardensvg{width:100%;max-width:760px;margin:0 auto;height:auto;display:block}
+.seedglow{animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{50%{opacity:.35}}
+.daily .cal.post{background:#ffe9b8;position:relative;width:56px;height:64px}
+.daily .cal.post svg{position:absolute;inset:0;width:56px;height:64px}
+.daily .cal.post b{position:relative;font-size:22px;margin-top:6px;color:var(--ink)}
+.daily .cal.post small{position:relative;font-size:10px}
+#dHead{flex-direction:column;align-items:stretch;padding:0;overflow:hidden;gap:0;color:var(--ink);box-shadow:0 6px 0 rgba(22,50,74,.12)}
+#dHead .scene>svg{width:100%;height:auto;display:block;aspect-ratio:640/170}
+#dHead .dtext{background:#fff;padding:12px 16px 14px;display:flex;flex-direction:column;gap:6px}
+#dHead h2{font-size:32px;color:var(--ink)}
+#dHead .friend{margin:0;font-weight:700;font-size:16px;opacity:1}
+#dHead .sir{margin:0;font-size:13.5px;font-weight:700;color:var(--ink-soft);opacity:1}
+#dHead .dmeta{display:flex;flex-wrap:wrap;gap:6px}
+#dHead .code{background:var(--sky);margin:0}
+#dHead .seed{display:inline-block;font-size:12px;font-weight:800;background:#fff7dc;color:var(--ink);border-radius:999px;padding:2px 10px}
 .stamps{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
-.stamps span{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;border:3px dashed #c9d3de;background:#f6f8fa}
-.stamps span.on{border-style:solid;background:#fff}
-.stamps span svg{width:30px;height:30px}
+.stamps span{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;border:3px dashed #c9d3de;background:#f6f8fa;overflow:hidden}
+.stamps span svg{width:46px;height:46px;margin-top:4px}
 .stamps span:not(.on) svg{filter:grayscale(1);opacity:.35}
-
 /* ortak etkinlik */
+.abubble{width:min(100%,560px);display:flex;align-items:center;gap:10px}
+.afriend{width:58px;height:58px;flex:none;border-radius:50%;overflow:hidden;display:grid;place-items:center;border:3px solid #fff;box-shadow:0 3px 0 rgba(22,50,74,.15)}
+.afriend svg{width:56px;height:56px;margin-top:5px}
+.abubble .goal{flex:1;margin:0;text-align:left;background:#fff;border-radius:18px;padding:10px 14px;font-size:16px;color:var(--ink);position:relative;box-shadow:0 3px 0 var(--panel-line)}
+.abubble .goal::before{content:"";position:absolute;left:-9px;top:50%;margin-top:-8px;border:8px solid transparent;border-right-color:#fff;border-left:0}
+.abubble .goal.bad{color:var(--red)}.abubble .goal.good{color:#178a52}
 .abody{width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
 .abody .board.agrid{width:min(100%,520px)}
 .ahelp{margin:0;font-size:13px;font-weight:700;color:var(--ink-soft);text-align:center}
@@ -346,17 +374,17 @@ h1,h2,h3{text-wrap:balance}
   </div>
   <div class="beta" role="note"><span class="pill">Açık beta</span><span><b>Şu an bütün içerik ücretsiz.</b> Bidik gelişiyor; gördüğünüz hataları bize bildirin.</span></div>
   <div class="mapwrap">
-    <h2>Bidik'in 7 Ada Yolculuğu</h2>
-    <p>Büyük Çiçek'in yaprakları döküldü! Yedi adadan yedi sihirli tohumu topla, çiçek yeniden açsın. Bir adaya dokun.</p>
+    <h2>Bidik'in Dünya Turu</h2>
+    <p>Bidik bahçesinde Büyük Çiçek Şenliği yapacak. Balonuyla yedi kıtayı gez, oradaki hayvan dostlarının sorununu çöz, onları şenliğe davet et!</p>
     <div class="map" id="map"></div>
     <div class="garden" id="garden"></div>
   </div>
   <button class="daily" id="dailyBtn">
-    <span class="cal bottle"><svg viewBox="0 0 40 56" aria-hidden="true"><rect x="15" y="2" width="10" height="7" rx="2" fill="#b07a45"/><path d="M14 9h12v8c7 3 10 8 10 15v16a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V32c0-7 3-12 10-15z" fill="#bfe9f3" stroke="#5aa9c0" stroke-width="2.5"/><rect x="9" y="27" width="22" height="18" rx="2" fill="#fff6dc" stroke="#d9b56a" stroke-width="1.5" transform="rotate(-6 20 36)"/></svg><b id="dDay"></b><small id="dMon"></small></span>
-    <div><strong>Mesaj Şişesi</strong><span id="dTxt">Her gün yeni bir usta bulmacası. Büyükler de dene!</span></div>
+    <span class="cal post"><svg viewBox="0 0 56 64" aria-hidden="true"><rect x="3" y="8" width="50" height="50" rx="6" fill="#fff" transform="rotate(-6 28 33)"/><rect x="34" y="12" width="14" height="16" rx="2" fill="#ffc93c" stroke="#d99a00" stroke-width="1.5" stroke-dasharray="2 1.5" transform="rotate(-6 28 33)"/></svg><b id="dDay"></b><small id="dMon"></small></span>
+    <div><strong>Günün Kartpostalı</strong><span id="dTxt">Her gün yeni bir usta bulmacası. Büyükler de dene!</span></div>
   </button>
   <div class="home-tools">
-    <button class="chip" id="reportBtn">Seyir Defteri (öğretmen / veli)</button>
+    <button class="chip" id="reportBtn">Pasaport (öğretmen / veli)</button>
     <button class="chip" id="teacherBtn" aria-pressed="false">Öğretmen modu</button>
     <a class="chip" id="fbBtn" style="text-decoration:none;color:inherit" href="mailto:topcubasitolga@gmail.com?subject=Bidik%20beta%20geri%20bildirim&amp;body=Cihaz%20(tahta%2Ftablet%2Fbilgisayar)%3A%0AOyun%20ve%20b%C3%B6l%C3%BCm%3A%0ANe%20oldu%3A%0A">Görüş / hata bildir</a>
   </div>
@@ -376,8 +404,8 @@ h1,h2,h3{text-wrap:balance}
 <!-- DURAK -->
 <section id="durak" class="screen" hidden>
   <div class="topbar">
-    <button class="iconbtn" data-home aria-label="Ada haritası"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="title"><strong>Ada Haritası</strong><small id="dSub"></small></div>
+    <button class="iconbtn" data-home aria-label="Dünya haritası"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="title"><strong>Dünya Turu</strong><small id="dSub"></small></div>
     <span style="width:46px"></span>
   </div>
   <div class="dhead" id="dHead"></div>
@@ -393,7 +421,7 @@ h1,h2,h3{text-wrap:balance}
     <button class="iconbtn" id="aTalk" aria-label="Konuşalım"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg></button>
     <button class="iconbtn" id="aReset" aria-label="Baştan başla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg></button>
   </div>
-  <p class="goal" id="aGoal" aria-live="polite"></p>
+  <div class="abubble"><span class="afriend" id="aFriend"></span><p class="goal" id="aGoal" aria-live="polite"></p></div>
   <div class="abody" id="aBody"></div>
   <button class="bigbtn" id="aCheck" hidden>Kontrol et</button>
   <div class="speedbar" id="aSpeedBar" hidden></div>
@@ -461,7 +489,7 @@ h1,h2,h3{text-wrap:balance}
 <section id="report" class="screen" hidden>
   <div class="topbar">
     <button class="iconbtn" data-home aria-label="Ana ekran"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="title"><strong>Seyir Defteri</strong><small>Öğretmen / veli paneli · beceri bazında ilerleme</small></div>
+    <div class="title"><strong>Pasaport</strong><small>Öğretmen / veli paneli · beceri bazında ilerleme</small></div>
     <span style="width:46px"></span>
   </div>
   <div class="list" id="rList"></div>
@@ -1520,6 +1548,7 @@ function startAct(id,n){
   $("aTitle").textContent=m.title;
   $("aSub").textContent=`Bölüm ${n} / ${m.N} · ${part.name}`;
   $("aSolve").hidden=!teacherOn();
+  const fw=typeof WORLD!=="undefined"&&WORLD[m.durak]; $("aFriend").innerHTML=fw?animalSVG(m.durak):""; $("aFriend").style.background=fw?fw.land:""; $("aFriend").title=fw?fw.friend:"";
   A.st=m.setup(n);
   aRefresh();
   aGoal();
@@ -1637,6 +1666,278 @@ function bindGrid(root,fn,hfn){
 }
 function chipsHTML(items){ return `<div class="achips">${items.map(t=>`<span class="achip ${t.cls||""}" ${t.style?`style="${t.style}"`:""}>${t.html}</span>`).join("")}</div>` }
 function optsHTML(opts,attr){ return `<div class="aopts">${opts.map((o,i)=>`<button class="aopt" data-${attr||"i"}="${i}">${o}</button>`).join("")}</div>` }
+// ===== Bidik'in Dünya Turu: 7 kıta, 7 hayvan dostu =====
+// Görsel dil: resimli çocuk atlası; kıtalar kâğıttan kesilmiş gibi, altta koyu bir gölge katmanı.
+const WORLD={
+  1:{kita:"Afrika",yer:"Savan",friend:"Fil Pofi",acc:"Fil Pofi'yi",anim:"fil",land:"#f3c561",shade:"#c98f2c",sky:["#ffe3a3","#ffcf73"],
+     sir:"Afrika'nın savanında yağmur az yağar. Filler suyu bulmak için uzun yollar yürür.",
+     sorun:"Su birikintisine giden yol çok uzun. Büyük işi küçük parçalara bölelim!"},
+  2:{kita:"Güney Amerika",yer:"Yağmur ormanı",friend:"Tukan Tuki",acc:"Tukan Tuki'yi",anim:"tukan",land:"#4fb36b",shade:"#2c7d45",sky:["#c9f0c8","#8fd6a0"],
+     sir:"Amazon yağmur ormanında neredeyse her gün yağmur yağar. Tukanlar renkli gagalarıyla meyve toplar.",
+     sorun:"Tuki şarkılarını hep aynı sırayla söyler. Sırada ne var?"},
+  3:{kita:"Avustralya",yer:"Kızıl çöl ve okaliptüs",friend:"Kanguru Kiki",acc:"Kanguru Kiki'yi",anim:"kanguru",land:"#ec8f55",shade:"#b85a26",sky:["#ffd7b0","#f7b27a"],
+     sir:"Avustralya'da kangurular zıplayarak gezer. Yavrusu annesinin kesesinde büyür.",
+     sorun:"Kiki'nin yavrusu kalabalığa karıştı. Onu ötekilerden ayıran ne?"},
+  4:{kita:"Asya",yer:"Bambu ormanı",friend:"Panda Pati",acc:"Panda Pati'yi",anim:"panda",land:"#a8d77a",shade:"#6aa443",sky:["#e3f5cf","#bfe3a0"],
+     sir:"Asya'nın dağlarındaki bambu ormanlarında pandalar yaşar. Günün çoğunu bambu yiyerek geçirir.",
+     sorun:"Pati sabahları neyi önce yapacağını karıştırıyor. Önce ne, sonra ne?"},
+  5:{kita:"Kuzey Amerika",yer:"Orman ve nehir",friend:"Kunduz Kunku",acc:"Kunduz Kunku'yu",anim:"kunduz",land:"#5aae95",shade:"#2f7a66",sky:["#cdeee6","#9fd8ca"],
+     sir:"Kuzey Amerika'nın ormanlarında kunduzlar dallarla nehre baraj yapar.",
+     sorun:"Baraj için aynı işi tekrar tekrar yapmak gerek. Kaç kez? Ne olursa ne yapmalı?"},
+  6:{kita:"Antarktika",yer:"Buzullar",friend:"Penguen Pengo",acc:"Penguen Pengo'yu",anim:"penguen",land:"#f2f8ff",shade:"#a9c6e2",sky:["#e8f4ff","#c9e2f7"],
+     sir:"Antarktika dünyanın en soğuk yeri. Penguenler buzda karınları üstünde kayar!",
+     sorun:"Pengo buzda kaydı ve yolunu şaşırdı. Hata nerede?"},
+  7:{kita:"Avrupa",yer:"Orman ve eski şatolar",friend:"Baykuş Bilge",acc:"Baykuş Bilge'yi",anim:"baykus",land:"#b59be0",shade:"#7a5eb0",sky:["#ece3fb","#d3c3f2"],
+     sir:"Avrupa'nın ormanlarında baykuşlar geceleri avlanır. Karanlıkta çok iyi görürler.",
+     sorun:"Bilge'nin haritası ve gizli mektupları şifreli. Sembolleri birlikte çözelim!"}
+};
+const HOME={kita:"Türkiye",yer:"Bidik'in Bahçesi",friend:"Bütün dostlar"};
+
+// ---- hayvan portreleri (100×100) ----
+function eyeP(x,y,r){ r=r||7; return `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x+r*.12}" cy="${y+r*.12}" r="${r*.64}" fill="#1b2a3a"/><circle cx="${x+r*.36}" cy="${y-r*.28}" r="${r*.24}" fill="#fff"/>` }
+const blushP=(x,y)=>`<ellipse cx="${x}" cy="${y}" rx="6" ry="3.6" fill="#f49ac1" opacity=".75"/>`;
+const ANIMALS={
+  fil:`<ellipse cx="22" cy="48" rx="20" ry="24" fill="#9fb4c9"/><ellipse cx="22" cy="49" rx="13" ry="16" fill="#f3b9cb"/>
+    <ellipse cx="78" cy="48" rx="20" ry="24" fill="#9fb4c9"/><ellipse cx="78" cy="49" rx="13" ry="16" fill="#f3b9cb"/>
+    <circle cx="50" cy="48" r="27" fill="#b4c6d8"/>
+    <path d="M50 58 C50 72 56 82 66 84 C70 85 72 80 68 78 C62 76 59 70 59 60Z" fill="#b4c6d8"/>
+    <path d="M52 66h6M53 72h6M57 77h5" stroke="#90a5bb" stroke-width="2" stroke-linecap="round"/>
+    <path d="M44 22 q3-6 6 0 q3-6 6 0" stroke="#7d93aa" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    ${eyeP(40,45)}${eyeP(60,45)}${blushP(35,58)}${blushP(65,58)}`,
+  tukan:`<path d="M26 86 C18 60 22 30 46 24 C66 20 74 40 70 60 C68 74 60 84 52 88Z" fill="#1f2b3c"/>
+    <path d="M34 56 C34 44 42 40 50 42 C54 52 50 66 40 72 C36 68 34 62 34 56Z" fill="#fff3c4"/>
+    <path d="M54 34 C70 26 90 30 97 44 C90 52 72 52 58 48Z" fill="#ff9b2f"/><path d="M58 48 C72 52 88 51 95 47 C88 58 70 60 58 54Z" fill="#ffd23f"/>
+    <path d="M88 34 C93 37 96 40 97 44 C94 45 91 44 89 42Z" fill="#e8443a"/>
+    <circle cx="48" cy="38" r="10" fill="#49b6ff"/>${eyeP(48,38,6.5)}${blushP(42,52)}`,
+  kanguru:`<path d="M30 40 C22 18 26 6 32 4 C38 6 40 22 40 34Z" fill="#d38a50"/><path d="M32 36 C27 20 29 11 32 9 C35 12 36 24 36 34Z" fill="#f2b5a0"/>
+    <path d="M70 40 C78 18 74 6 68 4 C62 6 60 22 60 34Z" fill="#d38a50"/><path d="M68 36 C73 20 71 11 68 9 C65 12 64 24 64 34Z" fill="#f2b5a0"/>
+    <ellipse cx="50" cy="52" rx="26" ry="27" fill="#de9a60"/><ellipse cx="50" cy="66" rx="16" ry="13" fill="#f6d1a8"/>
+    <ellipse cx="50" cy="60" rx="5.5" ry="4" fill="#3b2a22"/><path d="M45 69 q5 4 10 0" stroke="#3b2a22" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    ${eyeP(40,46)}${eyeP(60,46)}${blushP(33,60)}${blushP(67,60)}`,
+  panda:`<circle cx="25" cy="26" r="12" fill="#1f2b3c"/><circle cx="75" cy="26" r="12" fill="#1f2b3c"/>
+    <circle cx="50" cy="52" r="31" fill="#fff"/><circle cx="50" cy="52" r="31" fill="none" stroke="#e4ebf2" stroke-width="2"/>
+    <ellipse cx="38" cy="48" rx="9" ry="12" fill="#1f2b3c" transform="rotate(25 38 48)"/><ellipse cx="62" cy="48" rx="9" ry="12" fill="#1f2b3c" transform="rotate(-25 62 48)"/>
+    ${eyeP(39,47,5.5)}${eyeP(61,47,5.5)}
+    <ellipse cx="50" cy="62" rx="6" ry="4.2" fill="#1f2b3c"/><path d="M45 69 q5 4 10 0" stroke="#1f2b3c" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    ${blushP(30,64)}${blushP(70,64)}
+    <path d="M84 92 L90 40" stroke="#5aa043" stroke-width="6" stroke-linecap="round"/><path d="M85 76h6M87 58h6" stroke="#3f7f2e" stroke-width="2.4"/><path d="M89 48 C96 40 98 34 97 30 C90 34 88 40 89 48Z" fill="#7cc35a"/>`,
+  kunduz:`<circle cx="27" cy="28" r="9" fill="#8c5530"/><circle cx="73" cy="28" r="9" fill="#8c5530"/><circle cx="27" cy="28" r="4.5" fill="#d99a72"/><circle cx="73" cy="28" r="4.5" fill="#d99a72"/>
+    <ellipse cx="50" cy="52" rx="30" ry="29" fill="#a8693d"/><ellipse cx="50" cy="66" rx="18" ry="14" fill="#e0b48a"/>
+    <ellipse cx="50" cy="58" rx="7" ry="4.8" fill="#3b2418"/>
+    <rect x="44" y="68" width="6" height="9" rx="1.5" fill="#fff" stroke="#e1d6c6" stroke-width="1"/><rect x="50" y="68" width="6" height="9" rx="1.5" fill="#fff" stroke="#e1d6c6" stroke-width="1"/>
+    ${eyeP(39,46)}${eyeP(61,46)}${blushP(31,60)}${blushP(69,60)}`,
+  penguen:`<path d="M50 14 C24 14 16 40 18 64 C20 84 34 94 50 94 C66 94 80 84 82 64 C84 40 76 14 50 14Z" fill="#22344d"/>
+    <path d="M50 30 C44 22 30 26 30 42 C30 56 36 74 50 78 C64 74 70 56 70 42 C70 26 56 22 50 30Z" fill="#fff"/>
+    <path d="M42 52 L58 52 L50 62Z" fill="#ff9b2f"/>
+    ${eyeP(41,42,6)}${eyeP(59,42,6)}${blushP(36,56)}${blushP(64,56)}
+    <path d="M24 78 C36 84 64 84 76 78 L74 88 C62 92 38 92 26 88Z" fill="#e8443a"/><rect x="62" y="84" width="9" height="12" rx="3" fill="#e8443a"/>`,
+  baykus:`<path d="M24 30 L28 10 L40 22Z" fill="#7a5eb0"/><path d="M76 30 L72 10 L60 22Z" fill="#7a5eb0"/>
+    <path d="M50 16 C24 16 16 40 18 62 C20 82 34 94 50 94 C66 94 80 82 82 62 C84 40 76 16 50 16Z" fill="#9277c8"/>
+    <path d="M50 80 C40 80 34 72 34 66 M50 80 C60 80 66 72 66 66" stroke="#b9a5e3" stroke-width="3" fill="none"/>
+    <circle cx="37" cy="44" r="14" fill="#efe6fb"/><circle cx="63" cy="44" r="14" fill="#efe6fb"/>
+    <circle cx="37" cy="44" r="9.5" fill="#ffc93c"/><circle cx="63" cy="44" r="9.5" fill="#ffc93c"/>
+    <circle cx="38" cy="45" r="6" fill="#1b2a3a"/><circle cx="64" cy="45" r="6" fill="#1b2a3a"/><circle cx="40" cy="42" r="2.2" fill="#fff"/><circle cx="66" cy="42" r="2.2" fill="#fff"/>
+    <path d="M45 56 L55 56 L50 66Z" fill="#ff9b2f"/>${blushP(28,62)}${blushP(72,62)}`
+};
+function animalSVG(no,extra){ const w=WORLD[no]; return `<svg viewBox="0 0 100 100" ${extra||""} aria-hidden="true">${ANIMALS[w.anim]}</svg>` }
+
+// ---- doğa süsleri (küçük, düz şekiller) ----
+const DECO={
+  akasya:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M-2 0 L-1 -16 L-8 -24 M-1 -16 L6 -25" stroke="#7a4a20" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="-27" rx="20" ry="6" fill="#6f9e3a"/><ellipse cx="-4" cy="-30" rx="12" ry="4.5" fill="#86b84a"/></g>`,
+  palmiye:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 C2 -10 1 -20 -2 -28" stroke="#7a4a20" stroke-width="3.5" fill="none" stroke-linecap="round"/>${[-150,-110,-70,-30].map(a=>`<path d="M-2 -28 q${(Math.cos(a*Math.PI/180)*10).toFixed(1)} ${(Math.sin(a*Math.PI/180)*10-4).toFixed(1)} ${(Math.cos(a*Math.PI/180)*18).toFixed(1)} ${(Math.sin(a*Math.PI/180)*18+6).toFixed(1)}" stroke="#2f8a4a" stroke-width="5" fill="none" stroke-linecap="round"/>`).join("")}</g>`,
+  agac:(x,y,s,c)=>`<g transform="translate(${x} ${y}) scale(${s})"><rect x="-2" y="-10" width="4" height="10" fill="#7a4a20"/><circle cx="0" cy="-18" r="11" fill="${c||"#2f8a4a"}"/><circle cx="-7" cy="-13" r="7" fill="${c||"#2f8a4a"}"/><circle cx="7" cy="-13" r="7" fill="${c||"#2f8a4a"}"/><circle cx="-3" cy="-22" r="4" fill="#fff" opacity=".18"/></g>`,
+  cam:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><rect x="-2" y="-6" width="4" height="6" fill="#6b4226"/><path d="M0 -34 L11 -18 H6 L14 -6 H-14 L-6 -18 H-11Z" fill="#2f6f58"/></g>`,
+  bambu:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})">${[-6,0,6].map((dx,i)=>`<path d="M${dx} 0 V${-26-i*4}" stroke="#5aa043" stroke-width="3.5" stroke-linecap="round"/><path d="M${dx-2} -9h4M${dx-2} -18h4" stroke="#3f7f2e" stroke-width="1.5"/>`).join("")}<path d="M6 -22 q8 -4 10 -2 q-4 5 -10 2Z M-6 -18 q-8 -4 -10 -2 q4 5 10 2Z" fill="#7cc35a"/></g>`,
+  dag:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 0 L-4 -30 L14 0Z" fill="#8aa0b8"/><path d="M-4 -30 L-11 -18 L-6 -20 L-2 -16 L2 -21 Z" fill="#fff"/><path d="M4 0 L16 -20 L28 0Z" fill="#9db1c6"/><path d="M16 -20 L12 -13 L16 -15 L19 -12Z" fill="#fff"/></g>`,
+  buzdag:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M-18 0 L-12 -14 L-4 -20 L4 -12 L12 -18 L18 0Z" fill="#fff"/><path d="M-4 -20 L4 -12 L2 0 L-6 0Z" fill="#cfe4f7"/><path d="M12 -18 L18 0 L10 0Z" fill="#cfe4f7"/></g>`,
+  kaya:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M-22 0 C-20 -12 -10 -16 0 -16 C12 -16 20 -10 22 0Z" fill="#c4512a"/><path d="M-12 -12 C-8 -14 -4 -15 0 -15" stroke="#e37a4f" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>`,
+  sato:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><rect x="-14" y="-18" width="28" height="18" fill="#efe8ff"/><rect x="-18" y="-26" width="9" height="26" fill="#e2d8fb"/><rect x="9" y="-26" width="9" height="26" fill="#e2d8fb"/><path d="M-19 -26 L-13.5 -34 L-8 -26Z M8 -26 L13.5 -34 L19 -26Z" fill="#e0457b"/><path d="M-4 0 V-8 a4 4 0 0 1 8 0 V0Z" fill="#7a5eb0"/><path d="M-13.5 -34 V-40 L-8 -38 L-13.5 -36" stroke="#16324a" stroke-width="1.2" fill="#ffc93c"/></g>`,
+  lale:(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 V-14" stroke="#22a165" stroke-width="2.5"/><path d="M0 -6 q-7 -3 -8 -9 q6 1 8 6Z" fill="#22a165"/><path d="M-6 -20 C-6 -12 6 -12 6 -20 L4 -24 L2 -20 L0 -25 L-2 -20 L-4 -24Z" fill="#e8443a"/></g>`,
+  nehir:(x,y,s)=>`<path d="M${x} ${y} q${10*s} ${-6*s} ${20*s} 0 t${20*s} 0 t${20*s} 0" stroke="#7fd0ea" stroke-width="${4*s}" fill="none" stroke-linecap="round"/>`,
+};
+
+// ---- dünya haritası: kaba kıta sınırları (boylam, enlem) ----
+const CONT={
+  5:[[-166,66],[-150,71],[-128,70],[-110,74],[-90,72],[-78,72],[-64,62],[-56,52],[-66,45],[-71,42],[-76,36],[-80,30],[-81,25],[-90,29],[-97,26],[-97,20],[-90,21],[-87,16],[-82,9],[-79,8],[-86,13],[-95,16],[-105,20],[-111,28],[-117,32],[-124,40],[-125,48],[-133,56],[-146,60],[-158,58],[-166,62]],
+  "gl":[[-52,82],[-28,83],[-20,74],[-30,68],[-43,60],[-52,66],[-58,75]],
+  2:[[-79,8],[-73,11],[-62,10],[-52,4],[-44,-2],[-35,-6],[-39,-14],[-40,-22],[-48,-26],[-53,-34],[-58,-38],[-63,-42],[-66,-48],[-69,-53],[-74,-52],[-74,-44],[-72,-32],[-71,-20],[-76,-14],[-81,-6],[-80,0]],
+  7:[[-9,37],[-9,43],[-2,44],[-4,48],[2,51],[5,53],[8,55],[8,58],[5,61],[12,66],[18,70],[26,71],[32,70],[40,67],[44,60],[44,52],[40,47],[34,46],[29,45],[28,41],[24,38],[22,40],[19,40],[16,38],[12,42],[14,45],[10,44],[6,43],[3,42],[-1,37],[-6,36]],
+  "uk":[[-6,50],[1,51],[-1,54],[-3,58],[-6,57],[-5,54]],
+  1:[[-17,21],[-16,27],[-10,30],[-6,35],[0,36],[10,37],[11,33],[20,31],[25,32],[32,31],[34,28],[39,18],[43,12],[51,12],[48,6],[42,-2],[40,-10],[40,-16],[35,-24],[32,-29],[27,-34],[19,-35],[16,-29],[12,-18],[13,-10],[9,-2],[9,4],[3,6],[-5,5],[-12,7],[-17,13]],
+  "mg":[[44,-13],[50,-15],[48,-24],[44,-25],[43,-18]],
+  4:[[29,41],[36,37],[36,32],[42,29],[50,26],[57,25],[58,22],[52,16],[44,13],[50,12],[56,18],[60,22],[66,25],[70,20],[73,16],[77,8],[80,13],[86,20],[91,22],[92,16],[98,15],[100,8],[104,2],[104,10],[108,14],[106,19],[110,21],[117,24],[122,30],[120,36],[126,38],[129,35],[130,42],[140,46],[141,52],[136,55],[142,59],[155,59],[162,61],[170,64],[180,66],[178,70],[160,71],[140,73],[120,74],[105,78],[90,76],[76,73],[66,70],[56,70],[46,68],[44,60],[44,52],[48,47],[40,46],[36,44],[30,44]],
+  "jp":[[130,32],[135,34],[140,36],[142,42],[141,45],[138,40],[133,35]],
+  "id":[[95,5],[102,0],[106,-6],[112,-8],[120,-8],[128,-4],[134,-4],[140,-3],[141,-8],[132,-7],[118,-9],[106,-8],[100,-3]],
+  3:[[114,-22],[118,-20],[122,-17],[126,-14],[130,-12],[136,-12],[137,-15],[141,-12],[143,-11],[146,-18],[150,-22],[153,-26],[153,-31],[150,-37],[146,-39],[141,-38],[137,-34],[133,-32],[126,-32],[118,-35],[115,-33],[114,-27]],
+  "nz":[[172,-35],[175,-37],[178,-38],[174,-42],[170,-46],[167,-46],[172,-41]],
+  6:[[-178,-71],[-150,-75],[-120,-73],[-95,-72],[-70,-67],[-58,-63],[-60,-70],[-40,-77],[-10,-71],[20,-69],[50,-67],[80,-67],[110,-66],[140,-67],[165,-71],[178,-75],[178,-84],[-178,-84]]
+};
+const MAPW=1000, MAPH=520;
+function proj(lon,lat){ return [ (lon+180)/360*MAPW, (84-lat)/(84+86)*MAPH ] }
+function closedSmooth(pts,t){
+  t=t==null?0.5:t; const n=pts.length; let d=`M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for(let i=0;i<n;i++){ const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
+    d+=` C${(p1[0]+(p2[0]-p0[0])*t/3).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])*t/3).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])*t/3).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])*t/3).toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}` }
+  return d+"Z";
+}
+function contPath(key,shrink){
+  const pts=CONT[key].map(p=>proj(p[0],p[1]));
+  const cx=pts.reduce((a,p)=>a+p[0],0)/pts.length, cy=pts.reduce((a,p)=>a+p[1],0)/pts.length;
+  const k=shrink||1; return closedSmooth(pts.map(p=>[cx+(p[0]-cx)*k,cy+(p[1]-cy)*k]),0.9);
+}
+// kıta üzerindeki süs yerleşimi ve dost rozeti yeri (boylam, enlem)
+const PLACE={
+  1:{badge:[20,4],deco:[["akasya",8,16,1.3],["akasya",28,-18,1.1],["akasya",-6,12,.9],["nehir",30,0,.9]]},
+  2:{badge:[-60,-12],deco:[["palmiye",-52,-2,1.2],["palmiye",-70,-26,1],["agac",-46,-18,1.1,"#2f8a4a"],["agac",-64,2,.9,"#3f9a56"]]},
+  3:{badge:[134,-25],deco:[["kaya",126,-27,1.1],["agac",146,-30,.95,"#7fa36a"],["agac",120,-22,.8,"#7fa36a"]]},
+  4:{badge:[96,44],deco:[["dag",82,32,1.3],["bambu",112,30,1.3],["bambu",120,40,1.1],["dag",70,52,1],["agac",130,62,.9,"#6aa443"],["agac",60,62,.9,"#6aa443"]]},
+  5:{badge:[-102,48],deco:[["cam",-118,60,1.25],["cam",-86,60,1.1],["cam",-110,38,1],["nehir",-96,34,1],["cam",-140,64,.9]]},
+  6:{badge:[2,-63],deco:[["buzdag",-110,-72,1.2],["buzdag",60,-72,1.1],["buzdag",120,-74,1],["buzdag",-50,-74,.9]]},
+  7:{badge:[2,55],deco:[["sato",-2,44,1.05],["agac",22,60,.9,"#5d8f4a"],["agac",30,50,.85,"#5d8f4a"]]}
+};
+const TR=[35,39]; // Türkiye
+const BALLOON=`<g class="balloon"><path d="M0 -58 C-26 -58 -32 -30 -22 -14 C-16 -5 -8 2 -6 8 H6 C8 2 16 -5 22 -14 C32 -30 26 -58 0 -58Z" fill="#fff"/>
+  <path d="M0 -58 C-14 -50 -14 -10 -6 8 H-2 C-7 -10 -8 -46 0 -58Z" fill="#d6409f"/><path d="M0 -58 C14 -50 14 -10 6 8 H2 C7 -10 8 -46 0 -58Z" fill="#2f7fd8"/>
+  <path d="M0 -58 C-26 -58 -32 -30 -22 -14 C-16 -5 -8 2 -6 8 H6 C8 2 16 -5 22 -14 C32 -30 26 -58 0 -58Z" fill="none" stroke="#16324a" stroke-width="2.5"/>
+  <path d="M-6 8 L-8 18 M6 8 L8 18" stroke="#7a4a20" stroke-width="2"/>
+  <g transform="translate(-9.5 2) scale(.095)">${MASCOT_FRONT.replace(/<ellipse cx="100" cy="188"[^>]*>/,"")}</g>
+  <rect x="-11" y="16" width="22" height="13" rx="3" fill="#b5743c" stroke="#7a4a20" stroke-width="2"/><path d="M-11 21h22" stroke="#7a4a20" stroke-width="1.4"/></g>`;
+
+// ---- harita çizimi ----
+let mapWide=null;
+function renderMap(){
+  const m=$("map"), d=P(), seeds=DURAKS.map(dk=>hasSeed(dk,d)), nSeed=seeds.filter(Boolean).length;
+  const wide=window.matchMedia("(min-width:700px)").matches; mapWide=wide;
+  const last=Math.min(7,Math.max(0,d.lastIsle||0));
+  let o=`<svg class="world" viewBox="0 0 ${MAPW} ${MAPH}" role="group" aria-label="Dünya haritası">
+  <defs><radialGradient id="ocean" cx=".5" cy=".42" r=".75"><stop offset="0" stop-color="#7fd3ea"/><stop offset="1" stop-color="#3f9fc6"/></radialGradient>
+  <pattern id="waves" width="46" height="24" patternUnits="userSpaceOnUse"><path d="M3 14 q5 -5 10 0 t10 0" stroke="#b9ecf7" stroke-width="2" fill="none" stroke-linecap="round" opacity=".55"/></pattern></defs>
+  <rect width="${MAPW}" height="${MAPH}" rx="30" fill="url(#ocean)"/><rect width="${MAPW}" height="${MAPH}" rx="30" fill="url(#waves)"/>
+  <g stroke="#ffffff" stroke-opacity=".22" stroke-width="1.5" stroke-dasharray="2 7" fill="none">${[-60,-30,0,30,60].map(l=>`<path d="M0 ${proj(0,l)[1]} H${MAPW}"/>`).join("")}</g>`;
+  // kıtalar: önce gölge (kâğıt kesiği), sonra yüzey
+  const extra={gl:5,uk:7,mg:1,jp:4,id:4,nz:3};
+  const keys=[6,5,"gl",2,7,"uk",1,"mg",4,"jp","id",3,"nz"];
+  keys.forEach(k=>{ const no=extra[k]||k, w=WORLD[no], p=contPath(k,.97);
+    o+=`<path d="${p}" fill="${w.shade}" transform="translate(4 7)"/><path d="${p}" fill="${w.land}" stroke="#fffaf0" stroke-width="3.5" stroke-linejoin="round" class="land" data-no="${no}"/>` });
+  // süsler
+  for(const no in PLACE) PLACE[no].deco.forEach(([t,lon,lat,s,c])=>{ const [x,y]=proj(lon,lat); o+=DECO[t](x,y,s,c) });
+  // uçuş rotası: Türkiye → 1 → … → 7 → Türkiye
+  const route=[proj(...TR),...[1,2,3,4,5,6,7].map(n=>proj(...PLACE[n].badge)),proj(...TR)];
+  o+=`<path d="${route.map((p,i)=>(i?"L":"M")+p[0].toFixed(0)+" "+p[1].toFixed(0)).join(" ")}" stroke="#fff" stroke-width="3.5" stroke-dasharray="2 11" stroke-linecap="round" fill="none" opacity=".9"/>`;
+  // Türkiye: Bidik'in bahçesi
+  const [tx,ty]=proj(...TR);
+  o+=`<g class="hub" data-no="8" role="button" tabindex="0" aria-label="Türkiye, Bidik'in Bahçesi, ${nSeed} / 7 dost geldi"><circle cx="${tx}" cy="${ty}" r="${wide?24:30}" fill="#fff" stroke="#e8443a" stroke-width="4"/><g transform="translate(${tx-(wide?20:25)} ${ty-(wide?22:27)}) scale(${wide?.42:.52})">${FLOWER}</g>
+    ${wide?`<text x="${tx}" y="${ty+42}" text-anchor="middle" class="mlab">Türkiye</text>`:""}</g>`;
+  // dost rozetleri
+  DURAKS.forEach((dk,i)=>{ const w=WORLD[dk.no], [x,y]=proj(...PLACE[dk.no].badge), R=wide?34:46, on=seeds[i];
+    o+=`<g class="pin" data-no="${dk.no}" role="button" tabindex="0" aria-label="${w.kita}: ${w.friend}, ${dk.code}${on?", pul alındı":""}">
+      <circle cx="${x+2}" cy="${y+5}" r="${R}" fill="#16324a" opacity=".22"/>
+      <circle class="ring" cx="${x}" cy="${y}" r="${R}" fill="#fff" stroke="${w.shade}" stroke-width="5"/>
+      <svg x="${x-R*.86}" y="${y-R*.9}" width="${R*1.72}" height="${R*1.72}" viewBox="0 0 100 100">${ANIMALS[w.anim]}</svg>
+      ${on?`<g transform="translate(${x+R*.78} ${y-R*.7})"><circle r="12" fill="#ffc93c" stroke="#fff" stroke-width="3"/><path d="M-5 0 l3.5 3.5 l6.5 -7" stroke="#16324a" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`:""}
+      ${wide?`<text x="${x}" y="${y+R+20}" text-anchor="middle" class="mlab">${w.kita}</text>`:""}</g>`;
+  });
+  // balon: son girilen kıtanın yanında (hiç girilmediyse Türkiye'de)
+  const bp= last? proj(...PLACE[last].badge) : [tx,ty];
+  o+=`<g transform="translate(${(bp[0]+(wide?58:72)).toFixed(0)} ${(bp[1]-(wide?6:10)).toFixed(0)}) scale(${wide?1:1.25})">${BALLOON}</g>`;
+  o+=`</svg>`;
+  // kıta kartları (pasaport sayfası gibi)
+  o+=`<div class="conts">${DURAKS.map((dk,i)=>{ const w=WORLD[dk.no], live=dk.acts.some(a=>!a.soon), [g,mx]=isleStars(dk,d);
+    return `<button class="cont" data-no="${dk.no}" style="--land:${w.land};--shade:${w.shade}" aria-label="${w.kita}, ${w.friend}">
+      <span class="pic">${animalSVG(dk.no)}</span>
+      <span class="tx"><b>${w.kita}</b><small>${w.friend}</small><em>${dk.code}</em></span>
+      ${seeds[i]?`<span class="stamp" title="Pul alındı">✓</span>`:live?`<span class="cnt">${g} ★</span>`:`<span class="cnt soon">yakında</span>`}
+    </button>` }).join("")}
+    <button class="cont home" data-no="8"><span class="pic"><svg viewBox="0 0 100 100" aria-hidden="true">${FLOWER}</svg></span><span class="tx"><b>Türkiye</b><small>Bidik'in Bahçesi</small><em>${nSeed} / 7 dost geldi</em></span></button></div>`;
+  m.innerHTML=o;
+  const go=no=>{ sfx.click&&sfx.click(); no===8?openFinal():openDurak(no) };
+  m.querySelectorAll(".pin,.hub,.cont").forEach(g=>{ const no=+g.dataset.no; g.addEventListener("click",()=>go(no)); if(g.tagName!=="BUTTON") g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();go(no)} }) });
+  m.querySelectorAll(".land").forEach(g=>{ const no=+g.dataset.no; g.addEventListener("click",()=>go(no)) });
+  renderGarden(seeds,nSeed);
+  checkNewSeeds(seeds);
+}
+window.addEventListener("resize",()=>{ if(!$("home").hidden && window.matchMedia("(min-width:700px)").matches!==mapWide) renderMap() });
+
+// ---- Şenlik bahçesi: gelen dostlar ----
+function renderGarden(seeds,n){
+  const g=$("garden"); if(!g) return;
+  const W=700,H=210;
+  let s=`<svg viewBox="0 0 ${W} ${H}" class="gardensvg" aria-hidden="true">
+    <rect width="${W}" height="${H}" rx="22" fill="#d9f3ff"/>
+    <circle cx="610" cy="48" r="26" fill="#ffd95a"/><circle cx="610" cy="48" r="36" fill="#ffd95a" opacity=".25"/>
+    <path d="M0 140 C120 104 220 120 330 134 C450 150 560 112 700 128 V${H} H0Z" fill="#9fd884"/>
+    <path d="M0 168 C140 146 260 160 380 170 C500 180 600 158 700 166 V${H} H0Z" fill="#7cc35a"/>
+    ${[40,90,250,430,520,665].map((x,i)=>DECO.lale(x,170+(i%2)*14,1.15)).join("")}`;
+  // Büyük Çiçek (ortada) — gelen dost sayısı kadar yaprak renklenir
+  s+=`<g transform="translate(350 122)"><path d="M0 0 V62" stroke="#22a165" stroke-width="7" stroke-linecap="round"/><path d="M0 40 q-26 -10 -32 2 q14 12 32 4Z M0 30 q24 -12 30 0 q-12 12 -30 4Z" fill="#22a165"/>
+    ${[0,1,2,3,4,5,6].map(i=>`<ellipse cx="0" cy="-34" rx="16" ry="25" fill="${i<n?WORLD[i+1].land:"#ffffff"}" stroke="${i<n?WORLD[i+1].shade:"#c9d3de"}" stroke-width="3" ${i<n?"":`stroke-dasharray="5 5"`} transform="rotate(${i*360/7})"/>`).join("")}
+    <circle r="20" fill="#ffc93c" stroke="#d99a00" stroke-width="3"/><circle cx="-6.5" cy="-3" r="2.8" fill="#16324a"/><circle cx="6.5" cy="-3" r="2.8" fill="#16324a"/>
+    ${n===7?`<path d="M-7 5 Q0 12 7 5" stroke="#16324a" stroke-width="2.6" fill="none" stroke-linecap="round"/>`:`<path d="M-6 7 H6" stroke="#16324a" stroke-width="2.6" stroke-linecap="round"/>`}</g>`;
+  const spots=[[86,120],[176,140],[256,112],[452,112],[530,140],[616,118],[130,72]];
+  DURAKS.forEach((dk,i)=>{ const [x,y]=spots[i];
+    s+= seeds[i]? `<g><ellipse cx="${x}" cy="${y+34}" rx="30" ry="6" fill="#16324a" opacity=".12"/><svg x="${x-36}" y="${y-36}" width="72" height="72" viewBox="0 0 100 100">${ANIMALS[WORLD[dk.no].anim]}</svg></g>`
+      : `<g opacity=".55"><circle cx="${x}" cy="${y}" r="26" fill="#fff" stroke="#9fb4c9" stroke-width="3" stroke-dasharray="5 5"/><text x="${x}" y="${y+9}" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="26" fill="#9fb4c9">?</text></g>`;
+  });
+  s+=`</svg>`;
+  g.innerHTML=`<h3>Bidik'in Bahçesi</h3><p>${n===7?"Bütün dostlar geldi! Büyük Çiçek Şenliği başlıyor.":n?`${n} / 7 dost şenliğe geldi. Her kıtada bir dost seni bekliyor.`:"Şenliğe henüz kimse gelmedi. Bir kıtaya uç, ilk dostunu davet et!"}</p>${s}`;
+}
+function checkNewSeeds(seeds){
+  const d=P(); d.seeds=d.seeds||{};
+  const fresh=DURAKS.filter((dk,i)=>seeds[i]&&!d.seeds[dk.no]);
+  if(!fresh.length) return;
+  fresh.forEach(dk=>d.seeds[dk.no]=1); save();
+  const dk=fresh[0], w=WORLD[dk.no];
+  setTimeout(()=>{ if($("home").hidden||!$("overlay").hidden) return;
+    overlay(`<span class="kicker">Yeni pul</span><svg class="art" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="${w.land}"/>${ANIMALS[w.anim]}</svg>
+      <h2>${w.friend} şenliğe geliyor!</h2><p>${w.kita} pulu pasaportuna basıldı. ${seedCount()===7?"Yedi dostun hepsi yolda!":`Toplam ${seedCount()} / 7 dost.`}</p><div class="btns"><button class="btn-main" id="ovSeed">Yaşasın!</button></div>`);
+    sfx.win&&sfx.win(); $("ovSeed").onclick=()=>{closeOverlay(); renderMap()};
+  },350);
+}
+function openFinal(){
+  const n=seedCount();
+  overlay(`<span class="kicker">Eve dönüş</span><svg class="art" viewBox="0 0 100 100">${FLOWER}</svg><h2>Türkiye: Bidik'in Bahçesi</h2><p>Yedi kıtadaki dostlarını davet et, Büyük Çiçek Şenliği başlasın. Şenlikte bütün becerileri tek hikâyede kullanacaksın.</p><p><b>${n} / 7 dost</b> geldi.${n<7?" Kıtalarda biraz daha yıldız topla, dostlar gelsin.":""}</p><p style="font-size:13px">Şenlik yakında açılıyor. Kitapta s. ${FINAL.page}.</p><div class="btns"><button class="btn-main" id="ovFin">Tamam</button></div>`);
+  $("ovFin").onclick=closeOverlay;
+}
+// ---- kıta sahnesi (kıta sayfası başlığı) ----
+function sceneSVG(no){
+  const w=WORLD[no], W=640, H=170;
+  const ground=`<path d="M0 118 C110 96 220 104 330 116 C450 128 540 100 ${W} 110 V${H} H0Z" fill="${w.land}"/><path d="M0 140 C140 124 280 134 400 144 C500 152 580 136 ${W} 140 V${H} H0Z" fill="${w.shade}" opacity=".55"/>`;
+  const decos={
+    1:DECO.akasya(140,120,2.4)+DECO.akasya(560,116,2)+DECO.akasya(470,124,1.4)+`<circle cx="560" cy="40" r="22" fill="#ffb03a"/>`,
+    2:DECO.palmiye(130,122,2.2)+DECO.palmiye(560,118,2.4)+DECO.agac(470,128,1.8,"#2f8a4a")+DECO.agac(230,130,1.5,"#3f9a56")+`<g fill="#7fd0ea">${[180,320,420,520].map(x=>`<path d="M${x} 20 l-4 10" stroke="#7fd0ea" stroke-width="3" stroke-linecap="round"/>`).join("")}</g>`,
+    3:DECO.kaya(500,120,3)+DECO.agac(150,124,1.9,"#7fa36a")+DECO.agac(250,120,1.4,"#7fa36a")+`<circle cx="580" cy="40" r="22" fill="#ff8a3a"/>`,
+    4:DECO.dag(470,110,2.8)+DECO.bambu(140,126,2.4)+DECO.bambu(230,130,2)+DECO.bambu(580,128,2.2),
+    5:DECO.cam(130,124,2.4)+DECO.cam(200,120,1.9)+DECO.cam(560,122,2.4)+DECO.cam(490,126,1.7)+`<path d="M260 150 C320 138 380 160 440 146" stroke="#7fd0ea" stroke-width="10" fill="none" stroke-linecap="round"/>`,
+    6:DECO.buzdag(150,124,3)+DECO.buzdag(540,120,3.4)+DECO.buzdag(440,128,1.8)+`<g fill="#fff">${[[120,30],[260,50],[380,24],[600,60],[480,40]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.5"/>`).join("")}</g>`,
+    7:DECO.sato(520,118,2.6)+DECO.agac(150,124,2,"#5d8f4a")+DECO.agac(230,128,1.6,"#5d8f4a")+`<path d="M590 34 a16 16 0 1 0 12 26 a13 13 0 1 1 -12 -26Z" fill="#fff6c8"/>`
+  };
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="sk${no}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${w.sky[0]}"/><stop offset="1" stop-color="${w.sky[1]}"/></linearGradient></defs>
+    <rect width="${W}" height="${H}" fill="url(#sk${no})"/>${ground}${decos[no]||""}
+    <g transform="translate(270 22)"><ellipse cx="50" cy="104" rx="38" ry="7" fill="#16324a" opacity=".16"/><svg width="100" height="100" viewBox="0 0 100 100">${ANIMALS[w.anim]}</svg></g></svg>`;
+}
+function openDurak(no){
+  curDurak=no; lastLevels=null;
+  const d=P(); if(d.lastIsle!==no){ d.lastIsle=no; save() }
+  const dk=DURAKS.find(x=>x.no===no), w=WORLD[no];
+  show("durak");
+  $("dSub").textContent=`${w.yer} · ${no} / 7`;
+  const [g,mx]=isleStars(dk), need=seedNeed(mx), ok=mx>0&&g>=need;
+  const seedTxt= mx===0? "Oyunlar gelince pul kazanılır" : ok? `${w.friend} şenliğe geliyor ✓` : `${w.acc} davet etmeye ${need-g} yıldız kaldı`;
+  const h=$("dHead"); h.style.background=w.land; h.style.color=no===6?"var(--ink)":"var(--ink)";
+  h.innerHTML=`<div class="scene">${sceneSVG(no)}</div>
+    <div class="dtext"><h2>${w.kita}</h2><p class="friend"><b>${w.friend}:</b> “${w.sorun}”</p><p class="sir">${w.sir}</p>
+    <div class="dmeta"><span class="code">${dk.code}</span><span class="seed">${seedTxt}</span></div></div>`;
+  const box=$("dActs"); box.innerHTML="";
+  dk.acts.forEach(a=>{
+    const b=document.createElement("button"); b.className="act";
+    const pg=a.prog?a.prog():null;
+    b.innerHTML=`<h3>${a.t}</h3><p>${a.d}</p><div class="meta"><span class="lvl">${a.lvl}</span>${a.age?`<span>${a.age}</span>`:""}${a.page?`<span>Kitapta s. ${a.page}</span>`:""}${a.soon?`<span class="soon">Yakında</span>`:""}</div>${pg?`<div class="prog2">${pg[0]} / ${pg[1]} ★</div>`:""}`;
+    if(a.soon){ b.disabled=true; b.setAttribute("aria-label",`${a.t}, yakında`) }
+    else b.onclick=a.open;
+    box.appendChild(b);
+  });
+  $("dNote").textContent="● okul öncesi  ●● 1. sınıf  ●●● ileri düzey · “Yakında” etkinlikler Bidik ile Düşün, Çöz, Kodla kitabından dijitale taşınıyor.";
+}
 // ===== Koordinat Avı (Şifre Adası) =====
 (function(){
 const OBJ=["yildiz","cicek","elma","kalp","top","bidik"];
@@ -1870,7 +2171,7 @@ function goHome(){
   const now=new Date(), mon=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][now.getMonth()];
   $("dMon").textContent=mon; $("dDay").textContent=now.getDate();
   const ds=d.daily[todayKey()];
-  $("dTxt").textContent=ds?`Bugünkü şişe açıldı: ${starsTxt(ds)} · Yarın kıyıya yenisi vuracak`:`Kıyıya bir şişe vurdu! İçinde bugünün ${todayKey()%2?"Kodla Sür":"Yol Kur"} bulmacası var. Büyükler de dene!`;
+  $("dTxt").textContent=ds?`Bugünkü kartpostal çözüldü: ${starsTxt(ds)} · Yarın yenisi gelecek`:`Bir dosttan kartpostal geldi! Arkasında bugünün ${todayKey()%2?"Kodla Sür":"Yol Kur"} bulmacası var. Büyükler de dene!`;
   $("teacherBtn").setAttribute("aria-pressed",db.teacher);
 }
 // ---- Bidik Haritası: kitaptaki yedi durak (B1–B7) ----
@@ -1931,105 +2232,7 @@ function seedNeed(max){ return Math.min(12,Math.ceil(max/4)) }
 function hasSeed(dk,d){ const [g,m]=isleStars(dk,d); return m>0&&g>=seedNeed(m) }
 function seedCount(d){ return DURAKS.filter(dk=>hasSeed(dk,d)).length }
 const SEED_ART=(x,y,on)=>`<g transform="translate(${x} ${y})">${on?`<circle r="19" fill="#ffe27a" class="seedglow"/>`:""}<circle r="15" fill="${on?"#fff":"rgba(255,255,255,.75)"}" stroke="${on?"#d99a00":"#7aa7b8"}" stroke-width="3" ${on?"":`stroke-dasharray="4 4"`}/><path d="M0 -9 C7 -3 7 6 0 9 C-7 6 -7 -3 0 -9Z" fill="${on?"#a0682c":"#c9d3de"}"/><path d="M0 -4 v9" stroke="${on?"#f3c98b":"#eef2f6"}" stroke-width="2" stroke-linecap="round"/></g>`;
-function blobPath(cx,cy,r,seed){
-  const n=11, pts=[];
-  for(let i=0;i<n;i++){ const a=i/n*Math.PI*2, w=0.86+0.2*Math.abs(Math.sin(seed*7.3+i*2.1)); pts.push([cx+Math.cos(a)*r*w*1.12, cy+Math.sin(a)*r*w*0.9]) }
-  let d=""; for(let i=0;i<n;i++){ const p=pts[i], q=pts[(i+1)%n], m=[(p[0]+q[0])/2,(p[1]+q[1])/2]; if(i===0){const z=pts[n-1];d+=`M${((z[0]+p[0])/2).toFixed(1)} ${((z[1]+p[1])/2).toFixed(1)}`} d+=` Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}` }
-  return d+"Z";
-}
-const BOAT=`<g class="boat"><path d="M-36 4 h72 l-13 17 h-46z" fill="#b5743c" stroke="#7a4a20" stroke-width="3" stroke-linejoin="round"/><path d="M-30 10 h60" stroke="#e7a866" stroke-width="3"/><path d="M2 2 V-46" stroke="#7a4a20" stroke-width="3.5"/><path d="M5 -44 L30 -6 H5z" fill="#fff" stroke="#c9d3de" stroke-width="2"/><path d="M5 -20 L19 -20 L23 -14 H5z" fill="#f49ac1"/><g transform="translate(-14 -6) rotate(-90) scale(.42)">${ROBOT}</g></g>`;
-const MAPL={
-  wide:{w:1000,h:600,r:62,pos:[[130,150],[360,115],[600,160],[850,130],[860,400],[610,440],[370,410],[135,430]]},
-  tall:{w:420,h:1110,r:58,pos:[[120,95],[300,215],[120,340],[300,465],[120,590],[300,715],[120,840],[290,970]]}
-};
-function smoothPath(P){ let d=`M${P[0][0]} ${P[0][1]}`; for(let i=0;i<P.length-1;i++){ const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||p2; d+=` C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0]} ${p2[1]}` } return d }
-let curDurak=null, lastLevels=null, mapLayout=null;
-function renderMap(){
-  const m=$("map"), wide=window.matchMedia("(min-width:700px)").matches, Lp=wide?MAPL.wide:MAPL.tall; mapLayout=wide;
-  const d=P(), seeds=DURAKS.map(dk=>hasSeed(dk,d)), nSeed=seeds.filter(Boolean).length;
-  const last=Math.min(8,Math.max(1,d.lastIsle||1)), R=Lp.r;
-  let o=`<svg class="sea" viewBox="0 0 ${Lp.w} ${Lp.h}" role="group" aria-label="Ada haritası"><defs><linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9e3f2"/><stop offset="1" stop-color="#7fcfe6"/></linearGradient></defs>
-  <rect width="${Lp.w}" height="${Lp.h}" rx="28" fill="url(#seaG)"/>`;
-  // dalgalar
-  for(let i=0;i<14;i++){ const x=(i*173+60)%(Lp.w-80)+20, y=(i*97+40)%(Lp.h-40)+20; o+=`<path d="M${x} ${y} q8 -7 16 0 t16 0" stroke="#e6f8fd" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".8"/>` }
-  // rota
-  for(let i=0;i<7;i++){ const seg=smoothPath(Lp.pos).split(" C")[i+1]; const st=Lp.pos[i]; o+=`<path d="M${st[0]} ${st[1]} C${seg}" stroke="${seeds[i]?"#ffc93c":"#ffffff"}" stroke-width="7" stroke-dasharray="1 17" stroke-linecap="round" fill="none"/>` }
-  // adalar
-  const isle=(no,x,y,name,sub,color,soon,seedOn,isFinal)=>{
-    const lab=y+R+30;
-    return `<g class="isle${soon?" soonisle":""}" data-no="${no}" role="button" tabindex="0" aria-label="${name}${isFinal?`, ${nSeed} / 7 tohum`:`, ${sub}`}"><g class="lift">
-      <ellipse cx="${x}" cy="${y+8}" rx="${R*1.32}" ry="${R*1.05}" fill="#d4f3fb" opacity=".8"/>
-      <path class="land" d="${blobPath(x,y,R*1.12,no)}" fill="#f6e2a6" stroke="#e2c47a" stroke-width="3"/>
-      <path class="land" d="${blobPath(x,y-4,R*0.9,no+3)}" fill="${isFinal?"#a7dd8c":"#9fd884"}"/>
-      ${isFinal?"":`<g fill="#5fae55"><circle cx="${x-R*.72}" cy="${y-R*.15}" r="9"/><circle cx="${x-R*.6}" cy="${y-R*.3}" r="7"/><circle cx="${x+R*.7}" cy="${y+R*.25}" r="8"/></g>`}
-      <circle class="ring" cx="${x}" cy="${y-6}" r="${R*.56}" fill="#fff" stroke="${color}" stroke-width="5"/>
-      <svg x="${x-R*.42}" y="${y-6-R*.42}" width="${R*.84}" height="${R*.84}" viewBox="0 0 48 48">${isFinal?`<g transform="translate(-1 -3) scale(.5)">${FLOWER}</g>`:emblem(no,color)}</svg>
-      ${isFinal?"":`<circle cx="${x-R*.62}" cy="${y-R*.62}" r="15" fill="${color}" stroke="#fff" stroke-width="3"/><text x="${x-R*.62}" y="${y-R*.62+6}" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="18" fill="#fff">${no}</text>`}
-      ${isFinal?"":SEED_ART(x+R*.72,y-R*.6,seedOn)}
-      <rect x="${x-98}" y="${lab-22}" width="196" height="${soon?56:48}" rx="16" fill="#fff" stroke="${color}" stroke-width="3"/>
-      <text x="${x}" y="${lab}" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="22" fill="#16324a">${name}</text>
-      <text x="${x}" y="${lab+18}" text-anchor="middle" font-family="Nunito,Segoe UI,sans-serif" font-weight="800" font-size="13" fill="#466179">${sub}</text>
-      ${soon?`<text x="${x}" y="${lab+31}" text-anchor="middle" font-family="Nunito,Segoe UI,sans-serif" font-weight="800" font-size="11" fill="#8a9bab">oyunlar yakında</text>`:""}
-    </g></g>`;
-  };
-  DURAKS.forEach((dk,i)=>{ const [x,y]=Lp.pos[i]; o+=isle(dk.no,x,y,dk.name,dk.code,dk.color,!dk.acts.some(a=>!a.soon),seeds[i],false) });
-  const fp=Lp.pos[7]; o+=isle(8,fp[0],fp[1],FINAL.name,`${nSeed} / 7 tohum`,"#e0457b",false,false,true);
-  // tekne: son ziyaret edilen adanın kıyısında
-  const bp=Lp.pos[last-1], np=Lp.pos[last], t=.47; o+=`<g transform="translate(${(bp[0]+(np[0]-bp[0])*t).toFixed(0)} ${(bp[1]+(np[1]-bp[1])*t-8).toFixed(0)})">${BOAT}</g>`;
-  o+=`</svg>`;
-  m.innerHTML=o;
-  m.querySelectorAll(".isle").forEach(g=>{ const no=+g.dataset.no; const go=()=>{ sfx.click&&sfx.click(); no===8?openFinal():openDurak(no) }; g.addEventListener("click",go); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();go()} }) });
-  renderGarden(seeds,nSeed);
-  checkNewSeeds(seeds);
-}
-window.addEventListener("resize",()=>{ if(!$("home").hidden && window.matchMedia("(min-width:700px)").matches!==mapLayout) renderMap() });
-function potSVG(on,color,no){
-  return `<svg viewBox="0 0 60 84" aria-hidden="true">${on?`<path d="M30 58 V30" stroke="#22a165" stroke-width="4" stroke-linecap="round"/><path d="M30 48 Q20 42 16 46 Q22 53 30 50Z" fill="#22a165"/><path d="M30 42 Q40 36 44 40 Q38 47 30 44Z" fill="#22a165"/><g transform="translate(30 24)">${[0,60,120,180,240,300].map(a=>`<ellipse cx="0" cy="-9" rx="6" ry="8" fill="${color}" stroke="#fff" stroke-width="1.6" transform="rotate(${a})"/>`).join("")}<circle r="6.5" fill="#ffc93c" stroke="#d99a00" stroke-width="1.5"/></g>`:`<path d="M30 58 C28 54 26 52 24 51" stroke="#b9c7b0" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>`}
-  <path d="M12 58 h36 l-5 24 h-26z" fill="#d9774a" stroke="#a8532d" stroke-width="2.5" stroke-linejoin="round"/><rect x="9" y="54" width="42" height="8" rx="3" fill="#e88d5f" stroke="#a8532d" stroke-width="2.5"/><text x="30" y="77" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="13" fill="#fff">${no}</text></svg>`;
-}
-function renderGarden(seeds,n){
-  const g=$("garden"); if(!g) return;
-  g.innerHTML=`<h3>Bidik'in Bahçesi</h3><p>${n===7?"Yedi tohumun hepsi toprakta! Çiçek Adası'na yelken aç.":`${n} / 7 tohum toplandı. Her adanın tohumu bir saksıda çiçek açar.`}</p>
-    <div class="pots">${DURAKS.map((dk,i)=>potSVG(seeds[i],dk.color,dk.no)).join("")}</div>`;
-}
-function checkNewSeeds(seeds){
-  const d=P(); d.seeds=d.seeds||{};
-  const fresh=DURAKS.filter((dk,i)=>seeds[i]&&!d.seeds[dk.no]);
-  if(!fresh.length) return;
-  fresh.forEach(dk=>d.seeds[dk.no]=1); save();
-  const dk=fresh[0];
-  setTimeout(()=>{ if($("home").hidden||!$("overlay").hidden) return;
-    overlay(`<span class="kicker">Sihirli tohum!</span><svg class="art" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#ffe27a" class="seedglow"/><circle cx="50" cy="50" r="30" fill="#fff" stroke="${dk.color}" stroke-width="5"/><svg x="26" y="26" width="48" height="48" viewBox="0 0 48 48">${emblem(dk.no)}</svg></svg>
-      <h2>${dk.name} tohumu senin!</h2><p>Bidik tohumu çantasına koydu ve bahçesine dikti. ${seedCount()===7?"Yedi tohumun hepsi tamam!":`Toplam ${seedCount()} / 7 tohum.`}</p><div class="btns"><button class="btn-main" id="ovSeed">Yaşasın!</button></div>`);
-    sfx.win&&sfx.win(); $("ovSeed").onclick=()=>{closeOverlay(); renderMap()};
-  },350);
-}
-function openFinal(){
-  const n=seedCount();
-  overlay(`<span class="kicker">Son durak</span><svg class="art" viewBox="0 0 100 100">${FLOWER}</svg><h2>${FINAL.name}</h2><p>${FINAL.kid}</p><p><b>${n} / 7 tohum</b> toplandı.${n<7?" Her adada biraz daha yıldız topla, tohumlar gelsin.":""}</p><p style="font-size:13px">Bu ada yakında açılıyor. Kitapta s. ${FINAL.page}.</p><div class="btns"><button class="btn-main" id="ovFin">Tamam</button></div>`);
-  $("ovFin").onclick=closeOverlay;
-}
-function openDurak(no){
-  curDurak=no; lastLevels=null;
-  const d=P(); if(d.lastIsle!==no){ d.lastIsle=no; save() }
-  const dk=DURAKS.find(x=>x.no===no);
-  show("durak");
-  $("dSub").textContent=`Ada ${dk.no} / 7`;
-  const h=$("dHead"); h.style.background=dk.color;
-  const [g,mx]=isleStars(dk), need=seedNeed(mx), ok=mx>0&&g>=need;
-  const seedTxt= mx===0? "Tohum: oyunlar gelince" : ok? "Tohum kazanıldı ✓" : `Tohuma ${need-g} yıldız kaldı`;
-  h.innerHTML=`<span class="num" style="background:#fff"><svg viewBox="0 0 48 48" aria-hidden="true">${emblem(dk.no)}</svg></span><div><h2>${dk.name}</h2><p>${dk.kid}</p><span class="code">${dk.code}</span><span class="seed">${seedTxt}</span></div>`;
-  const box=$("dActs"); box.innerHTML="";
-  dk.acts.forEach(a=>{
-    const b=document.createElement("button"); b.className="act";
-    const pg=a.prog?a.prog():null;
-    b.innerHTML=`<h3>${a.t}</h3><p>${a.d}</p><div class="meta"><span class="lvl">${a.lvl}</span>${a.age?`<span>${a.age}</span>`:""}${a.page?`<span>Kitapta s. ${a.page}</span>`:""}${a.soon?`<span class="soon">Yakında</span>`:""}</div>${pg?`<div class="prog2">${pg[0]} / ${pg[1]} ★</div>`:""}`;
-    if(a.soon){ b.disabled=true; b.setAttribute("aria-label",`${a.t}, yakında`) }
-    else b.onclick=a.open;
-    box.appendChild(b);
-  });
-  $("dNote").textContent="● okul öncesi  ●● 1. sınıf  ●●● ileri düzey · “Yakında” etkinlikler Bidik ile Düşün, Çöz, Kodla kitabından dijitale taşınıyor.";
-}
+let curDurak=null, lastLevels=null;
 function backToLevels(mode){ if(lastLevels&&lastLevels.mode===mode) openLevels(mode,lastLevels.opts); else openLevels(mode) }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 $("dailyBtn").onclick=()=>Daily.open();
@@ -2124,8 +2327,8 @@ function openReport(){
     ];
     const daily=Object.keys(d.daily).length;
     const c=document.createElement("div"); c.className="rcard";
-    const stamps=`<div class="stamps" aria-label="Ada mühürleri">${DURAKS.map(dk=>`<span class="${hasSeed(dk,d)?"on":""}" title="${dk.name}" style="${hasSeed(dk,d)?`border-color:${dk.color}`:""}"><svg viewBox="0 0 48 48">${emblem(dk.no)}</svg></span>`).join("")}</div>`;
-    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)} · ${seedCount(d)} / 7 tohum</header>${stamps}
+    const stamps=`<div class="stamps" aria-label="Pasaport pulları">${DURAKS.map(dk=>`<span class="${hasSeed(dk,d)?"on":""}" title="${WORLD[dk.no].kita}: ${WORLD[dk.no].friend}" style="${hasSeed(dk,d)?`border-color:${WORLD[dk.no].shade};background:${WORLD[dk.no].land}`:""}">${animalSVG(dk.no)}</span>`).join("")}</div>`;
+    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)} · ${seedCount(d)} / 7 dost</header>${stamps}
       <div class="bars">${rows.map(([l,v,m,col])=>`<span>${l}</span><div class="meter"><i style="width:${v/m*100}%;background:${col}"></i></div><span class="v">${v}/${m}</span>`).join("")}</div>
       <p class="note" style="text-align:left">Çözülen günlük bulmaca: ${daily}</p>`;
     list.appendChild(c);
