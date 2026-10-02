@@ -138,7 +138,7 @@ h1,h2,h3{text-wrap:balance}
 .slot.err .blk{outline:4px solid var(--red);outline-offset:1px}
 .blk{width:100%;height:100%;border-radius:10px;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;font-size:20px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .12s}
 .blk svg{width:64%;height:64%}
-.blk.g{background:var(--green)} .blk.b{background:var(--blue)} .blk.p{background:var(--purple)} .blk.o{background:var(--orange)} .blk.c{background:#0e6f7c} .blk.r{background:#d6409f}
+.blk.g{background:var(--green)} .blk.b{background:var(--blue)} .blk.p{background:var(--purple)} .blk.o{background:var(--orange)} .blk.c{background:#0e6f7c} .blk.gd{background:#13704a} .blk.r{background:#d6409f}
 .bl{transform-box:fill-box;transform-origin:center}
 #kCar.blink-L .bl-L,#kCar.blink-R .bl-R{animation:wave .3s ease-in-out 3}
 .petals{transform-box:view-box;transform-origin:0 0}
@@ -869,6 +869,7 @@ const BLK={
   F:{name:"İleri",cls:"g",svg:'<path d="M12 20V5M6 11l6-6 6 6"/>'},
   L:{name:"Sola dön",cls:"b",svg:'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'},
   R:{name:"Sağa dön",cls:"r",svg:'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>'},
+  G:{name:"Geri",cls:"gd",svg:'<path d="M12 4v16M6 14l6 6 6-6"/>'},
   N:{name:"Yukarı",cls:"g",svg:'<path d="M12 20V4M5 11l7-7 7 7"/>'},
   E:{name:"Sağa",cls:"g",svg:'<path d="M4 12h16M13 5l7 7-7 7"/>'},
   S:{name:"Aşağı",cls:"g",svg:'<path d="M12 4v16M5 13l7 7 7-7"/>'},
@@ -885,12 +886,12 @@ const isPre=t=>/^[234IAYK]$/.test(t), isCond=t=>t==="A"||t==="Y"||t==="K";
 
 const Kod=(()=>{
 const CH=[
-  {name:"Oklarla yol",sub:"Ekrandaki oklarla adım adım git",from:1,to:10,pal:["N","E","S","W"],abs:true,
-   intro:{kicker:"Kodla Sür",title:"Algoritma: sıralı adımlar",text:"Bidik'e nereye gideceğini oklarla söyle. Oklar ekrana göredir: yukarı ok Bidik'i ekranın üstüne götürür. Bloğa dokun, programa eklenir. Programdaki bloğa dokun, silinir.",ex:["E","E","N","E"]}},
-  {name:"Oklar ve döngü",sub:"Tekrar eden adımları kısalt",from:11,to:20,pal:["N","E","S","W","2","3","4"],abs:true,
-   intro:{kicker:"Yeni kavram",title:"Döngü: tekrar et",text:"Aynı oku üst üste koymak yerine önüne bir sayı bloğu koy. “3× Sağa” üç kare sağa gider. Programda yer az, döngü kullanmak zorundasın!",ex:["3","E","N","2","E"]}},
-  {name:"Bidik'in yönleri",sub:"İleri, sağa dön, sola dön",from:21,to:30,pal:["F","L","R","2","3","4"],
-   intro:{kicker:"Yeni yön",title:"Bidik'in gözünden",text:"Artık Bidik'in kendi sağı ve solu var. Sağ ve sol ekrana göre değil, Bidik'e göredir. Ellerine bak: mavi eli sol, pembe eli sağ. Bloklar da aynı renkte. Zorlanırsan “Bidik yukarı baksın” düğmesine bas: tahta döner, Bidik'in sağı hep senin sağında kalır.",ex:["F","R","F","L"]}},
+  {name:"İlk adımlar",sub:"Bee‑Bot gibi: ileri, geri, dön",from:1,to:10,pal:["F","G","L","R"],
+   intro:{kicker:"Kodla Sür",title:"Bidik, Bee‑Bot gibi çalışır",text:"İleri bloğu Bidik'i yüzünün baktığı yöne bir kare götürür. Geri bloğu bir kare geri götürür. Sola dön ve sağa dön, Bidik'i yerinde çeyrek tur döndürür. Antenlerine bak: mavi anten sol, pembe anten sağ. Bloğa dokun, programa eklenir; programdaki bloğa dokun, silinir.",ex:["F","F","R","F"]}},
+  {name:"Dönüşler",sub:"Bidik'in yerine geç",from:11,to:20,pal:["F","G","L","R"],
+   intro:{kicker:"Yeni zorluk",title:"Bidik'in yerine geç",text:"Artık Bidik her yöne bakabilir. Sağ ve sol, ekrana göre değil Bidik'e göredir; Bee‑Bot'u yere koyup arkasına geçtiğin gibi düşün. Zorlanırsan “Bidik yukarı baksın” düğmesine bas: tahta döner, Bidik'in sağı hep senin sağında kalır.",ex:["R","F","F","L","F"]}},
+  {name:"Döngüler",sub:"Tekrar eden adımları kısalt",from:21,to:30,pal:["F","G","L","R","2","3","4"],
+   intro:{kicker:"Yeni kavram",title:"Döngü: tekrar et",text:"Aynı bloğu üst üste koymak yerine önüne bir sayı bloğu koy. “3× İleri” Bidik'i üç kare ileri götürür. Programda yer az, döngü kullanmak zorundasın!",ex:["3","F","R","2","F"]}},
   {name:"Fonksiyonlar",sub:"Kendi bloğunu yap",from:31,to:40,pal:["F","L","R","2","3","4","P"],
    intro:{kicker:"Yeni kavram",title:"Fonksiyon: kendi bloğun",text:"Tekrar eden bir hareket grubunu mor Fonksiyon satırına bir kez yaz. Ana programdaki F bloğu o satırın tamamını çalıştırır. “3× F” onu üç kez çalıştırır.",ex:["3","P"]}},
   {name:"Koşullar",sub:"Eğer… ise: duruma göre karar ver",from:41,to:50,pal:["F","L","R","2","3","4","P","I","A","Y"],cond:true,
@@ -932,8 +933,9 @@ function execute(lv,prog,maxSteps=200){
     const i=steps.length; steps.push({op:o,src});
     const ABS={N:0,E:1,S:2,W:3};
     if(o in ABS){ const t=ABS[o], dl=(t-d+4)%4; ang+= dl===1?90: dl===3?-90: dl===2?180:0; d=t; o="F" }
-    if(o==="F"){
-      const nx=x+DX[d], ny=y+DY[d], b=blockedAt(nx,ny);
+    if(o==="F"||o==="G"){
+      const md= o==="G"?OPP(d):d;
+      const nx=x+DX[md], ny=y+DY[md], b=blockedAt(nx,ny);
       if(b){ st={ok:false,crash:true,fail:i,why:b==="out"?"Bidik tahtadan çıkıyor!":b==="water"?"Bidik suya düşecek!":"Bidik engele çarpacak!",cell:b==="out"?y*N+x:ny*N+nx}; return }
       x=nx;y=ny; const ni=y*N+x; const isCoin=lv.coins.includes(ni); if(isCoin) got.add(ni);
       states.push({x,y,d,ang,coin:isCoin?ni:null});
@@ -997,7 +999,7 @@ function trace(prog,d0){
   for(const s of steps){ if(s.op==="F"){x+=DX[d];y+=DY[d];cells.push([x,y])} else if(s.op==="R") d=(d+1)%4; else d=(d+3)%4 }
   return {steps,cells};
 }
-function seedFor(g,k,r){ // g: 0 sıralama, 1 döngü, 2 fonksiyon, 3 usta
+function seedFor(g,k,r,fixD0){ // g: 0 sıralama, 1 döngü, 2 fonksiyon, 3 usta
   const maxSide=[4,5,6,6][g], minDistinct=[3+Math.round(k*3),6,7,9][g];
   for(let a=0;a<4000;a++){
     let prog;
@@ -1012,7 +1014,7 @@ function seedFor(g,k,r){ // g: 0 sıralama, 1 döngü, 2 fonksiyon, 3 usta
       const nCalls=prog.main.reduce((s,t,i)=>s+(t==="P"?(/[234]/.test(prog.main[i-1]||"")?+prog.main[i-1]:1):0),0);
       if(nCalls<2) continue;
     }
-    const d0=Math.floor(r()*4), tr=trace(prog,d0);
+    const d0=fixD0!=null?fixD0:Math.floor(r()*4), tr=trace(prog,d0);
     const xs=tr.cells.map(c=>c[0]), ys=tr.cells.map(c=>c[1]);
     const w=Math.max(...xs)-Math.min(...xs)+1, h=Math.max(...ys)-Math.min(...ys)+1;
     if(w>maxSide||h>maxSide) continue;
@@ -1057,12 +1059,13 @@ function toAbs(cells,loops){
 }
 function makeLevel(n,seed){
   const ch=chOf(n), chi=CH.indexOf(ch), k=(n-ch.from)/Math.max(1,ch.to-ch.from), r=rng(seed!=null?seed:n*104729+77);
-  const cond=!!ch.cond, abs=!!ch.abs;
+  const cond=!!ch.cond, abs=false;
   // üretici türü: 0 sıra, 1 döngü, 2 fonksiyon, 3 usta
-  const g= chi===0?0 : chi===1?1 : chi===2?(k<.45?0:1) : chi===3?2 : 3;
-  const kk= chi===2?(k<.45?k/.45:(k-.45)/.55):k;
+  const g= chi<=1?0 : chi===2?1 : chi===3?2 : 3;
+  const kk= chi===0?k*.45 : chi===1?.45+k*.55 : k;
+  const north= chi===0&&n<=5; // ilk bölümlerde Bidik yukarı bakar: ekran ve Bidik aynı yönü gösterir
   for(let attempt=0;attempt<60;attempt++){
-    let sd= cond? condFor(n,k,r) : seedFor(g,kk,r);
+    let sd= cond? condFor(n,k,r) : seedFor(g,kk,r,north?0:null);
     if(!sd) continue;
     const N=Math.max(5,Math.min(8,Math.max(sd.w,sd.h)+(chi?2:1)));
     const ox=Math.floor(r()*(N-sd.w+1))-sd.minx, oy=Math.floor(r()*(N-sd.h+1))-sd.miny;
@@ -1070,8 +1073,7 @@ function makeLevel(n,seed){
     const pathIdx=sd.cells.map(at), onPath=new Set(pathIdx);
     const start=pathIdx[0], fin=pathIdx[pathIdx.length-1];
     const cells=Array(N*N).fill(null).map(()=>({kind:"empty"}));
-    if(abs) sd={...sd,prog:{main:toAbs(sd.cells,chi===1),fn:[]}};
-    const nCoins= cond?(sd.sensor?1:2):[n<3?0:1,2,1,2,0,3][chi];
+    const nCoins= cond?(sd.sensor?1:2):[n<3?0:1,1,2,2,0,3][chi];
     const cand=[...new Set(pathIdx)].filter(i=>i!==start&&i!==fin);
     const coins=shuffle(cand,r).slice(0,Math.min(nCoins,cand.length));
     const off=[]; for(let i=0;i<N*N;i++) if(!onPath.has(i)) off.push(i);
@@ -1083,7 +1085,7 @@ function makeLevel(n,seed){
     if(cond) pal= sd.sensor? ["F","L","R","2","P","I","K"] : ["F","L","R","2","P","I","A","Y"];
     const lv={n,N,cells,start,fin,d0:sd.d0,coins,seed:sd.prog,chi,ch,pal,paint,sensor:!!sd.sensor,abs,rel:!abs,bug:false,pre:null};
     if(!execute(lv,sd.prog).ok) continue;
-    const slack= chi===0?2 : chi===1?(n<13?1:0) : chi===2?(k<.45?2:1) : chi===3?1 : cond?(n%5===1?1:0) : 0;
+    const slack= chi===0?2 : chi===1?1 : chi===2?(n<23?1:0) : chi===3?1 : cond?(n%5===1?1:0) : 0;
     lv.limits={main:sd.prog.main.length+(cond?1:slack),fn:sd.prog.fn.length+(sd.prog.fn.length?slack:0)};
     lv.ideal=sd.prog.main.length+sd.prog.fn.length;
     if(isBug(n)&&seed==null){
@@ -1395,9 +1397,9 @@ function openReport(){
     let bugS=0; for(let n=5;n<=60;n+=5) bugS+=d.kod[n]||0;
     const rows=[
       ["Yol Kur: planlama",sumStars(d.yol,1,40),120,"var(--rail)"],
-      ["Oklarla sıralama",sumStars(d.kod,1,10),30,"var(--green)"],
-      ["Döngüler (örüntü)",sumStars(d.kod,11,20),30,"var(--orange)"],
-      ["Bidik'in yönleri (sağ/sol)",sumStars(d.kod,21,30),30,"#d6409f"],
+      ["İlk adımlar (sıralama)",sumStars(d.kod,1,10),30,"var(--green)"],
+      ["Dönüşler (Bidik'in yönü)",sumStars(d.kod,11,20),30,"#d6409f"],
+      ["Döngüler (örüntü)",sumStars(d.kod,21,30),30,"var(--orange)"],
       ["Fonksiyonlar (soyutlama)",sumStars(d.kod,31,40),30,"var(--purple)"],
       ["Koşullar (karar verme)",sumStars(d.kod,41,50),30,"#0e6f7c"],
       ["Usta bölümler",sumStars(d.kod,51,60),30,"var(--blue)"],
