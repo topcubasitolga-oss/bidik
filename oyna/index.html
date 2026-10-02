@@ -312,6 +312,43 @@ h1,h2,h3{text-wrap:balance}
 .mans b{font-family:var(--display);font-size:32px;color:#b59be0}
 .tcard.sm{width:84px}
 @media (max-width:480px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* şenlik ve belge */
+.festsvg{width:100%}.festsvg svg{width:100%;height:auto;display:block;border-radius:16px}
+.certin{width:100%;font:inherit;font-size:22px;font-weight:800;text-align:center;padding:10px;border-radius:14px;border:3px solid var(--panel-line)}
+.sk{font-family:var(--display);font-weight:800;font-size:18px;text-align:center}.sk small{font-family:var(--body);font-size:12px;color:var(--ink-soft)}
+.week{display:flex;flex-direction:column;gap:6px;background:#fff;border-radius:18px;padding:10px;border:3px solid var(--panel-line)}
+.wrow{display:flex;align-items:center;gap:8px}.wrow b{width:92px;font-size:14px}
+.wq{width:46px;height:46px;border-radius:12px;border:3px dashed #9fb4c9;display:grid;place-items:center;font-family:var(--display);font-weight:800;color:#9fb4c9;font-size:22px}
+.aopt.icn{padding:4px 10px}.aopt.icn[aria-pressed="true"],.aopt[aria-pressed="true"]{border-color:var(--ink);background:#fff7dc}
+.win3{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+.win3 .pane{background:#cfe4f7;border:8px solid #b5743c;border-radius:12px;padding:4px}
+.smap{width:min(100%,460px)!important}.smap .shd{font-family:var(--display);font-weight:800;font-size:38px;fill:#16324a}
+.rblk{position:relative;width:52px;height:52px;border-radius:12px;padding:0;border:3px solid transparent}
+.rblk b{position:absolute;right:-10px;bottom:-10px;background:#fff;border:2px solid var(--ink);border-radius:999px;font-family:var(--display);font-size:15px;padding:0 6px}
+.rblk.sel{border-color:var(--red);box-shadow:0 0 0 3px #ffc93c}.rblk.on{transform:translateY(-3px);border-color:#ffc93c}
+#cert{display:none}
+@media print{
+  body.printing>*:not(#cert){display:none!important}
+  body.printing #cert{display:block!important}
+  @page{size:A4 landscape;margin:12mm}
+}
+#cert .cframe{border:6px solid #e0457b;outline:3px solid #ffc93c;outline-offset:-14px;border-radius:24px;padding:28px 36px;font-family:var(--body);color:#16324a;text-align:center;background:#fffaf3}
+#cert .ctop{display:flex;align-items:center;justify-content:center;gap:24px}
+#cert .cmasc{width:90px;height:90px}
+#cert .ck{margin:0;font-weight:800;color:#7a5eb0;letter-spacing:1px}
+#cert h1{margin:0;font-family:var(--display);font-size:54px;line-height:1}
+#cert .cname{font-family:var(--display);font-size:44px;font-weight:800;margin:16px 0 4px;border-bottom:3px dotted #c9d3de;display:inline-block;padding:0 40px}
+#cert .ctext{font-size:17px;font-weight:700;max-width:620px;margin:8px auto 16px}
+#cert .cstamps{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+#cert .cstamps div{display:flex;flex-direction:column;align-items:center;width:86px}
+#cert .cstamps span{width:70px;height:70px;border-radius:50%;overflow:hidden;display:grid;place-items:center;border:3px solid #16324a}
+#cert .cstamps svg{width:66px;height:66px;margin-top:6px}
+#cert .cstamps small{font-weight:800;font-size:12px;margin-top:4px}#cert .cstamps em{font-style:normal;font-size:10.5px}
+#cert .cfoot{display:flex;justify-content:space-around;margin-top:22px}
+#cert .cfoot div{display:flex;flex-direction:column;min-width:200px}
+#cert .cfoot b{border-bottom:2px solid #16324a;padding-bottom:4px;margin-bottom:4px;min-height:1.4em}#cert .cfoot span{font-size:12px}
+#cert .cbrand{font-size:11px;margin:14px 0 0;color:#466179}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -603,6 +640,7 @@ h1,h2,h3{text-wrap:balance}
 </section>
 
 <div class="overlay" id="overlay" hidden></div>
+<div id="cert" aria-hidden="true"></div>
 
 <script>
 (function(){
@@ -1654,7 +1692,9 @@ function startAct(id,n){
   $("aTitle").textContent=m.title;
   $("aSub").textContent=`Bölüm ${n} / ${m.N} · ${part.name}`;
   $("aSolve").hidden=!teacherOn();
-  const fw=typeof WORLD!=="undefined"&&WORLD[m.durak]; $("aFriend").innerHTML=fw?animalSVG(m.durak):""; $("aFriend").style.background=fw?fw.land:""; $("aFriend").title=fw?fw.friend:"";
+  const fw=typeof WORLD!=="undefined"&&WORLD[m.durak];
+  if(fw){ $("aFriend").innerHTML=animalSVG(m.durak); $("aFriend").style.background=fw.land; $("aFriend").title=fw.friend }
+  else { $("aFriend").innerHTML=`<svg viewBox="0 0 200 200" style="margin-top:8px">${MASCOT_FRONT}</svg>`; $("aFriend").style.background="#fde3ee"; $("aFriend").title="Bidik" }
   A.st=m.setup(n);
   aRefresh();
   aGoal();
@@ -1686,8 +1726,8 @@ function aWin(extra){
     msg:(extra&&extra.msg)||(stars===3?"Harika iş!":"Bir daha dene, 3 yıldızı yakala!"),
     talk:m.talk(n),
     onAgain:()=>{closeOverlay();startAct(id,n)},
-    onNext:()=>{closeOverlay(); n<m.N?startAct(id,n+1):openActLevels(id)},
-    nextLabel:n<m.N?"Sonraki":"Bölümler"}),500);
+    onNext:()=>{closeOverlay(); n<m.N?startAct(id,n+1):(m.finale?m.finale():openActLevels(id))},
+    nextLabel:n<m.N?"Sonraki":(m.finaleLabel||"Bölümler")}),500);
 }
 async function aSolveRun(){
   if(!A||A.busy) return;
@@ -1967,6 +2007,9 @@ window.addEventListener("resize",()=>{ if(!$("home").hidden && window.matchMedia
 // ---- Şenlik bahçesi: gelen dostlar ----
 function renderGarden(seeds,n){
   const g=$("garden"); if(!g) return;
+  g.innerHTML=`<h3>Bidik'in Bahçesi</h3><p>${n===7?"Bütün dostlar geldi! Büyük Çiçek Şenliği başlıyor.":n?`${n} / 7 dost şenliğe geldi. Her kıtada bir dost seni bekliyor.`:"Şenliğe henüz kimse gelmedi. Bir kıtaya uç, ilk dostunu davet et!"}</p>${gardenSVG(seeds,n)}`;
+}
+function gardenSVG(seeds,n,party){
   const W=700,H=210;
   let s=`<svg viewBox="0 0 ${W} ${H}" class="gardensvg" aria-hidden="true">
     <rect width="${W}" height="${H}" rx="22" fill="#d9f3ff"/>
@@ -1984,8 +2027,10 @@ function renderGarden(seeds,n){
     s+= seeds[i]? `<g><ellipse cx="${x}" cy="${y+34}" rx="30" ry="6" fill="#16324a" opacity=".12"/><svg x="${x-36}" y="${y-36}" width="72" height="72" viewBox="0 0 100 100">${ANIMALS[WORLD[dk.no].anim]}</svg></g>`
       : `<g opacity=".55"><circle cx="${x}" cy="${y}" r="26" fill="#fff" stroke="#9fb4c9" stroke-width="3" stroke-dasharray="5 5"/><text x="${x}" y="${y+9}" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="26" fill="#9fb4c9">?</text></g>`;
   });
-  s+=`</svg>`;
-  g.innerHTML=`<h3>Bidik'in Bahçesi</h3><p>${n===7?"Bütün dostlar geldi! Büyük Çiçek Şenliği başlıyor.":n?`${n} / 7 dost şenliğe geldi. Her kıtada bir dost seni bekliyor.`:"Şenliğe henüz kimse gelmedi. Bir kıtaya uç, ilk dostunu davet et!"}</p>${s}`;
+  if(party){ const cols=["#e8443a","#2f7fd8","#ffc93c","#22a165","#e0457b","#8a5cd6"];
+    s+=`<path d="M20 8 Q180 34 350 12 Q520 34 680 8" stroke="#16324a" stroke-width="2" fill="none"/>`+[...Array(16)].map((_,i)=>{ const x=40+i*40, y=10+Math.abs(Math.sin(i/7.5*Math.PI))*14; return `<path d="M${x-9} ${y} L${x+9} ${y} L${x} ${y+20}Z" fill="${cols[i%6]}"/>` }).join("")
+      +`<g transform="translate(318 16) scale(.32)">${MASCOT_FRONT}</g>`; }
+  return s+`</svg>`;
 }
 function checkNewSeeds(seeds){
   const d=P(); d.seeds=d.seeds||{};
@@ -2000,9 +2045,13 @@ function checkNewSeeds(seeds){
   },350);
 }
 function openFinal(){
-  const n=seedCount();
-  overlay(`<span class="kicker">Eve dönüş</span><svg class="art" viewBox="0 0 100 100">${FLOWER}</svg><h2>Türkiye: Bidik'in Bahçesi</h2><p>Yedi kıtadaki dostlarını davet et, Büyük Çiçek Şenliği başlasın. Şenlikte bütün becerileri tek hikâyede kullanacaksın.</p><p><b>${n} / 7 dost</b> geldi.${n<7?" Kıtalarda biraz daha yıldız topla, dostlar gelsin.":""}</p><p style="font-size:13px">Şenlik yakında açılıyor. Kitapta s. ${FINAL.page}.</p><div class="btns"><button class="btn-main" id="ovFin">Tamam</button></div>`);
-  $("ovFin").onclick=closeOverlay;
+  const n=seedCount(), done=typeof senlikDone==="function"&&senlikDone(), o=actData("senlik"), got=[1,2,3,4,5].filter(k=>o[k]).length;
+  overlay(`<span class="kicker">Eve dönüş · Türkiye</span><div class="festsvg">${gardenSVG(DURAKS.map(dk=>hasSeed(dk)),n,done)}</div><h2>Bidik'in Bahçesi</h2>
+    <p>Büyük Çiçek Şenliği'nde Bidik çiçek pazarına gidecek, yedi kıtada öğrendiğin bütün becerileri kullanacak. <b>${got} / 5</b> bölüm tamam · <b>${n} / 7</b> dost geldi.</p>
+    <p style="font-size:13px">Kitapta s. ${FINAL.page}: Bidik'in Bir Günü.</p>
+    <div class="btns">${done||teacherOn()?`<button class="btn-alt" id="ovCert2">Kâşif Belgesi</button>`:""}<button class="btn-main" id="ovFin">${got?"Şenliğe devam":"Şenliğe başla"}</button></div>`);
+  $("ovFin").onclick=()=>{ closeOverlay(); openActLevels("senlik") };
+  if($("ovCert2")) $("ovCert2").onclick=()=>certForm();
 }
 // ---- kıta sahnesi (kıta sayfası başlığı) ----
 function sceneSVG(no){
@@ -3080,6 +3129,228 @@ regAct("ikili",{
   }
 });
 })();
+// ===== Final: Büyük Çiçek Şenliği (Türkiye · Bidik'in Bahçesi) — kitapta “Bidik'in Bir Günü” =====
+Object.assign(ICONS,{
+  para:`<circle cx="44" cy="54" r="26" fill="#ffd23f" stroke="#d99a00" stroke-width="4"/><circle cx="58" cy="42" r="26" fill="#ffe27a" stroke="#d99a00" stroke-width="4"/><text x="58" y="52" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="28" fill="#a87700">₺</text>`,
+  kopek:`<ellipse cx="26" cy="44" rx="11" ry="20" fill="#8c5530" transform="rotate(20 26 44)"/><ellipse cx="74" cy="44" rx="11" ry="20" fill="#8c5530" transform="rotate(-20 74 44)"/><circle cx="50" cy="52" r="26" fill="#d9a273"/><ellipse cx="50" cy="66" rx="14" ry="10" fill="#f3d6b5"/><ellipse cx="50" cy="60" rx="6" ry="4.5" fill="#3b2418"/><path d="M50 64 V70 M44 72 q6 4 12 0" stroke="#3b2418" stroke-width="2.5" fill="none" stroke-linecap="round"/>${eyeP(40,48,5.5)}${eyeP(60,48,5.5)}<path d="M56 74 q2 10 -4 10" fill="#f49ac1"/>`,
+  kalem:`<path d="M20 80 L26 62 L70 18 L82 30 L38 74Z" fill="#ffc93c" stroke="#d99a00" stroke-width="4" stroke-linejoin="round"/><path d="M20 80 L26 62 L38 74Z" fill="#f3d6b5"/><path d="M20 80 L23 71 L29 77Z" fill="#16324a"/><path d="M64 24 L76 36" stroke="#e0457b" stroke-width="8"/>`,
+  ev:`<path d="M12 48 L50 16 L88 48Z" fill="#e8443a" stroke="#a8261e" stroke-width="4" stroke-linejoin="round"/><rect x="20" y="46" width="60" height="40" fill="#fff1dc" stroke="#d9b56a" stroke-width="4"/><rect x="42" y="60" width="16" height="26" fill="#b5743c"/><rect x="26" y="54" width="12" height="12" fill="#7fd0ea"/><rect x="62" y="54" width="12" height="12" fill="#7fd0ea"/>`,
+  market:`<rect x="14" y="40" width="72" height="46" fill="#fff" stroke="#9fb4c9" stroke-width="4"/><path d="M10 40 L18 18 H82 L90 40Z" fill="#e0457b"/><path d="M10 40 L18 18 H82 L90 40" fill="none" stroke="#a82a5c" stroke-width="3"/>${[22,38,54,70].map((x,i)=>`<path d="M${x-6} 40 a8 8 0 0 0 16 0" fill="${i%2?"#fff":"#f49ac1"}"/>`).join("")}<g transform="translate(50 64)">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-8" rx="6" ry="8" fill="#e0457b" transform="rotate(${a})"/>`).join("")}<circle r="5" fill="#ffc93c"/></g>`,
+  tas:`<path d="M14 76 C10 56 26 34 46 32 C68 30 88 48 86 70 C84 82 20 86 14 76Z" fill="#9aa6b4" stroke="#5f7489" stroke-width="4"/><path d="M34 48 C40 44 48 42 54 44" stroke="#c9d3de" stroke-width="4" fill="none" stroke-linecap="round"/>`,
+  agac:`<rect x="45" y="60" width="10" height="28" fill="#7a4a20"/><circle cx="50" cy="40" r="26" fill="#22a165"/><circle cx="32" cy="54" r="16" fill="#3fae5f"/><circle cx="68" cy="54" r="16" fill="#3fae5f"/><circle cx="42" cy="30" r="7" fill="#fff" opacity=".2"/>`
+});
+(function(){
+const DX=[0,1,0,-1], DY=[-1,0,1,0];
+const B={F:["İleri","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>']};
+const bHTML=t=>`<span class="blk ${B[t][1]}" aria-label="${B[t][0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${B[t][2]}</svg></span>`;
+const NM={lavabo:"Yüzünü yıka",tabak:"Kahvaltı et",ceket:"Giyin",canta:"Çantanı al",tv:"Televizyon izle",semsiye:"Şemsiye",sapka:"Şapka",para:"Para",kopek:"Komşunun köpeği",kalem:"Kalem",bulut:"Bulutun şekli"};
+// harita (bölüm 4 ve 5): 5×5, harf sütun, rakam satır
+const MAP={N:5,water:[[1,4],[2,4]],rock:[[1,2],[2,3],[3,3]],tree:[[0,2]],dog:[[2,1]],market:[3,1],home:[1,4]};
+// bölüm 5'te ev B5 olacağı için B5'teki suyu oraya koymuyoruz
+const MAP5={N:5,water:[[0,4],[2,4]],rock:[[2,2],[2,3]],tree:[[3,4]],dog:[[1,1]],market:[3,1],home:[1,4]};
+const has=(arr,x,y)=>arr.some(p=>p[0]===x&&p[1]===y);
+function walk(M,sx,sy,sd,prog){
+  let x=sx,y=sy,d=sd; const steps=[[x,y,d]];
+  for(const c of prog){
+    if(c==="L") d=(d+3)%4; else if(c==="R") d=(d+1)%4;
+    else { const nx=x+DX[d], ny=y+DY[d]; if(nx<0||ny<0||nx>=M.N||ny>=M.N) return {steps,fail:"out"}; x=nx; y=ny;
+      if(has(M.water,x,y)){ steps.push([x,y,d]); return {steps,fail:"water"} } if(has(M.rock,x,y)){ steps.push([x,y,d]); return {steps,fail:"rock"} } }
+    steps.push([x,y,d]);
+  }
+  return {steps,fail:null,end:[x,y]};
+}
+function mapSVG(M,st,goal){
+  const cs=100, hx=70, W=hx+M.N*cs;
+  let s=`<svg class="board agrid smap" viewBox="0 0 ${W+16} ${W+16}" xmlns="http://www.w3.org/2000/svg"><g transform="translate(8 8)">`;
+  for(let c=0;c<M.N;c++) s+=`<text x="${hx+c*cs+50}" y="48" text-anchor="middle" class="shd">${LET[c]}</text>`;
+  for(let r=0;r<M.N;r++) s+=`<text x="${hx/2}" y="${hx+r*cs+64}" text-anchor="middle" class="shd">${r+1}</text>`;
+  for(let r=0;r<M.N;r++) for(let c=0;c<M.N;c++){ const x=hx+c*cs, y=hx+r*cs, w=has(M.water,c,r);
+    s+=`<rect x="${x+4}" y="${y+4}" width="${cs-8}" height="${cs-8}" rx="14" fill="${w?"#4aa8d8":(c+r)%2?"#bfe6a8":"#b2df98"}"/>`;
+    if(w) s+=`<path d="M${x+20} ${y+44} q10 -8 20 0 t20 0 t20 0 M${x+20} ${y+64} q10 -8 20 0 t20 0 t20 0" stroke="#bfe9f7" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+    const ic= has(M.rock,c,r)?"tas": has(M.tree,c,r)?"agac": has(M.dog,c,r)?"kopek": (goal==="market"&&M.market[0]===c&&M.market[1]===r)?"market": (goal==="home"&&M.home[0]===c&&M.home[1]===r)?"ev": null;
+    if(ic) s+=`<svg x="${x+10}" y="${y+10}" width="${cs-20}" height="${cs-20}" viewBox="0 0 100 100">${ICONS[ic]}</svg>`; }
+  const p=st.pos; s+=`<g transform="translate(${hx+p[0]*cs+50} ${hx+p[1]*cs+50}) rotate(${p[2]*90-90}) scale(.8)">${ROBOT}</g>`;
+  return s+`</g></svg>`;
+}
+const SCRIPT={
+  1:{t:"Günaydın Bidik!",sk:"B1 · Ayrıştırma + B4 · Algoritma"},
+  2:{t:"Her Sabah Aynı",sk:"B2 · Örüntü + B5 · Döngü"},
+  3:{t:"Kapıdan Çıkmadan",sk:"B5 · Koşul + B3 · Soyutlama"},
+  4:{t:"Çiçek Pazarına Giden Yol",sk:"B7 · Temsil + B4 · Algoritma + B3 · Soyutlama"},
+  5:{t:"Takıldım!",sk:"B6 · Hata ayıklama + B5 · Döngü"}
+};
+regAct("senlik",{
+  title:"Büyük Çiçek Şenliği", durak:8, N:5, speed:true,
+  parts:[{name:"Şenlik Günü",sub:"Yedi becerinin hepsi tek hikâyede",from:1,to:5}],
+  doneText:"Bölüm tamam",
+  levelsNote:"Kitapta s. 78-82: Bidik'in Bir Günü. Beş bölüm bitince Büyük Çiçek açar ve Kâşif Belgesi hazır olur.",
+  finaleLabel:"Şenlik başlasın!",
+  talk:n=>["Bidik'in sabahı ile seninki aynı mı? Senin sıran farklıysa neden?","Hafta sonu da aynı örüntü mü? Örüntü değişirse tekrar sayısı ne olur?","Kural olmasa Bidik her gün pencereye bakmadan ne yapardı? “Gerekli” ile “gereksiz”i nasıl ayırdın?","Bidik'in geçtiği karelerin adlarını sırayla söyle: A5, A4… Ağaç ve köpek neden yolu engellemedi?","Bidik'in günü sana benziyor mu? Bugün hangi becerileri kullandın? Yarın kendi gününü Bidik gibi anlatır mısın?"][n-1],
+  intro:n=> n===1?{key:"p1",kicker:"Türkiye · Bidik'in Bahçesi",title:"Şenlik günü geldi!",art:FLOWER,text:"Bugün Büyük Çiçek Şenliği var! Bidik sabah hazırlanacak, çiçek pazarına gidip çiçek alacak ve eve dönecek. Yedi kıtada öğrendiğin her şeyi kullanacaksın!"}:null,
+  setup(n){
+    const r=mkRng(n*313+9);
+    if(n===1) return {n,stage:"sec",cards:shuffle(["lavabo","tabak","ceket","canta","tv"],r),sel:[],slots:[null,null,null,null],tray:[]};
+    if(n===2) return {n,first:null,times:null,firstOpts:shuffle(["lavabo","canta","tv"],r)};
+    if(n===3) return {n,rule:null,need:[],items:shuffle(["semsiye","para","kopek","kalem","sapka","bulut"],r)};
+    if(n===4) return {n,M:MAP,prog:[],pos:[0,4,0],fail:null,runAt:-1};
+    return {n,M:MAP5,stage:"find",bad:[["F",3],["L",1],["F",3]],fixN:null,pos:[3,1,3],runAt:-1};
+  },
+  goal(st){
+    const n=st.n;
+    if(n===1) return st.stage==="sec"?"Bidik: “Şenliğe hazırlanmak büyük bir iş! Hangi küçük işler bu büyük işin parçası? Hepsini seç. Biri ait değil!”":"Şimdi seçtiğin işleri sıraya koy: önce ne, sonra ne?";
+    if(n===2) return "Bidik her sabah aynı işleri aynı sırayla yapıyor. Bu bir örüntü!";
+    if(n===3) return "Pencereden bak: yağmur yağıyor! Kuralı uygula, sonra çiçek pazarı için gerekli olanları seç.";
+    if(n===4) return "Çiçek pazarı D2 karesinde, Bidik A5'te. Taşa ve suya çarpmadan kodunu yaz (en fazla 7 blok). Ağaç ve köpek yolu engellemez!";
+    return st.stage==="find"?"Bidik çiçeği aldı, eve (B5) dönüyor ama kodu takıldı! Hatalı tekrar sayısı hangi blokta? Ona dokun.":"Tekrar sayısı kaç olmalı?";
+  },
+  checkLabel(st){ return st.n===4?"Çalıştır":st.n===5?null:"Kontrol et" },
+  info(st){ return st.n===4?`Blok: ${st.prog.length} / 7`:"" },
+  render(st){
+    const body=$("aBody"), n=st.n; let h=`<div class="sk">${SCRIPT[n].t} · <small>${SCRIPT[n].sk}</small></div>`;
+    if(n===1){
+      if(st.stage==="sec"){
+        h+=`<div class="tray">${st.cards.map(c=>`<button class="tcard ${st.sel.includes(c)?"sel":""}" data-c="${c}" aria-pressed="${st.sel.includes(c)}">${cardIcon(c,64)}<small>${NM[c]}</small></button>`).join("")}</div>`;
+        body.innerHTML=h; body.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const c=b.dataset.c; st.sel=st.sel.includes(c)?st.sel.filter(x=>x!==c):[...st.sel,c]; sfx.click(); aRefresh() }); return }
+      h+=`<div class="seq">${st.slots.map((v,i)=>`<button class="sq ${v==null?"empty":""}" data-s="${i}"><span class="no">${i+1}</span>${v?cardIcon(v,64)+`<small>${NM[v]}</small>`:`<span class="qm"></span><small>&nbsp;</small>`}</button>`).join(`<span class="arr">›</span>`)}</div>`;
+      h+=`<div class="tray">${st.tray.map(v=>`<button class="tcard" data-v="${v}">${cardIcon(v,56)}<small>${NM[v]}</small></button>`).join("")||`<p class="ahelp">Hepsi yerleşti. Kontrol et!</p>`}</div>`;
+      body.innerHTML=h;
+      body.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const v=b.dataset.v, j=st.slots.indexOf(null); if(j<0) return; st.slots[j]=v; st.tray=st.tray.filter(x=>x!==v); sfx.place(); aRefresh() });
+      body.querySelectorAll(".sq").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.s, v=st.slots[i]; if(!v) return; st.slots[i]=null; st.tray.push(v); sfx.erase(); aRefresh() });
+      return;
+    }
+    if(n===2){
+      const seq=["lavabo","tabak","ceket","canta"];
+      h+=`<div class="week">${["Pazartesi","Salı","Çarşamba"].map(g=>`<div class="wrow"><b>${g}</b>${seq.map(c=>cardIcon(c,46)).join("")}</div>`).join("")}<div class="wrow"><b>Perşembe</b><span class="wq">${st.first!=null?cardIcon(st.first,46):"?"}</span><span class="wq">?</span><span class="wq">?</span><span class="wq">?</span></div></div>`;
+      h+=`<p class="ahelp">Perşembe sabahı ilk iş ne olacak?</p><div class="aopts">${st.firstOpts.map(c=>`<button class="aopt icn" data-f="${c}" aria-pressed="${st.first===c}">${cardIcon(c,44)}</button>`).join("")}</div>`;
+      h+=`<p class="ahelp">Beş okul günü için kısa kod: (sabah işleri) × ?</p><div class="kodkart">(${seq.map(c=>cardIcon(c,30)).join("")}) <span class="x">×</span>${[3,4,5,7].map(x=>`<button class="xbtn" data-x="${x}" aria-pressed="${st.times===x}">${x}</button>`).join("")}</div>`;
+      body.innerHTML=h;
+      body.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ st.first=b.dataset.f; sfx.click(); aRefresh() });
+      body.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{ st.times=+b.dataset.x; sfx.click(); aRefresh() });
+      return;
+    }
+    if(n===3){
+      h+=`<div class="win3"><div class="pane">${cardIcon("yagmur",90)}</div><div class="rulecard"><div><b>Eğer</b>${cardIcon("yagmur",36)}<span>yağmur</span><b>ise</b><span class="to">→</span>?</div><div><b>Değilse</b><span class="to">→</span>?</div></div></div>`;
+      h+=`<p class="ahelp">Bidik ne almalı?</p><div class="aopts">${["semsiye","sapka"].map(c=>`<button class="aopt icn" data-r="${c}" aria-pressed="${st.rule===c}">${cardIcon(c,44)}</button>`).join("")}</div>`;
+      h+=`<p class="ahelp">Çiçek almaya gidiyor. Hangileri gerekli? Hepsini seç.</p><div class="tray">${st.items.map(c=>`<button class="tcard ${st.need.includes(c)?"sel":""}" data-c="${c}" aria-pressed="${st.need.includes(c)}">${cardIcon(c,56)}<small>${NM[c]}</small></button>`).join("")}</div>`;
+      body.innerHTML=h;
+      body.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{ st.rule=b.dataset.r; sfx.click(); aRefresh() });
+      body.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{ const c=b.dataset.c; st.need=st.need.includes(c)?st.need.filter(x=>x!==c):[...st.need,c]; sfx.click(); aRefresh() });
+      return;
+    }
+    if(n===4){
+      h+=mapSVG(st.M,st,"market");
+      h+=`<div class="kprog">${st.prog.length?st.prog.map((t,i)=>`<span class="kb2 ${st.runAt===i?"on":""}">${bHTML(t)}</span>`).join(""):`<span class="ahelp">Kod boş. Aşağıdaki bloklara dokun.</span>`}</div>`;
+      h+=`<div class="kpal">${Object.keys(B).map(t=>`<button class="kpb" data-t="${t}">${bHTML(t)}<small>${B[t][0]}</small></button>`).join("")}<button class="kpb undo" data-t="-"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg><small>Sil</small></button></div>`;
+      body.innerHTML=h;
+      body.querySelectorAll(".kpb").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t; if(t==="-") st.prog.pop(); else { if(st.prog.length>=7){ aGoal("En fazla 7 blok!","bad"); return } st.prog.push(t) } st.pos=[0,4,0]; sfx.click(); aRefresh() });
+      return;
+    }
+    h+=mapSVG(st.M,st,"home");
+    h+=`<div class="kprog">${st.bad.map(([t,x],i)=>`<button class="rblk ${st.stage==="fix"&&i===0?"sel":""} ${st.runAt===i?"on":""}" data-i="${i}">${bHTML(t)}${t==="F"?`<b>×${i===0&&st.fixN?st.fixN:x}</b>`:""}</button>`).join("")}</div>`;
+    if(st.stage==="fix") h+=`<div class="aopts">${[1,2,3,4].map(x=>`<button class="aopt" data-n="${x}">${x}</button>`).join("")}</div>`;
+    body.innerHTML=h;
+    body.querySelectorAll(".rblk").forEach(b=>b.onclick=()=>this.pickBad(st,+b.dataset.i));
+    body.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>this.fixBad(st,+b.dataset.n));
+  },
+  check(st){
+    const n=st.n;
+    if(n===1){
+      if(st.stage==="sec"){ const want=["lavabo","tabak","ceket","canta"]; if(st.sel.includes("tv")) return "Televizyon izlemek hazırlanmanın bir parçası mı?"; if(want.some(c=>!st.sel.includes(c))) return "Bir iş eksik. Hazırlanırken başka ne yaparsın?";
+        st.stage="sira"; st.tray=shuffle(want,mkRng(5)); aGood("Doğru! Dört küçük iş. Şimdi sıraya koy."); aRefresh(); setTimeout(()=>{ if(A&&A.st===st&&!A.won) aGoal() },1200); return null }
+      if(st.slots.includes(null)) return "Bütün kartları kutulara koy.";
+      if(st.slots[3]!=="canta") return "Çantayı almak en son iş olmalı; yoksa çantayla mı yüzünü yıkayacaksın?";
+      if(st.slots[0]!=="lavabo") return "Güne başlarken ilk iş yüzünü yıkamak. Bir daha düşün!";
+      return true;
+    }
+    if(n===2){ if(!st.first||!st.times) return "İki soruyu da cevapla."; if(st.first!=="lavabo") return "Örüntüye bak: her sabah ilk iş hangisi?"; if(st.times!==5) return "Kaç okul günü var? Pazartesi, Salı, Çarşamba, Perşembe, Cuma…"; return true }
+    if(n===3){ if(!st.rule) return "Önce kuralı uygula: yağmur var, ne almalı?"; if(st.rule!=="semsiye") return "Kural: yağmur yağıyorsa şemsiye!";
+      const need=["semsiye","para"]; if(st.need.some(c=>!need.includes(c))) return "Seçtiklerinden bazıları gereksiz. Çiçek almak için gerçekten ne lazım?"; if(need.some(c=>!st.need.includes(c))) return "Bir şey eksik: çiçeği almak için neye ihtiyaç var?"; return true }
+    if(n===4){ if(!st.prog.length) return "Önce kod yaz.";
+      this.play(st,st.prog,[0,4,0]).then(r=>{ if(r.fail) aBad(r.fail==="water"?"Bidik suya düştü! Suyun etrafından dolaş.":r.fail==="rock"?"Bidik taşa çarptı!":"Bidik haritanın dışına çıktı!");
+        else if(r.end[0]===3&&r.end[1]===1) aWin(); else aBad(`Bidik ${cname(r.end[0],r.end[1])} karesinde durdu. Pazar D2'de!`) });
+      return null }
+    return null;
+  },
+  async play(st,prog,start){
+    A.busy=true; const r=walk(st.M,start[0],start[1],start[2],prog); st.pos=start.slice(); aRefresh();
+    for(let k=1;k<r.steps.length;k++){ st.runAt=k-1; const p=r.steps[k], q=r.steps[k-1]; st.pos=p; (p[0]!==q[0]||p[1]!==q[1])?sfx.step():sfx.turn(); aRefresh(); await aWait(450) }
+    st.runAt=-1; A.busy=false; aRefresh(); if(r.fail) sfx.fail();
+    return r;
+  },
+  expand(bad){ return bad.flatMap(([t,x])=>Array(x).fill(t)) },
+  async pickBad(st,i){
+    if(A.busy||A.won||st.stage!=="find") return;
+    if(i!==0){ aBad(i===1?"Dönüş bloğu doğru: Bidik eve gitmek için sola dönmeli.":"Aşağı inerken 3 adım doğru. B2'den B5'e kaç adım var? Say!"); return }
+    st.stage="fix"; sfx.place(); aRefresh(); aGoal();
+  },
+  async fixBad(st,x){
+    if(A.busy||A.won) return;
+    st.fixN=x; aRefresh();
+    const prog=this.expand([["F",x],["L",1],["F",3]]);
+    const r=await this.play(st,prog,[3,1,3]);
+    if(!r.fail&&r.end[0]===1&&r.end[1]===4){ aGood("Eve vardı! Şenlik başlıyor!"); aWin(); return }
+    aBad(r.fail==="water"?"Yine suya düştü! D2'den B2'ye kaç adım var?":"Eve varamadı. D2'den B2'ye sola doğru say: kaç adım?"); st.pos=[3,1,3]; st.fixN=null; aRefresh();
+  },
+  solved(st){
+    const n=st.n;
+    if(n===1) return st.stage==="sira"&&st.slots[0]==="lavabo"&&st.slots[3]==="canta"&&!st.slots.includes(null);
+    if(n===2) return st.first==="lavabo"&&st.times===5;
+    if(n===3) return st.rule==="semsiye"&&st.need.length===2&&st.need.includes("para")&&st.need.includes("semsiye");
+    if(n===4){ const r=walk(st.M,0,4,0,st.prog); return !r.fail&&r.end[0]===3&&r.end[1]===1&&st.prog.length<=7 }
+    const r=walk(st.M,3,1,3,this.expand([["F",st.fixN],["L",1],["F",3]])); return !r.fail&&r.end[0]===1&&r.end[1]===4;
+  },
+  auto(st){ const n=st.n;
+    if(n===1){ st.stage="sira"; st.slots=["lavabo","tabak","ceket","canta"]; st.tray=[] }
+    else if(n===2){ st.first="lavabo"; st.times=5 }
+    else if(n===3){ st.rule="semsiye"; st.need=["semsiye","para"] }
+    else if(n===4) st.prog=["F","F","F","R","F","F","F"];
+    else st.fixN=2;
+    return true },
+  async solve(st){
+    const n=st.n;
+    if(n===1){ aGoal("TV izlemek hazırlanmanın parçası değil."); st.sel=["lavabo","tabak","ceket","canta"]; aRefresh(); await aWait(1300); st.stage="sira"; st.tray=[]; aRefresh();
+      for(let i=0;i<4;i++){ st.slots[i]=["lavabo","tabak","ceket","canta"][i]; aGoal(`${i+1}. ${NM[st.slots[i]]}`); sfx.place(); aRefresh(); await aWait(800) } return }
+    if(n===2){ st.first="lavabo"; aGoal("Her sabah ilk iş: yüzünü yıkamak."); aRefresh(); await aWait(1200); st.times=5; aGoal("Beş okul günü: × 5"); aRefresh(); await aWait(1200); return }
+    if(n===3){ st.rule="semsiye"; aGoal("Yağmur var → şemsiye!"); aRefresh(); await aWait(1200); st.need=["semsiye","para"]; aGoal("Gerekli: şemsiye ve para. Köpek, kalem, şapka, bulut gerekmez."); aRefresh(); await aWait(1600); return }
+    if(n===4){ for(const t of ["F","F","F","R","F","F","F"]){ st.prog.push(t); sfx.click(); aRefresh(); await aWait(300) } aGoal("A5 → A2 (ağaç engel değil), sonra sağa: B2, C2, D2."); await this.play(st,st.prog,[0,4,0]); A.busy=true; return }
+    st.stage="fix"; aGoal("İlk tekrar sayısı hatalı: D2'den B2'ye 2 adım var."); aRefresh(); await aWait(1300); st.fixN=2; aRefresh(); await this.play(st,this.expand([["F",2],["L",1],["F",3]]),[3,1,3]); A.busy=true;
+  },
+  finale(){ openFestival() }
+});
+})();
+// ---- şenlik kutlaması ve Kâşif Belgesi ----
+function senlikDone(d){ const o=actData("senlik",d); return [1,2,3,4,5].every(n=>o[n]) }
+function openFestival(){
+  const seeds=DURAKS.map(dk=>hasSeed(dk)), n=seeds.filter(Boolean).length;
+  overlay(`<span class="kicker">Büyük Çiçek Şenliği</span><div class="festsvg">${gardenSVG(DURAKS.map(()=>true),7,true)}</div>
+    <h2>Büyük Çiçek açtı!</h2><p>Bidik yedi kıtadaki dostlarıyla şenlikte. Bütün becerileri tek hikâyede kullandın.${n<7?` <small>(Pasaportunda ${n} / 7 pul var. Kıtalarda yıldız topladıkça pullar dolacak.)</small>`:""}</p>
+    <div class="btns"><button class="btn-alt" id="ovMap">Haritaya dön</button><button class="btn-main" id="ovCert">Kâşif Belgesi</button></div>`);
+  sfx.win();
+  $("ovMap").onclick=()=>{ closeOverlay(); goHome() };
+  $("ovCert").onclick=()=>certForm();
+}
+function certForm(){
+  overlay(`<span class="kicker">Kâşif Belgesi</span><h2 style="font-size:26px">Belgeye kimin adı yazılsın?</h2>
+    <input id="certName" class="certin" maxlength="40" value="${esc(prof().name)}" aria-label="Ad">
+    <p style="font-size:13px">Ad yalnızca yazdırılan belgede görünür, hiçbir yere gönderilmez.</p>
+    <div class="btns"><button class="btn-alt" id="ovCx">Vazgeç</button><button class="btn-main" id="ovPr">Yazdır</button></div>`);
+  $("ovCx").onclick=closeOverlay;
+  $("ovPr").onclick=()=>{ printCert($("certName").value.trim()||prof().name) };
+}
+function printCert(name){
+  const d=new Date(), tarih=`${d.getDate()} ${["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"][d.getMonth()]} ${d.getFullYear()}`;
+  const c=$("cert");
+  c.innerHTML=`<div class="cframe">
+    <div class="ctop"><svg viewBox="0 0 200 200" class="cmasc">${MASCOT_FRONT}</svg><div><p class="ck">Bidik'in Dünya Turu</p><h1>Kâşif Belgesi</h1></div><svg viewBox="0 0 100 100" class="cmasc">${FLOWER}</svg></div>
+    <p class="cname">${esc(name)}</p>
+    <p class="ctext">Bidik'le birlikte yedi kıtayı gezdi, hayvan dostlarının sorunlarını çözdü ve Büyük Çiçek Şenliği'ni tamamladı.</p>
+    <div class="cstamps">${DURAKS.map(dk=>`<div><span style="background:${WORLD[dk.no].land}">${animalSVG(dk.no)}</span><small>${WORLD[dk.no].kita}</small><em>${dk.code.split("·")[1].trim()}</em></div>`).join("")}</div>
+    <div class="cfoot"><div><b>${tarih}</b><span>Tarih</span></div><div><b>&nbsp;</b><span>Öğretmen / veli imzası</span></div></div>
+    <p class="cbrand">Bidik bir TT Robotics ürünüdür.</p></div>`;
+  closeOverlay();
+  document.body.classList.add("printing");
+  setTimeout(()=>{ try{ window.print() }catch(e){} setTimeout(()=>document.body.classList.remove("printing"),500) },150);
+}
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
@@ -3200,7 +3471,7 @@ function openLevels(mode,opts){
   wrap.appendChild(legend);
 }
 // bölüm listesinin geri düğmesi: geldiği durağa döner
-document.querySelector("#levels [data-home]").onclick=()=>{ curDurak?openDurak(curDurak):goHome() };
+document.querySelector("#levels [data-home]").onclick=()=>{ curDurak&&curDurak<8?openDurak(curDurak):goHome() };
 
 let newColor=2;
 function openProfiles(){
@@ -3243,7 +3514,7 @@ function openReport(){
       ["Koşullar (karar verme)",sumStars(d.kod,41,50),30,"#0e6f7c"],
       ["Usta bölümler",sumStars(d.kod,51,60),30,"var(--blue)"],
       ["Hata ayıklama",bugS,36,"var(--red)"],
-      ...Object.keys(ACT).map(id=>[ACT[id].title,actProg(id,d)[0],ACT[id].N*3,DURAKS.find(x=>x.no===ACT[id].durak).color]),
+      ...Object.keys(ACT).map(id=>[ACT[id].title,actProg(id,d)[0],ACT[id].N*3,(DURAKS.find(x=>x.no===ACT[id].durak)||{color:"#e0457b"}).color]),
     ];
     const daily=Object.keys(d.daily).length;
     const c=document.createElement("div"); c.className="rcard";
