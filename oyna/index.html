@@ -393,6 +393,22 @@ h1,h2,h3{text-wrap:balance}
 .ebar{flex:1;height:16px;border-radius:999px;background:#2b3a6e;overflow:hidden;border:2px solid #1e2a55}
 .ebar i{display:block;height:100%;background:linear-gradient(90deg,#ffe14d,#ffc93c);transition:width .3s}
 .lv-y4 .kpb .blk,.lv-y5 .kpb .blk{width:58px;height:58px}
+
+/* kutlama */
+.card{position:relative}
+.confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit}
+.confetti i{position:absolute;top:-14px;width:9px;height:14px;border-radius:2px;animation:fall 2s ease-in forwards;opacity:.9}
+@keyframes fall{to{top:105%;transform:rotate(540deg) translateX(20px);opacity:.2}}
+.heal{position:relative;width:100%}
+.heal svg{width:100%;height:auto;display:block;border-radius:16px;background:#c6eba9}
+.heal .before{animation:fadeout 1.4s .5s forwards}
+.heal .after{opacity:0;animation:fadein 1.4s .5s forwards}
+@keyframes fadeout{to{opacity:0}} @keyframes fadein{to{opacity:1}}
+.hfriend{position:absolute;right:6px;bottom:-14px;width:78px;height:78px;border-radius:50%;border:4px solid #fff;overflow:hidden;display:grid;place-items:center;box-shadow:0 4px 0 rgba(22,50,74,.15);animation:hop .6s 1.6s 3 ease-in-out}
+.hfriend svg{width:74px;height:74px;margin-top:6px}
+@keyframes hop{50%{transform:translateY(-14px) rotate(-6deg)}}
+.thanks{background:#fff7dc;border-radius:16px;padding:10px 14px;text-align:left;font-weight:700;font-size:15px;width:100%}
+@media (prefers-reduced-motion:reduce){.confetti{display:none}.heal .before{animation:none;opacity:0}.heal .after{animation:none;opacity:1}.hfriend{animation:none}}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -810,7 +826,7 @@ function overlay(html){const o=$("overlay");o.innerHTML=`<div class="card" role=
 function closeOverlay(){$("overlay").hidden=true}
 function winCard({stars,checks,msg,onAgain,onNext,nextLabel,talk}){
   const ck=(ok,txt)=>`<span class="${ok?"y":"n"}">${ok?"✓":"○"} ${txt}</span>`;
-  overlay(`<h2>Tebrikler!</h2><div class="bigstars">${[0,1,2].map(i=>starSVG(i<stars)).join("")}</div>
+  overlay(`${typeof confettiHTML==="function"&&stars===3?confettiHTML(24):""}<h2>Tebrikler!</h2><div class="bigstars">${[0,1,2].map(i=>starSVG(i<stars)).join("")}</div>
    <div class="checks">${checks.map(c=>ck(c[0],c[1])).join("")}</div><p style="font-size:14px">${msg}</p>${talk?`<div class="talkbox"><b>KONUŞALIM</b>${talk}</div>`:""}
    <div class="btns"><button class="btn-alt" id="ovAgain">Tekrar</button><button class="btn-main" id="ovNext">${nextLabel||"Sonraki"}</button></div>`);
   $("ovAgain").onclick=onAgain; $("ovNext").onclick=onNext;
@@ -2184,17 +2200,43 @@ function gardenSVG(seeds,n,party){
       +`<g transform="translate(318 16) scale(.32)">${MASCOT_FRONT}</g>`; }
   return s+`</svg>`;
 }
+// ---- kutlama: konfeti, bölgenin iyileşmesi, dostun sesli teşekkürü ----
+const THANKS={
+  1:"Teşekkürler! Artık okula ve parka güvenle yürüyüp bisiklet sürebiliyoruz. Ben Kirpi Kiko, şenlikte görüşürüz!",
+  2:"Vırak vırak, teşekkürler! Gölet tertemiz oldu, balıklar yeniden yüzüyor. Ben Kurbağa Kuki, şenliğe geliyorum!",
+  3:"Vızz vızz, teşekkürler! Bütün çiçekler açtı, arılar polen buldu. Ben Arı Bal, şenlikte bal ikram edeceğim!",
+  4:"Teşekkürler! Orman yeniden yeşerdi, yuvama kavuştum. Ben Sincap Fındık, şenliğe fındık getiriyorum!",
+  5:"Gak gak, teşekkürler! Atıklar doğru kutularda, yeniden kullanılacak. Ben Karga Kara, şenlikte buluşalım!",
+  6:"Teşekkürler! Enerjiyi boşa harcamıyoruz, gece sokaklar huzurlu. Ben Ateşböceği Işıl, şenliği ben aydınlatacağım!",
+  7:"Teşekkürler! Tarla suyuna kavuştu, fideler büyüyor. Ben Tavşan Pıtır, şenliğe taze havuç getiriyorum!"
+};
+// her dostun kısa “ses imzası” (Türkçe ses olmayan tahtalarda da bir karakter sesi duyulsun)
+const CHIRP={1:[[660,.08],[880,.08],[990,.14]],2:[[220,.12],[180,.16],[220,.12],[180,.18]],3:[[880,.05],[920,.05],[880,.05],[920,.05],[1040,.16]],
+  4:[[784,.07],[988,.07],[1175,.07],[988,.12]],5:[[392,.12],[330,.18]],6:[[1047,.1],[1319,.1],[1568,.22]],7:[[587,.08],[740,.08],[880,.08],[1175,.16]]};
+function friendChirp(no){ let t=0; (CHIRP[no]||[]).forEach(([f,d])=>{ tone(f,d+.05,"triangle",t,.16); t+=d }) }
+function confettiHTML(n){ const cols=["#e8443a","#2f7fd8","#ffc93c","#22a165","#e0457b","#8a5cd6","#f08a24"];
+  return `<div class="confetti" aria-hidden="true">${[...Array(n||36)].map((_,i)=>`<i style="left:${(i*37)%100}%;background:${cols[i%7]};animation-delay:${((i*13)%20)/20}s;animation-duration:${1.6+((i*7)%10)/10}s;transform:rotate(${i*31}deg)"></i>`).join("")}</div>` }
+function celebrateRegion(no){
+  const w=WORLD[no], [x,y]=PLACE[no];
+  overlay(`${confettiHTML(40)}<span class="kicker">Sorun çözüldü · ${w.ska}</span>
+    <div class="heal"><svg viewBox="${x-150} ${y-110} 300 200" aria-hidden="true"><g class="before">${regionArt(no,false)}</g><g class="after">${regionArt(no,true)}</g></svg>
+      <div class="hfriend" style="background:${w.land}">${animalSVG(no)}</div></div>
+    <h2>${w.kita} iyileşti!</h2>
+    <div class="thanks"><b>${w.friend}:</b> “${THANKS[no]}”</div>
+    <p style="font-size:13px">${seedCount()===7?"Bütün sorunlar çözüldü! Meydanda şenlik seni bekliyor.":`Kasabada ${seedCount()} / 7 sorun çözüldü.`}</p>
+    <div class="btns"><button class="btn-alt" id="ovSay" ${Voice.ready?"":"hidden"}>Tekrar dinle</button><button class="btn-main" id="ovSeed">Yaşasın!</button></div>`);
+  sfx.win&&sfx.win();
+  setTimeout(()=>friendChirp(no),900);
+  setTimeout(()=>Voice.say(THANKS[no],true),1500);
+  $("ovSay").onclick=()=>{ friendChirp(no); Voice.say(THANKS[no],true) };
+  $("ovSeed").onclick=()=>{ Voice.stop(); closeOverlay(); renderMap() };
+}
 function checkNewSeeds(seeds){
   const d=P(); d.seeds=d.seeds||{};
   const fresh=DURAKS.filter((dk,i)=>seeds[i]&&!d.seeds[dk.no]);
   if(!fresh.length) return;
   fresh.forEach(dk=>d.seeds[dk.no]=1); save();
-  const dk=fresh[0], w=WORLD[dk.no];
-  setTimeout(()=>{ if($("home").hidden||!$("overlay").hidden) return;
-    overlay(`<span class="kicker">Sorun çözüldü · ${w.ska}</span><div class="festsvg"><svg viewBox="${PLACE[dk.no][0]-150} ${PLACE[dk.no][1]-110} 300 200">${regionArt(dk.no,true)}</svg></div>
-      <h2>${w.kita} iyileşti!</h2><p>${w.friend} çok mutlu ve meydandaki şenliğe geliyor. Haritada ${w.kita.toLowerCase()} artık değişti, bak! ${seedCount()===7?"Bütün sorunlar çözüldü!":`Toplam ${seedCount()} / 7 sorun çözüldü.`}</p><div class="btns"><button class="btn-main" id="ovSeed">Yaşasın!</button></div>`);
-    sfx.win&&sfx.win(); $("ovSeed").onclick=()=>{closeOverlay(); renderMap()};
-  },350);
+  setTimeout(()=>{ if($("home").hidden||!$("overlay").hidden) return; celebrateRegion(fresh[0].no) },350);
 }
 function openFinal(){
   const n=seedCount(), done=typeof senlikDone==="function"&&senlikDone(), o=actData("senlik"), got=[1,2,3,4,5].filter(k=>o[k]).length;
