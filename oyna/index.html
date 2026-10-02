@@ -1305,7 +1305,7 @@ $("yHint").onclick=()=>{
 };
 $("yReset").onclick=()=>{ if(!running){ const g=grid; grid=L.cells.map(c=>({...c})); failCell=-1; setGoal(); render(); stats(); } };
 $("yBack").onclick=()=>{ if(!running) isDaily?goHome():backToLevels("yol") };
-return {start,TIERS,TOTAL,makeLevel,features,UNLOCK,check:(lv)=>{L=lv;grid=lv.cells.map((c,i)=>i in lv.solution?{...c,kind:"piece",fixed:false,...lv.solution[i]}:{...c});return simulate()}};
+return {start,TIERS,TOTAL,makeLevel,features,UNLOCK,INTRO,check:(lv)=>{L=lv;grid=lv.cells.map((c,i)=>i in lv.solution?{...c,kind:"piece",fixed:false,...lv.solution[i]}:{...c});return simulate()}};
 })();
 
 // =====================================================================
@@ -1761,7 +1761,7 @@ $("kSolve").onclick=()=>{
   setTimeout(()=>$("kRun").click(),350);
 };
 $("kTalk").onclick=()=>{ if(!anim) openTalk("kod",L.n) };
-return {start,CH,TOTAL,isBug,makeLevel,execute};
+return {start,CH,TOTAL,isBug,makeLevel,execute,BUG,SENSOR_INTRO};
 })();
 
 // =====================================================================
@@ -2361,11 +2361,11 @@ regAct("yaris",{
   title:"İki Sulama Robotu", durak:7, N:8, speed:true,
   parts:[{name:"Tahmin Et, Bul, Düzelt",sub:"İki sulama robotu aynı fideye gidiyor; biri takılacak",from:1,to:4},{name:"Uzun Kodlar",sub:"Daha büyük tarla, daha uzun program",from:5,to:8}],
   doneText:"Hata bulundu ve düzeltildi",
-  talk:n=>"Takılan Robot'nun kodu hangi adımda ayrıldı? İki kodu karşılaştırmak hatayı bulmayı neden kolaylaştırdı?",
-  intro:n=> n===1?{key:"p1",kicker:"Tarla",title:"İki sulama robotu",art:`<g transform="translate(50 54)">${pengo("#e8443a")}</g>`,text:"İki Robot aynı kuru fideye gidiyor. Kodlar neredeyse aynı ama birinde tek bir hata var. 1) Hangisi kuru fideye ulaşır, <b>tahmin et</b>. 2) Yarışı izle. 3) Hatalı bloğu <b>bul</b> ve <b>düzelt</b>. Komutlar Robot'ya göre: Sola dön, Robot'nun soluna."}:null,
+  talk:n=>"Takılan robotun kodu hangi adımda ayrıldı? İki kodu karşılaştırmak hatayı bulmayı neden kolaylaştırdı?",
+  intro:n=> n===1?{key:"p1",kicker:"Tarla",title:"İki sulama robotu",art:`<g transform="translate(50 54)">${pengo("#e8443a")}</g>`,text:"İki robot aynı kuru fideye gidiyor. Kodlar neredeyse aynı ama birinde tek bir hata var. 1) Hangisi kuru fideye ulaşır, <b>tahmin et</b>. 2) Yarışı izle. 3) Hatalı bloğu <b>bul</b> ve <b>düzelt</b>. Komutlar robota göre: Sola dön, robotun soluna."}:null,
   setup(n){ const L=CACHE[n]||(CACHE[n]=gen(n)); return {n,L,phase:"guess",guess:null,pos:{A:null,B:null},runAt:-1,sel:null,fixed:null,fail:{}} },
   goal(st){ const bad=st.L.good==="A"?"B":"A";
-    return {guess:"Hangi Robot kuru fideye ulaşır? Kodlara bak, tahmin et.",race:"Yarış başladı!",find:`Robot ${bad} takıldı! Kodunda hatalı blok hangisi? Ona dokun.`,fix:"Bu bloğun yerine hangisi gelmeli?",done:"İki Robot da kuru fideye ulaştı!"}[st.phase] },
+    return {guess:"Hangi robot kuru fideye ulaşır? Kodlara bak, tahmin et.",race:"Yarış başladı!",find:`Robot ${bad} takıldı! Kodunda hatalı blok hangisi? Ona dokun.`,fix:"Bu bloğun yerine hangisi gelmeli?",done:"İki robot da kuru fideye ulaştı!"}[st.phase] },
   render(st){
     const L=st.L, N=L.N, cs=100, W=N*cs+16, bad=L.good==="A"?"B":"A";
     let s=`<svg class="board agrid" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#8a6a3a"/><g transform="translate(8 8)">`;
@@ -2465,7 +2465,7 @@ regAct("kalem",{
   doneText:"Orman deseni tamam",
   talk:n=> n<=4?"Kare biçiminde orman kurmak için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi? Ağaçlar kasabaya ne kazandırır?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık nasıl bir desen çıkardı? (İklim eylemi)",
   intro:n=> n===1?{key:"p1",kicker:"Orman",title:"Fidanlarla desen",art:`<path d="M30 80 V30 H70" stroke="#a8693d" stroke-width="8" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Sincap Fındık Bidik'e fidan dolu bir çanta verdi! Bidik <b>İleri</b> gidince geçtiği yere sıra sıra fidan diker. Kesikli çizgideki orman desenini kuracak kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
-        : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. (İleri, Sağa dön) × 4 = kare!"}:null,
+        : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını 4 kez tekrarla: kare olur!"}:null,
   setup(n){ const L=LV[n], tg=run(L,L.sol.split(""),L.x); return {n,L,target:new Set(tg.segs.map(key)),tsegs:tg.segs,prog:[],x:L.rep?1:1,drawn:[],pos:[L.s[0],L.s[1],0],running:false,err:null} },
   goal(st){ return st.L.rep?`${st.L.name} biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.`:`${st.L.name} biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.` },
   checkLabel(){ return "Çiz" },
@@ -2765,6 +2765,7 @@ function reg(id){
   function L_left(st){ const n=st.L.items.length-(st.run?st.run.got.size:0); return st.L.mode==="deliver"?`Program bitti ama ${n} atık hâlâ kutusunda değil.`:`Program bitti ama ${n} görev kaldı. Programı uzat ya da yolu değiştir.` }
 }
 Object.keys(REG).forEach(reg);
+window.__gorev={REG,cfg};
 })();
 // ===== Final: Kasaba Şenliği kutlaması ve Kahraman Belgesi (bölümler 80-gorev.js içinde) =====
 // ---- şenlik kutlaması ve Kahraman Belgesi ----
@@ -3000,7 +3001,7 @@ window.bidikBack=function(){
   if(!$("home").hidden) return false;
   goHome(); return true;
 };
-window.__bidik={Yol,Kod,Daily,ACT,
+window.__bidik={Yol,Kod,Daily,ACT,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
   actStart:startAct};

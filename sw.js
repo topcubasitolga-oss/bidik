@@ -1,5 +1,5 @@
 // Bidik çevrimdışı önbellek. Sürüm değişince eski önbellek silinir.
-const CACHE="bidik-2026-10-02-26";
+const CACHE="bidik-2026-10-02-27";
 const FILES=["./", "index.html", "rehber.html", "gizlilik.html", "oyna/index.html", "manifest.webmanifest", "simgeler/simge-192.png", "simgeler/simge-512.png", "simgeler/apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(u=>new Request(u,{cache:"reload"})))).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
