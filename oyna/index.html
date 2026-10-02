@@ -409,6 +409,28 @@ h1,h2,h3{text-wrap:balance}
 @keyframes hop{50%{transform:translateY(-14px) rotate(-6deg)}}
 .thanks{background:#fff7dc;border-radius:16px;padding:10px 14px;text-align:left;font-weight:700;font-size:15px;width:100%}
 @media (prefers-reduced-motion:reduce){.confetti{display:none}.heal .before{animation:none;opacity:0}.heal .after{animation:none;opacity:1}.hfriend{animation:none}}
+
+/* sade ana ekran ve durak yolu */
+.brand{flex-direction:row;gap:12px;justify-content:center}
+.brand .mascot{width:76px!important;height:76px!important;margin:0}
+.brand h1{font-size:46px}
+.brand>p:not(.bid){display:none}
+.brand .bid{font-size:13px}
+.brand .btxt{display:flex;flex-direction:column;align-items:flex-start}
+.mapwrap{align-items:center}
+.mapwrap h2{font-size:24px;text-align:center}
+.mapwrap>p{text-align:center}
+.map svg.trail{width:min(100%,420px);height:auto;display:block;margin:0 auto}
+@media (min-width:760px){ .map svg.trail{width:min(100%,980px)} }
+.trail .node{cursor:pointer;outline:none}
+.trail .node:focus-visible circle:nth-of-type(3){stroke:#16324a;stroke-width:4}
+.trail .node.dim{opacity:.4}
+.trail .nlab{font-family:var(--display);font-weight:800;font-size:20px;fill:#16324a}
+.trail .nsub{font-weight:800;font-size:13px;fill:#466179}
+.trail .pulse{transform-box:fill-box;transform-origin:center;animation:pulse 1.8s ease-out infinite}
+@keyframes pulse{0%{opacity:.9;transform:scale(.92)}100%{opacity:0;transform:scale(1.18)}}
+@media (prefers-reduced-motion:reduce){.trail .pulse{animation:none}}
+.daily{padding:10px 14px}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -572,14 +594,14 @@ h1,h2,h3{text-wrap:balance}
   </div>
   <div class="brand">
     <svg class="mascot" id="mascot" viewBox="0 0 200 200" aria-hidden="true"></svg>
-    <h1>Bi<span>dik</span></h1>
-    <p class="bid"><b>B</b>ilgi <b>İ</b>şlemsel <b>D</b>üşünme</p>
+    <div class="btxt"><h1>Bi<span>dik</span></h1>
+    <p class="bid"><b>B</b>ilgi <b>İ</b>şlemsel <b>D</b>üşünme</p></div>
     <p>Düşün, planla, adım adım çöz.</p>
   </div>
   <button class="bigbtn playbtn" id="playBtn"><svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" aria-hidden="true"><path d="M7 4l13 8-13 8z"/></svg><span>Oyna</span></button>
   <div class="mapwrap">
     <h2>Bidik Kasabayı İyileştiriyor</h2>
-    <p>Kasabada yedi sorun var. Her bölgede bir dost yardım bekliyor. Sorunları kodla çöz, kasaba yeniden gülsün!</p>
+    <p>Bir dosta dokun, sorununu kodla birlikte çözelim.</p>
     <div class="map" id="map"></div>
     <div class="garden" id="garden"></div>
   </div>
@@ -2122,60 +2144,50 @@ function regionArt(no,ok){
   return s;
 }
 let mapWide=null;
+// Sade harita: yedi bölge ve meydan, yumuşak bir yol üstünde durak durak
 function renderMap(){
   const m=$("map"), d=P(), seeds=DURAKS.map(dk=>hasSeed(dk,d)), nSeed=seeds.filter(Boolean).length;
-  const wide=window.matchMedia("(min-width:700px)").matches; mapWide=wide;
-  const last=Math.min(7,Math.max(0,d.lastIsle||0));
-  let o=`<svg class="world town" viewBox="0 0 ${MAPW} ${MAPH}" role="group" aria-label="Kasaba haritası">
-  <defs><linearGradient id="grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c6eba9"/><stop offset="1" stop-color="#a5db86"/></linearGradient>
-  <pattern id="tufts" width="60" height="44" patternUnits="userSpaceOnUse"><path d="M10 30 l3 -6 l3 6 M40 14 l3 -6 l3 6" stroke="#8fcf6e" stroke-width="2" fill="none" stroke-linecap="round"/></pattern></defs>
-  <rect width="${MAPW}" height="${MAPH}" rx="30" fill="url(#grass)"/><rect width="${MAPW}" height="${MAPH}" rx="30" fill="url(#tufts)"/>
-  <path d="M640 -10 C600 80 520 120 420 120 C300 120 250 260 190 330" stroke="#7fd0ea" stroke-width="26" fill="none" stroke-linecap="round"/><path d="M640 -10 C600 80 520 120 420 120 C300 120 250 260 190 330" stroke="#bdeaf7" stroke-width="6" fill="none" stroke-dasharray="14 18" stroke-linecap="round"/>`;
-  // yollar
-  const route=[MEYDAN,PLACE[1],PLACE[2],PLACE[3],PLACE[4],PLACE[6],PLACE[5],PLACE[7],MEYDAN];
-  const rd=smoothOpen(route);
-  o+=`<path d="${rd}" stroke="#e2cfa3" stroke-width="30" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${rd}" stroke="#f6e7c8" stroke-width="22" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="${rd}" stroke="#fff" stroke-width="3" stroke-dasharray="10 12" fill="none"/>`;
-  // bölgeler
-  DURAKS.forEach((dk,i)=>{ o+=`<g class="land" data-no="${dk.no}">${regionArt(dk.no,seeds[i])}</g>` });
-  // süs ağaçları
-  [[40,250],[60,540],[960,230],[960,560],[560,40],[300,560],[880,470],[520,580]].forEach(([x,y],i)=>o+=DECO.agac(x,y,1.3,i%2?"#5cbf5a":"#3d8a4a"));
-  // meydan: çeşme ve büyük çiçek
-  const [mx,my]=MEYDAN;
-  o+=`<g class="hub" data-no="8" role="button" tabindex="0" aria-label="Meydan, Kasaba Şenliği, ${nSeed} / 7 dost geldi"><circle cx="${mx}" cy="${my}" r="56" fill="#f3e6c8" stroke="#e2cfa3" stroke-width="5"/><circle cx="${mx}" cy="${my}" r="36" fill="#7fd0ea" stroke="#fff" stroke-width="4"/>
-    <g transform="translate(${mx-26} ${my-30}) scale(.52)">${FLOWER}</g>${wide?`<text x="${mx}" y="${my+80}" text-anchor="middle" class="mlab">Meydan</text>`:""}</g>`;
-  // dost rozetleri
-  const OFF={1:[150,-62],2:[96,-70],3:[118,-56],4:[-120,-60],5:[-150,-40],6:[-110,-112],7:[-128,-52]};
-  DURAKS.forEach((dk,i)=>{ const w=WORLD[dk.no], [px,py]=PLACE[dk.no], [ox,oy]=OFF[dk.no], x=px+ox, y=py+oy, R=wide?34:44, on=seeds[i], none=dk.acts.some(a=>a.prog)&&isleStars(dk,d)[1]===0;
-    o+=`<g class="pin${none?" dim":""}" data-no="${dk.no}" role="button" tabindex="0" aria-label="${w.kita}: ${w.friend}, ${w.ska}${on?", sorun çözüldü":""}">
-      <circle cx="${x+2}" cy="${y+5}" r="${R}" fill="#16324a" opacity=".2"/><circle class="ring" cx="${x}" cy="${y}" r="${R}" fill="#fff" stroke="${w.shade}" stroke-width="5"/>
-      <svg x="${x-R*.86}" y="${y-R*.88}" width="${R*1.72}" height="${R*1.72}" viewBox="0 0 100 100">${ANIMALS[w.anim]}</svg>
-      ${on?`<g transform="translate(${x+R*.78} ${y-R*.7})"><circle r="12" fill="#22a165" stroke="#fff" stroke-width="3"/><path d="M-5 0 l3.5 3.5 l6.5 -7" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`:""}
-      ${wide?`<text x="${x}" y="${y+R+19}" text-anchor="middle" class="mlab">${w.kita}</text>`:""}</g>`;
+  const wide=window.matchMedia("(min-width:760px)").matches; mapWide=wide;
+  const order=[1,2,3,4,5,6,7,8];
+  const next=(()=>{ const last=d.lastIsle||0; if(last&&!seeds[last-1]) return last; const k=seeds.findIndex(x=>!x); return k<0?8:k+1 })();
+  const W=wide?1000:400, H=wide?400:1035, R=wide?52:46;
+  const pos=wide? order.map((_,i)=>i<4?[140+i*240,110]:[860-(i-4)*240,295]) : order.map((_,i)=>[i%2?285:115,78+i*120]);
+  // yol: duraklar arasında yumuşak eğri
+  let path=`M${pos[0][0]} ${pos[0][1]}`;
+  for(let i=1;i<pos.length;i++){ const [x0,y0]=pos[i-1],[x1,y1]=pos[i];
+    path+= wide&&y0!==y1 ? ` C${x0+150} ${y0} ${x1+150} ${y1} ${x1} ${y1}` : wide ? ` L${x1} ${y1}` : ` C${x0} ${(y0+y1)/2} ${x1} ${(y0+y1)/2} ${x1} ${y1}` }
+  let o=`<svg class="trail" viewBox="0 0 ${W} ${H}" role="group" aria-label="Kasaba yolu"><path d="${path}" stroke="#cfe7e3" stroke-width="16" fill="none" stroke-linecap="round"/><path d="${path}" stroke="#fff" stroke-width="4" stroke-dasharray="2 14" fill="none" stroke-linecap="round"/>`;
+  order.forEach((no,i)=>{ const [x,y]=pos[i];
+    if(no===8){
+      o+=`<g class="node hub" data-no="8" role="button" tabindex="0" aria-label="Meydan, Kasaba Şenliği, ${nSeed} / 7 sorun çözüldü">
+        <circle cx="${x}" cy="${y}" r="${R+4}" fill="#fff"/><circle cx="${x}" cy="${y}" r="${R-4}" fill="${nSeed===7?"#fde3ee":"#f3f5f7"}"/>
+        <g transform="translate(${x-R*.62} ${y-R*.7}) scale(${R/80})">${FLOWER}</g>
+        <text x="${x}" y="${y+R+26}" text-anchor="middle" class="nlab">Meydan</text><text x="${x}" y="${y+R+44}" text-anchor="middle" class="nsub">${nSeed} / 7</text></g>`;
+      return;
+    }
+    const w=WORLD[no], dk=DURAKS.find(k=>k.no===no), on=seeds[i], [g,mx]=isleStars(dk,d), none=mx===0, cur=no===next;
+    o+=`<g class="node${none?" dim":""}${cur?" cur":""}" data-no="${no}" role="button" tabindex="0" aria-label="${w.kita}, ${w.friend}${on?", sorun çözüldü":""}">
+      ${cur?`<circle class="pulse" cx="${x}" cy="${y}" r="${R+10}" fill="none" stroke="${w.shade}" stroke-width="3"/>`:""}
+      <circle cx="${x}" cy="${y+5}" r="${R+4}" fill="${w.shade}" opacity=".25"/>
+      <circle cx="${x}" cy="${y}" r="${R+4}" fill="#fff"/>
+      <circle cx="${x}" cy="${y}" r="${R-3}" fill="${w.land}" opacity="${on?1:.35}"/>
+      <svg x="${x-R*.82}" y="${y-R*.8}" width="${R*1.64}" height="${R*1.64}" viewBox="0 0 100 100">${ANIMALS[w.anim]}</svg>
+      ${on?`<g transform="translate(${x+R*.72} ${y-R*.72})"><circle r="13" fill="#22a165" stroke="#fff" stroke-width="3"/><path d="M-5.5 0 l4 4 l7 -8" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`:""}
+      <text x="${x}" y="${y+R+26}" text-anchor="middle" class="nlab">${w.kita}</text>
+      <text x="${x}" y="${y+R+44}" text-anchor="middle" class="nsub">${none?"bu seviyede yok":on?"iyileşti":g+" ★"}</text></g>`;
   });
-  // Bidik: son girilen bölgede
-  const bp= last? PLACE[last] : MEYDAN;
-  o+=`<g class="balloon" transform="translate(${bp[0]-(last?60:110)} ${bp[1]+(last?-10:-40)}) scale(${wide?.3:.38})"><ellipse cx="100" cy="190" rx="60" ry="10" fill="#16324a" opacity=".2"/>${MASCOT_FRONT}</g>`;
   o+=`</svg>`;
-  // bölge kartları
-  o+=`<div class="conts">${DURAKS.map((dk,i)=>{ const w=WORLD[dk.no], live=dk.acts.some(a=>!a.soon), [g,mx2]=isleStars(dk,d);
-    return `<button class="cont" data-no="${dk.no}" style="--land:${w.land};--shade:${w.shade}" aria-label="${w.kita}, ${w.friend}">
-      <span class="pic">${animalSVG(dk.no)}</span>
-      <span class="tx"><b>${w.kita}</b><small>${w.friend}</small><em>${w.ska} · ${dk.code.split("·")[1].trim()}</em></span>
-      ${seeds[i]?`<span class="stamp" title="Sorun çözüldü">✓</span>`:live&&mx2===0?`<span class="cnt soon">bu seviyede yok</span>`:live?`<span class="cnt">${g} ★</span>`:`<span class="cnt soon">yakında</span>`}
-    </button>` }).join("")}
-    <button class="cont home" data-no="8"><span class="pic"><svg viewBox="0 0 100 100" aria-hidden="true">${FLOWER}</svg></span><span class="tx"><b>Meydan</b><small>Kasaba Şenliği</small><em>SKA 17 · ${nSeed} / 7 dost geldi</em></span></button></div>`;
   m.innerHTML=o;
   const go=no=>{ sfx.click&&sfx.click(); no===8?openFinal():openDurak(no) };
-  m.querySelectorAll(".pin,.hub,.cont").forEach(g=>{ const no=+g.dataset.no; g.addEventListener("click",()=>go(no)); if(g.tagName!=="BUTTON") g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();go(no)} }) });
-  m.querySelectorAll(".land").forEach(g=>{ const no=+g.dataset.no; g.addEventListener("click",()=>go(no)) });
+  m.querySelectorAll(".node").forEach(g=>{ const no=+g.dataset.no; g.addEventListener("click",()=>go(no)); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();go(no)} }) });
   renderGarden(seeds,nSeed);
   checkNewSeeds(seeds);
 }
-window.addEventListener("resize",()=>{ if(!$("home").hidden && window.matchMedia("(min-width:700px)").matches!==mapWide) renderMap() });
+window.addEventListener("resize",()=>{ if(!$("home").hidden && window.matchMedia("(min-width:760px)").matches!==mapWide) renderMap() });
 
 // ---- Kasaba meydanı: şenliğe gelen dostlar ----
 function renderGarden(seeds,n){
-  const g=$("garden"); if(!g) return;
+  const g=$("garden"); if(!g) return; g.hidden=true; return;
   g.innerHTML=`<h3>Kasaba Meydanı</h3><p>${n===7?"Bütün sorunlar çözüldü, bütün dostlar meydanda! Şenlik başlıyor.":n?`${n} / 7 sorun çözüldü. Dostlar meydana geliyor.`:"Meydan bomboş. Bir bölgeye git, ilk sorunu çöz, dostunu şenliğe davet et!"}</p>${gardenSVG(seeds,n)}`;
 }
 function gardenSVG(seeds,n,party){
