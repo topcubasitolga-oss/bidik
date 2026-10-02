@@ -2454,7 +2454,7 @@ const FILM={
 };
 // ses: önce kayıt (ElevenLabs), yoksa cihaz sesi; bitince ya da süre dolunca devam
 // ses/ klasörüne eklenen kayıtların adları (ElevenLabs dosyaları gelince doldurulur); listede olmayan satır cihaz sesiyle okunur
-const SES_DOSYA=new Set([]);
+const SES_DOSYA=new Set(["genel-hosgeldin"]);
 let filmAudio=null;
 function sayLine(file,text){
   return new Promise(res=>{
@@ -2493,6 +2493,22 @@ function filmBlock(t){
 }
 const SKA_COCUK={2:"Herkese yiyecek",6:"Temiz su",7:"Temiz enerji",9:"Güvenli yollar",11:"Güzel şehirler",12:"Atıkları azalt",13:"İklimi koru",14:"Sudaki canlılar",15:"Karadaki canlılar",17:"Hep birlikte"};
 function skaBadge(n){ const s=SKA[n]; return `<div class="skab" style="--c:${s[1]}" title="Sürdürülebilir Kalkınma Amacı ${n}: ${s[0]}"><span>🌍</span><span>${SKA_COCUK[n]||s[0]}</span></div>` }
+// ilk "Oyna"da Bidik kendini tanıtır (oyuncu başına bir kez; ses kapalıysa atlanır)
+const HOSGELDIN="Merhaba! Ben Bidik. Kasabamızda yedi sorun var. Hadi, kodla birlikte çözelim!";
+function hello(then,force){
+  const d=P(); d.seen=d.seen||{};
+  if((!force&&d.seen.hosgeldin)||!db.sound){ then&&then(); return }
+  d.seen.hosgeldin=1; save();
+  let el=$("film"); if(!el){ el=document.createElement("div"); el.id="film"; document.body.appendChild(el) }
+  el.className="hello"; el.hidden=false;
+  el.innerHTML=`<div class="fcard" role="dialog" aria-modal="true" aria-label="Bidik tanışma" style="max-width:560px;align-items:center;text-align:center">
+    <svg viewBox="-50 -50 100 100" style="width:min(42vw,190px);height:auto" aria-hidden="true"><g>${ROBOT}</g></svg>
+    <p class="fcap" style="font-size:1.25rem;margin:0">${HOSGELDIN}</p>
+    <div class="btns"><button class="btn-main" id="hGo">Hadi başlayalım!</button></div></div>`;
+  let alive=true; const end=()=>{ if(!alive) return; alive=false; stopFilmAudio(); el.hidden=true; el.innerHTML=""; el.className=""; then&&then() };
+  $("hGo").onclick=()=>{ sfx.click&&sfx.click(); end() };
+  sayLine("genel-hosgeldin",HOSGELDIN).then(()=>{ if(alive) $("hGo").focus() });
+}
 function filmSeen(no){ return !!(P().seen||{})["film"+no] }
 function playFilm(no,then){
   const w=WORLD[no], F=FILM[no]; if(!w||!F){ then&&then(); return }
@@ -3201,7 +3217,7 @@ $("teacherBtn").onclick=()=>{db.teacher=!db.teacher;save();goHome();
 };
 $("whoBtn").onclick=openProfiles;
 $("lvBtn").onclick=levelChipClick;
-$("playBtn").onclick=()=>{ sfx.click(); continuePlay() };
+$("playBtn").onclick=()=>{ sfx.click(); typeof hello==="function"?hello(continuePlay):continuePlay() };
 function openMenu(){
   const L=curLevel()?levelObj().name:"seçilmedi";
   overlay(`<span class="kicker">Öğretmen / veli</span><h2 style="font-size:28px">Ayarlar ve takip</h2>
