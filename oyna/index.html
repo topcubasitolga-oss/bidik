@@ -145,7 +145,6 @@ h1,h2,h3{text-wrap:balance}
 .bloom .petals{animation:bloom 1.2s ease-in-out 2}
 @keyframes bloom{50%{transform:rotate(60deg) scale(1.3)}}
 @keyframes wave{50%{transform:scale(1.7)}}
-.badges{opacity:.9}
 .blk svg text{font-family:var(--display)}
 .palette{width:min(100%,500px);display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .palbtn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:800;color:var(--ink-soft);line-height:1.1;text-align:center}
@@ -1156,7 +1155,7 @@ function renderBoard(){
   });
   g+=`<polyline id="kTrail" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 16" opacity=".85" points=""/>`;
   g+=`<rect id="kFail" x="3" y="3" width="94" height="94" rx="14" fill="none" stroke="var(--red)" stroke-width="6" stroke-dasharray="10 6" style="display:none"/>`;
-  const badges=L.rel?`<g class="badges"><g transform="translate(0 -40)"><circle r="13" fill="var(--blue)" stroke="#fff" stroke-width="3"/><path d="M5 5V0a3 3 0 0 0-3-3h-7M-2-7l-4 4 4 4" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="rotate(90)"/></g><g transform="translate(0 40)"><circle r="13" fill="#d6409f" stroke="#fff" stroke-width="3"/><path d="M-5 5V0a3 3 0 0 1 3-3h7M2-7l4 4-4 4" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="rotate(90)"/></g></g>`:"";
+  const badges="";
   g+=`<g id="kCar"><g class="carbody">${CAR}</g>${badges}</g>`;
   s.innerHTML=`<g id="kWorld">${g}</g>`; placeCar(startState());
 }
