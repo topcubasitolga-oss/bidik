@@ -2106,10 +2106,11 @@ const Voice={
   v:null, ready:false,
   init(){ try{ if(!("speechSynthesis" in window)) return; const pick=()=>{ const vs=speechSynthesis.getVoices(); this.v=vs.find(x=>/^tr(-|_|$)/i.test(x.lang))||null; this.ready=!!this.v; document.documentElement.classList.toggle("has-voice",this.ready) }; pick(); speechSynthesis.onvoiceschanged=pick }catch(e){} },
   on(){ const d=P(); return this.ready&&(d.voice!=null?d.voice:levelObj().voice) },
+  // konuşmayı başlatır; konuşma nesnesini döndürür (bitişi beklemek isteyen onend dinleyebilir)
   say(text,force){
-    if(!this.ready||!db.sound) return; if(!force&&!this.on()) return;
-    try{ const t=String(text).replace(/[“”"]/g,"").replace(/×/g," kere ").replace(/→/g,", ").replace(/·/g,", ").trim(); if(!t) return;
-      speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.voice=this.v; u.lang=this.v.lang; u.rate=levelObj().id.startsWith("y")?.85:.95; u.pitch=1.1; speechSynthesis.speak(u) }catch(e){}
+    if(!this.ready||!db.sound) return null; if(!force&&!this.on()) return null;
+    try{ const t=String(text).replace(/[“”"]/g,"").replace(/×/g," kere ").replace(/→/g,", ").replace(/·/g,", ").trim(); if(!t) return null;
+      speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.voice=this.v; u.lang=this.v.lang; u.rate=levelObj().id.startsWith("y")?.85:.95; u.pitch=1.1; this.cur=u; speechSynthesis.speak(u); return u }catch(e){ return null }
   },
   stop(){ try{ speechSynthesis.cancel() }catch(e){} }
 };
@@ -2455,9 +2456,16 @@ const SES_DOSYA=new Set([]);
 let filmAudio=null;
 function sayLine(file,text){
   return new Promise(res=>{
-    const min=Math.max(4200,text.length*64);
+    const min=Math.max(4200,text.length*64), t0=Date.now();
     let done=false; const fin=()=>{ if(!done){ done=true; res() } };
-    const fallback=()=>{ Voice.say(text,true); setTimeout(fin,min) };
+    // cihaz sesi: cümle bitince geç (en az 3 sn ekranda kalsın); konuşma olayı gelmeyen tarayıcılar için uzun bir güvenlik süresi
+    const fallback=()=>{
+      const u=Voice.say(text,true);
+      if(!u){ setTimeout(fin,min); return }
+      let ended=false; const after=()=>{ if(ended) return; ended=true; setTimeout(fin, Math.max(700, 3000-(Date.now()-t0))) };
+      u.onend=after; u.onerror=after;
+      setTimeout(after, Math.max(min, text.length*120)+3000);
+    };
     if(!db.sound){ setTimeout(fin,min); return }
     if(!SES_DOSYA.has(file)){ fallback(); return }
     try{
