@@ -100,5 +100,5 @@ li{margin:4px 0}
   <p style="margin-top:30px"><a href="index.html">← Ana sayfaya dön</a></p>
 </div>
 
-<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(()=>{}))}</script>
+<script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let done=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!done){done=true;location.reload()}});window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{scope:"./",updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}))}</script>
 </body></html>

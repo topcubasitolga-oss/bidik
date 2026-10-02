@@ -437,8 +437,8 @@ const ROBOT=`<g class="robot" transform="translate(-6 0) scale(.8)">
   <ellipse cx="-8" cy="-8" rx="8" ry="4" fill="#fff" opacity=".35" transform="rotate(-25 -8 -8)"/>
   <circle cx="22" cy="0" r="13" fill="#16324a"/>
   <circle cx="27" cy="-6" r="4.5" fill="#fff"/><circle cx="27" cy="6" r="4.5" fill="#fff"/><circle cx="29" cy="-6" r="2" fill="#16324a"/><circle cx="29" cy="6" r="2" fill="#16324a"/>
-  <path d="M32 -8 Q40 -14 42 -20 M32 8 Q40 14 42 20" stroke="#16324a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <circle cx="42" cy="-21" r="3.5" fill="#ffc93c"/><circle cx="42" cy="21" r="3.5" fill="#ffc93c"/>
+  <g class="bl bl-L"><path d="M30 -8 Q40 -15 43 -23" stroke="#2f7fd8" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="44" cy="-25" r="6.5" fill="#2f7fd8" stroke="#fff" stroke-width="2.5"/></g>
+  <g class="bl bl-R"><path d="M30 8 Q40 15 43 23" stroke="#d6409f" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="44" cy="25" r="6.5" fill="#d6409f" stroke="#fff" stroke-width="2.5"/></g>
 </g>`;
 // tanıtım hali (önden); eller burada renksiz, çünkü önden bakınca sağ-sol ters görünür
 const MASCOT_FRONT=`<ellipse cx="100" cy="188" rx="58" ry="8" fill="#16324a" opacity=".12"/>
@@ -1427,5 +1427,5 @@ goHome();
 })();
 </script>
 
-<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("../sw.js",{scope:"../"}).catch(()=>{}))}</script>
+<script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let done=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!done){done=true;location.reload()}});window.addEventListener("load",()=>navigator.serviceWorker.register("../sw.js",{scope:"../",updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}))}</script>
 </body></html>
