@@ -123,6 +123,7 @@ h1,h2,h3{text-wrap:balance}
 .world .mlab{font-family:var(--display);font-weight:800;font-size:19px;fill:#16324a;paint-order:stroke;stroke:#fff;stroke-width:5px;stroke-linejoin:round}
 .world .pin,.world .hub,.world .land{cursor:pointer;outline:none}
 .world .pin .ring{transition:stroke-width .15s}
+.world .pin.dim{opacity:.4}
 .world .pin:hover .ring,.world .pin:focus-visible .ring{stroke-width:8}
 .world .pin:focus-visible .ring,.world .hub:focus-visible circle{stroke:#16324a}
 .balloon{animation:float 4s ease-in-out infinite}
@@ -349,6 +350,27 @@ h1,h2,h3{text-wrap:balance}
 #cert .cfoot div{display:flex;flex-direction:column;min-width:200px}
 #cert .cfoot b{border-bottom:2px solid #16324a;padding-bottom:4px;margin-bottom:4px;min-height:1.4em}#cert .cfoot span{font-size:12px}
 #cert .cbrand{font-size:11px;margin:14px 0 0;color:#466179}
+
+/* seviyeler */
+.lvchip{font-family:var(--display);font-size:16px;padding:6px 14px;background:#fff7dc;border-color:var(--rail)}
+.lvpick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+.lvb{display:flex;flex-direction:column;align-items:flex-start;text-align:left;background:var(--sky);border:3px solid var(--panel-line);border-radius:16px;padding:10px 12px;gap:2px}
+.lvb b{font-family:var(--display);font-size:22px;line-height:1}
+.lvb small{font-weight:700;font-size:12px;color:var(--ink-soft);line-height:1.2}
+.lvb.on{border-color:var(--ink);background:#fff7dc}
+.lvall{display:flex;gap:8px;align-items:center;font-weight:700;font-size:13px;text-align:left;width:100%}
+.lv.other{opacity:.35}
+.lv.other .st{font-size:9px;letter-spacing:0}
+.act.other{opacity:.45}
+.act .lvtag{background:#eef2f6!important;color:var(--ink-soft)!important}
+.speakable{cursor:pointer}
+.has-voice .abubble .goal{padding-right:40px}
+.has-voice .abubble .goal::after{content:"";position:absolute;right:10px;top:50%;width:22px;height:22px;margin-top:-11px;background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23466179' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 9h4l5-4v14l-5-4H4z'/%3E%3Cpath d='M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12'/%3E%3C/svg%3E")}
+@media (min-width:700px){ .screen{zoom:var(--uiz,1)} .mapwrap{width:min(1000px,calc((100vw - 32px) / var(--uiz,1)))} }
+.lv-y4 #dailyBtn,.lv-y5 #dailyBtn{display:none}
+.lv-y4 .abubble .goal,.lv-y5 .abubble .goal{font-size:19px}
+.lv-y4 .goal,.lv-y5 .goal{font-size:17px}
+.lv-y4 .tcard small,.lv-y5 .tcard small,.lv-y4 .sq small,.lv-y5 .sq small{font-size:14px}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -507,6 +529,7 @@ h1,h2,h3{text-wrap:balance}
 <section id="home" class="screen">
   <div class="home-head">
     <button class="who" id="whoBtn" aria-label="Oyuncu değiştir"></button>
+    <button class="chip lvchip" id="lvBtn" aria-label="Seviye"></button>
     <button class="iconbtn" id="soundBtn" aria-label="Ses"></button>
   </div>
   <div class="brand">
@@ -763,7 +786,7 @@ const SPEEDS=[
   {v:1,name:"Tavşan",svg:'<ellipse cx="9" cy="6" rx="2.1" ry="5.2" fill="#d5dae2" stroke="#9aa5b4" stroke-width=".8"/><ellipse cx="15" cy="6" rx="2.1" ry="5.2" fill="#d5dae2" stroke="#9aa5b4" stroke-width=".8"/><ellipse cx="9" cy="6.5" rx=".9" ry="3.4" fill="#f49ac1"/><ellipse cx="15" cy="6.5" rx=".9" ry="3.4" fill="#f49ac1"/><circle cx="12" cy="15" r="6.8" fill="#eef1f5" stroke="#9aa5b4" stroke-width=".8"/><circle cx="9.7" cy="14" r="1.1" fill="#16324a"/><circle cx="14.3" cy="14" r="1.1" fill="#16324a"/><ellipse cx="12" cy="16.6" rx="1.2" ry=".9" fill="#f49ac1"/>'},
   {v:2,name:"Çita",svg:'<path d="M1 9.5 H5.5 M1.8 13.5 H5.5 M1 17.5 H5.5" stroke="#f08a24" stroke-width="1.8" stroke-linecap="round"/><circle cx="9.8" cy="7.6" r="2.3" fill="#ffc93c" stroke="#d99a00" stroke-width=".8"/><circle cx="20.2" cy="7.6" r="2.3" fill="#ffc93c" stroke="#d99a00" stroke-width=".8"/><circle cx="15" cy="13.5" r="7" fill="#ffc93c" stroke="#d99a00" stroke-width=".9"/><circle cx="12.6" cy="12.3" r="1.1" fill="#16324a"/><circle cx="17.4" cy="12.3" r="1.1" fill="#16324a"/><path d="M12.6 13.5 Q12.1 15.6 13.4 17.2 M17.4 13.5 Q17.9 15.6 16.6 17.2" stroke="#16324a" stroke-width="1" fill="none"/><ellipse cx="15" cy="15.4" rx="1.3" ry=".9" fill="#16324a"/><circle cx="10.6" cy="16.3" r=".7" fill="#a65a10"/><circle cx="19.4" cy="16.3" r=".7" fill="#a65a10"/><circle cx="15" cy="9.3" r=".7" fill="#a65a10"/>'}
 ];
-function getSpeed(){const v=P().speed; return SPEEDS.some(s=>s.v===v)?v:.5}
+function getSpeed(){const v=P().speed; return SPEEDS.some(s=>s.v===v)?v:(typeof levelObj==="function"?levelObj().speed:.5)}
 function renderSpeedBars(){
   ["kSpeedBar","ySpeedBar","aSpeedBar"].forEach(id=>{
     const box=$(id); if(!box) return;
@@ -1176,7 +1199,7 @@ function win(){
   document.querySelectorAll("#yBoard .finish").forEach(e=>e.classList.add("bloom"));
   winCard({stars,checks:[[true,"Bidik bitişe ulaştı"],[first,"İlk denemede, ipucusuz"],[minimal,`En az parçayla (${used} / ${L.best})`]],
     msg:stars===3?"Kusursuz plan!":!minimal?"Daha kısa bir yol bulabilir misin?":"Çalıştırmadan önce yolu parmağınla izlemeyi dene.",
-    onAgain:()=>isDaily?Daily.open():start(n), onNext:()=>isDaily?goHome():(n<TOTAL?start(n+1):backToLevels("yol")), nextLabel:isDaily?"Ana ekran":n<TOTAL?"Sonraki":"Bölümler", talk:isDaily?null:talkFor("yol",n)});
+    onAgain:()=>isDaily?Daily.open():start(n), onNext:()=>isDaily?goHome():(n<TOTAL&&allowed("yol",n+1)?start(n+1):backToLevels("yol")), nextLabel:isDaily?"Ana ekran":n<TOTAL&&allowed("yol",n+1)?"Sonraki":"Bölümler", talk:isDaily?null:talkFor("yol",n)});
 }
 $("ySolve").onclick=()=>{
   if(running) return;
@@ -1650,7 +1673,7 @@ function win(){
   document.querySelectorAll("#kBoard .finish").forEach(e=>e.classList.add("bloom"));
   winCard({stars,checks:[[true,L.bug?"Hatayı buldun ve düzelttin":"Bidik bitişe ulaştı"],[first,"İlk denemede, ipucusuz"],[minimal,`En az blokla (${u} / ${L.ideal})`]],
     msg:stars===3?"Kusursuz algoritma!":!minimal?"Daha kısa bir program yazabilir misin? Döngü, fonksiyon ya da koşul dene.":"Adım düğmesiyle programı önce kafanda çalıştırmayı dene.",
-    onAgain:()=>isDaily?Daily.open():start(n), onNext:()=>isDaily?goHome():(n<TOTAL?start(n+1):backToLevels("kod")),nextLabel:isDaily?"Ana ekran":n<TOTAL?"Sonraki":"Bölümler", talk:isDaily?null:talkFor("kod",n)});
+    onAgain:()=>isDaily?Daily.open():start(n), onNext:()=>isDaily?goHome():(n<TOTAL&&allowed("kod",n+1)?start(n+1):backToLevels("kod")),nextLabel:isDaily?"Ana ekran":n<TOTAL&&allowed("kod",n+1)?"Sonraki":"Bölümler", talk:isDaily?null:talkFor("kod",n)});
 }
 $("kSolve").onclick=()=>{
   if(anim) return;
@@ -1679,6 +1702,7 @@ let A=null;
 function regAct(id,def){ ACT[id]=def }
 function actData(id,d){ d=d||P(); d.act=d.act||{}; return d.act[id]||(d.act[id]={}) }
 function actProg(id,d){ const m=ACT[id], o=actData(id,d); let s=0; for(let n=1;n<=m.N;n++) s+=o[n]||0; return [s,m.N*3] }
+function actProgL(id,d){ return lvlProg(id,1,ACT[id].N,d) }
 function actPart(m,n){ return m.parts.find(p=>n>=p.from&&n<=p.to)||m.parts[0] }
 const aWait=ms=>new Promise(r=>setTimeout(r,ms/getSpeed()));
 function mkRng(seed){ let s=(seed*2654435761)>>>0||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>17; s^=s<<5; s>>>=0; return s/4294967296 } }
@@ -1721,13 +1745,14 @@ function aWin(extra){
   const first=A.tries===0, nohint=A.hints===0;
   const stars=extra&&extra.stars!=null?extra.stars:(first&&nohint?3:A.tries<=2?2:1);
   const o=actData(id); if((o[n]||0)<stars){ o[n]=stars; save() }
+  let nx=null; for(let k=n+1;k<=m.N;k++) if(allowed(id,k)){ nx=k; break }
   setTimeout(()=>winCard({stars,
     checks:(extra&&extra.checks)||[[true,m.doneText||"Görev tamam"],[first,"İlk denemede"],[nohint,"Yardım almadan"]],
     msg:(extra&&extra.msg)||(stars===3?"Harika iş!":"Bir daha dene, 3 yıldızı yakala!"),
     talk:m.talk(n),
     onAgain:()=>{closeOverlay();startAct(id,n)},
-    onNext:()=>{closeOverlay(); n<m.N?startAct(id,n+1):(m.finale?m.finale():openActLevels(id))},
-    nextLabel:n<m.N?"Sonraki":(m.finaleLabel||"Bölümler")}),500);
+    onNext:()=>{closeOverlay(); nx?startAct(id,nx):(n===m.N&&m.finale?m.finale():openActLevels(id))},
+    nextLabel:nx?"Sonraki":n===m.N?(m.finaleLabel||"Bölümler"):"Bölümler"}),500);
 }
 async function aSolveRun(){
   if(!A||A.busy) return;
@@ -1742,19 +1767,21 @@ function openActLevels(id){
   show("levels");
   const o=actData(id), wrap=$("chapters"); wrap.innerHTML="";
   $("lvlTitle").textContent=m.title;
-  $("lvlSub").textContent=`${actProg(id)[0]} / ${m.N*3} yıldız`;
+  const pr=actProgL(id); $("lvlSub").textContent=`${pr[0]} / ${pr[1]} yıldız`;
   m.parts.forEach((c,ci)=>{
-    const lv=Array.from({length:c.to-c.from+1},(_,k)=>c.from+k);
+    const lvAll=Array.from({length:c.to-c.from+1},(_,k)=>c.from+k), lv=showAllLevels()?lvAll:lvAll.filter(n=>allowed(id,n));
+    if(!lv.length) return;
     const box=document.createElement("div"); box.className="chapter";
     box.innerHTML=`<div class="ch-head"><span class="num">${ci+1}</span><div><h2>${c.name}</h2><small>${c.sub}</small></div><span class="sc">${lv.reduce((a,n)=>a+(o[n]||0),0)} / ${lv.length*3} ★</span></div>`;
     const g=document.createElement("div"); g.className="levels";
     lv.forEach(n=>{
       const b=document.createElement("button"), st=o[n]||0;
       const open=BETA_ALL_OPEN||teacherOn()||n===1||!!o[n-1]||!!st;
-      b.className="lv"+(st?" done":"")+(open?"":" locked");
+      const okLv=allowed(id,n); b.className="lv"+(st?" done":"")+(open&&okLv?"":" locked")+(okLv?"":" other");
       b.innerHTML=`${n}<span class="st">${st?starsTxt(st):(open?"&nbsp;":"kilitli")}</span>`;
       b.setAttribute("aria-label",`Bölüm ${n}`+(open?"":", kilitli"));
       b.onclick=()=>{ if(!open){sfx.no();return} startAct(id,n) };
+      if(!okLv){ const fl=firstLevelFor(id,n,n); b.querySelector(".st").textContent=fl?fl.name:"" }
       g.appendChild(b);
     });
     box.appendChild(g); wrap.appendChild(box);
@@ -1812,6 +1839,91 @@ function bindGrid(root,fn,hfn){
 }
 function chipsHTML(items){ return `<div class="achips">${items.map(t=>`<span class="achip ${t.cls||""}" ${t.style?`style="${t.style}"`:""}>${t.html}</span>`).join("")}</div>` }
 function optsHTML(opts,attr){ return `<div class="aopts">${opts.map((o,i)=>`<button class="aopt" data-${attr||"i"}="${i}">${o}</button>`).join("")}</div>` }
+// ===== Yaş / sınıf seviyesi ve sesli yönerge =====
+const LEVELS=[
+  {id:"y4",name:"4 yaş",long:"Okul öncesi · 4 yaş",desc:"Büyük düğmeler, az seçenek, sesli yönerge",scale:1.16,speed:.25,voice:true},
+  {id:"y5",name:"5 yaş",long:"Okul öncesi · 5 yaş",desc:"Örüntü, sıralama, ilk kodlar",scale:1.1,speed:.25,voice:true},
+  {id:"s1",name:"1. sınıf",long:"İlkokul · 1. sınıf",desc:"Dönüşler, koordinat, hata bulma",scale:1.04,speed:.5,voice:true},
+  {id:"s2",name:"2. sınıf",long:"İlkokul · 2. sınıf",desc:"Döngüler, kısaltma, gizli dil",scale:1,speed:.5,voice:false},
+  {id:"s3",name:"3. sınıf",long:"İlkokul · 3. sınıf",desc:"Fonksiyonlar ve koşullar",scale:1,speed:1,voice:false},
+  {id:"s4",name:"4. sınıf",long:"İlkokul · 4. sınıf",desc:"Usta bölümler, en kısa program",scale:1,speed:1,voice:false}
+];
+const LVI=id=>Math.max(0,LEVELS.findIndex(l=>l.id===id));
+// her etkinlik için seviyelere göre açık bölümler (y4, y5, s1, s2, s3, s4); sayı = 1..n, dizi = liste, 0 = kapalı
+const AV={
+  yol:[10,20,30,40,40,40],
+  kod:[5,10,20,30,50,60],
+  piknik:[3,6,6,6,6,6],
+  boncuk:[3,8,12,15,15,15],
+  yavru:[2,6,10,10,10,10],
+  sira:[4,8,10,10,10,10],
+  kural:[[1,3,5,6],6,8,10,10,10],
+  yaris:[0,0,4,8,8,8],
+  koord:[0,2,10,15,15,15],
+  kalem:[0,0,4,8,8,8],
+  ikili:[0,0,4,7,8,8],
+  senlik:[3,3,5,5,5,5]
+};
+function curLevel(d){ d=d||P(); return d.level||null }
+function levelObj(d){ return LEVELS[LVI(curLevel(d)||"s1")] }
+function showAllLevels(){ return !!db.showAll&&teacherOn() }
+function allowed(mode,n,d){
+  const lv=curLevel(d); if(!lv) return true;
+  const a=AV[mode]; if(!a) return true;
+  const v=a[LVI(lv)];
+  return Array.isArray(v)?v.includes(n):n<=v;
+}
+function allowedList(mode,list,d){ return list.filter(n=>allowed(mode,n,d)) }
+// seviyeye uygun bölümlere göre ilerleme [yıldız, en çok]
+function lvlProg(mode,from,to,d){ d=d||P(); const o=mode==="yol"||mode==="kod"?d[mode]:actData(mode,d); let s=0,c=0; for(let n=from;n<=to;n++) if(allowed(mode,n,d)){ s+=o[n]||0; c++ } return [s,c*3] }
+function lvlProgList(mode,list,d){ d=d||P(); const o=d[mode]; const L=allowedList(mode,list,d); return [L.reduce((a,n)=>a+(o[n]||0),0),L.length*3] }
+// hangi seviyeden itibaren açılıyor (etiket için)
+function firstLevelFor(mode,from,to){ const a=AV[mode]; if(!a) return null; for(let i=0;i<a.length;i++){ const v=a[i]; for(let n=from;n<=to;n++) if(Array.isArray(v)?v.includes(n):n<=v) return LEVELS[i] } return null }
+function applyLevelUI(){
+  const L=levelObj(), root=document.documentElement;
+  LEVELS.forEach(l=>root.classList.remove("lv-"+l.id)); root.classList.add("lv-"+L.id);
+  root.style.setProperty("--uiz",L.scale);
+}
+function openLevelPicker(first){
+  const d=P(), cur=curLevel(d);
+  overlay(`<span class="kicker">${first?"Hoş geldin!":"Seviye"}</span><h2 style="font-size:28px">${first?"Kim oynuyor?":"Seviye seç"}</h2><p>${first?"Oyunu çocuğun yaşına göre hazırlayalım. Seviyeyi sonra öğretmen modunda değiştirebilirsiniz.":"Seviyeye uygun bölümler açılır, yazılar ve düğmeler yaşa göre büyür."}</p>
+    <div class="lvpick">${LEVELS.map(l=>`<button class="lvb ${cur===l.id?"on":""}" data-l="${l.id}"><b>${l.name}</b><small>${l.desc}</small></button>`).join("")}</div>
+    ${db.profiles.length>1?`<label class="lvall"><input type="checkbox" id="lvAll"> Bu cihazdaki bütün oyunculara uygula</label>`:""}
+    ${teacherOn()?`<label class="lvall"><input type="checkbox" id="lvShow" ${db.showAll?"checked":""}> Haritada bütün seviyelerin etkinliklerini göster (soluk)</label>`:""}`);
+  document.querySelectorAll(".lvb").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.l, all=$("lvAll")&&$("lvAll").checked;
+    (all?db.profiles.map(p=>P(p.id)):[d]).forEach(x=>{ x.level=id; delete x.speed });
+    if($("lvShow")) db.showAll=$("lvShow").checked;
+    save(); sfx.click(); closeOverlay(); goHome();
+  });
+  if($("lvShow")) $("lvShow").onchange=()=>{ db.showAll=$("lvShow").checked; save() };
+}
+function levelChipClick(){
+  if(!curLevel()||teacherOn()) { openLevelPicker(!curLevel()); return }
+  overlay(`<span class="kicker">Seviye</span><h2 style="font-size:26px">${levelObj().long}</h2><p>Seviyeyi değiştirmek için ana ekrandan <b>Öğretmen modu</b>nu açın, sonra bu düğmeye yeniden dokunun.</p><div class="btns"><button class="btn-main" id="ovLv">Tamam</button></div>`);
+  $("ovLv").onclick=closeOverlay;
+}
+// ---- sesli yönerge (tarayıcının Türkçe sesi varsa) ----
+const Voice={
+  v:null, ready:false,
+  init(){ try{ if(!("speechSynthesis" in window)) return; const pick=()=>{ const vs=speechSynthesis.getVoices(); this.v=vs.find(x=>/^tr(-|_|$)/i.test(x.lang))||null; this.ready=!!this.v; document.documentElement.classList.toggle("has-voice",this.ready) }; pick(); speechSynthesis.onvoiceschanged=pick }catch(e){} },
+  on(){ const d=P(); return this.ready&&(d.voice!=null?d.voice:levelObj().voice) },
+  say(text,force){
+    if(!this.ready||!db.sound) return; if(!force&&!this.on()) return;
+    try{ const t=String(text).replace(/[“”"]/g,"").replace(/×/g," kere ").replace(/→/g,", ").replace(/·/g,", ").trim(); if(!t) return;
+      speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.voice=this.v; u.lang=this.v.lang; u.rate=levelObj().id.startsWith("y")?.85:.95; u.pitch=1.1; speechSynthesis.speak(u) }catch(e){}
+  },
+  stop(){ try{ speechSynthesis.cancel() }catch(e){} }
+};
+Voice.init();
+// görev yazıları değişince oku; yazıya dokununca tekrar oku
+(function(){
+  const watch=id=>{ const el=$(id); if(!el) return; let last="";
+    new MutationObserver(()=>{ const t=el.textContent; if(t&&t!==last&&!el.closest("[hidden]")){ last=t; clearTimeout(el._vt); el._vt=setTimeout(()=>Voice.say(t),250) } }).observe(el,{childList:true,characterData:true,subtree:true});
+    el.addEventListener("click",()=>Voice.say(el.textContent,true)); el.classList.add("speakable") };
+  ["aGoal","yGoal","kGoal"].forEach(watch);
+  const f=$("aFriend"); if(f) f.addEventListener("click",()=>Voice.say($("aGoal").textContent,true));
+})();
 // ===== Bidik'in Dünya Turu: 7 kıta, 7 hayvan dostu =====
 // Görsel dil: resimli çocuk atlası; kıtalar kâğıttan kesilmiş gibi, altta koyu bir gölge katmanı.
 const WORLD={
@@ -1975,8 +2087,8 @@ function renderMap(){
   o+=`<g class="hub" data-no="8" role="button" tabindex="0" aria-label="Türkiye, Bidik'in Bahçesi, ${nSeed} / 7 dost geldi"><circle cx="${tx}" cy="${ty}" r="${wide?24:30}" fill="#fff" stroke="#e8443a" stroke-width="4"/><g transform="translate(${tx-(wide?20:25)} ${ty-(wide?22:27)}) scale(${wide?.42:.52})">${FLOWER}</g>
     ${wide?`<text x="${tx}" y="${ty+42}" text-anchor="middle" class="mlab">Türkiye</text>`:""}</g>`;
   // dost rozetleri
-  DURAKS.forEach((dk,i)=>{ const w=WORLD[dk.no], [x,y]=proj(...PLACE[dk.no].badge), R=wide?34:46, on=seeds[i];
-    o+=`<g class="pin" data-no="${dk.no}" role="button" tabindex="0" aria-label="${w.kita}: ${w.friend}, ${dk.code}${on?", pul alındı":""}">
+  DURAKS.forEach((dk,i)=>{ const w=WORLD[dk.no], [x,y]=proj(...PLACE[dk.no].badge), R=wide?34:46, on=seeds[i], none=dk.acts.some(a=>a.prog)&&isleStars(dk,d)[1]===0;
+    o+=`<g class="pin${none?" dim":""}" data-no="${dk.no}" role="button" tabindex="0" aria-label="${w.kita}: ${w.friend}, ${dk.code}${on?", pul alındı":""}">
       <circle cx="${x+2}" cy="${y+5}" r="${R}" fill="#16324a" opacity=".22"/>
       <circle class="ring" cx="${x}" cy="${y}" r="${R}" fill="#fff" stroke="${w.shade}" stroke-width="5"/>
       <svg x="${x-R*.86}" y="${y-R*.9}" width="${R*1.72}" height="${R*1.72}" viewBox="0 0 100 100">${ANIMALS[w.anim]}</svg>
@@ -1992,7 +2104,7 @@ function renderMap(){
     return `<button class="cont" data-no="${dk.no}" style="--land:${w.land};--shade:${w.shade}" aria-label="${w.kita}, ${w.friend}">
       <span class="pic">${animalSVG(dk.no)}</span>
       <span class="tx"><b>${w.kita}</b><small>${w.friend}</small><em>${dk.code}</em></span>
-      ${seeds[i]?`<span class="stamp" title="Pul alındı">✓</span>`:live?`<span class="cnt">${g} ★</span>`:`<span class="cnt soon">yakında</span>`}
+      ${seeds[i]?`<span class="stamp" title="Pul alındı">✓</span>`:live&&mx===0?`<span class="cnt soon">bu seviyede yok</span>`:live?`<span class="cnt">${g} ★</span>`:`<span class="cnt soon">yakında</span>`}
     </button>` }).join("")}
     <button class="cont home" data-no="8"><span class="pic"><svg viewBox="0 0 100 100" aria-hidden="true">${FLOWER}</svg></span><span class="tx"><b>Türkiye</b><small>Bidik'in Bahçesi</small><em>${nSeed} / 7 dost geldi</em></span></button></div>`;
   m.innerHTML=o;
@@ -2077,20 +2189,22 @@ function openDurak(no){
   show("durak");
   $("dSub").textContent=`${w.yer} · ${no} / 7`;
   const [g,mx]=isleStars(dk), need=seedNeed(mx), ok=mx>0&&g>=need;
-  const seedTxt= mx===0? "Oyunlar gelince pul kazanılır" : ok? `${w.friend} şenliğe geliyor ✓` : `${w.acc} davet etmeye ${need-g} yıldız kaldı`;
+  const seedTxt= mx===0? (dk.acts.some(a=>!a.soon)?"Bu seviyede oyun yok":"Oyunlar gelince pul kazanılır") : ok? `${w.friend} şenliğe geliyor ✓` : `${w.acc} davet etmeye ${need-g} yıldız kaldı`;
   const h=$("dHead"); h.style.background=w.land; h.style.color=no===6?"var(--ink)":"var(--ink)";
   h.innerHTML=`<div class="scene">${sceneSVG(no)}</div>
     <div class="dtext"><h2>${w.kita}</h2><p class="friend"><b>${w.friend}:</b> “${w.sorun}”</p><p class="sir">${w.sir}</p>
     <div class="dmeta"><span class="code">${dk.code}</span><span class="seed">${seedTxt}</span></div></div>`;
   const box=$("dActs"); box.innerHTML="";
   dk.acts.forEach(a=>{
-    const b=document.createElement("button"); b.className="act";
-    const pg=a.prog?a.prog():null;
-    b.innerHTML=`<h3>${a.t}</h3><p>${a.d}</p><div class="meta"><span class="lvl">${a.lvl}</span>${a.age?`<span>${a.age}</span>`:""}${a.page?`<span>Kitapta s. ${a.page}</span>`:""}${a.soon?`<span class="soon">Yakında</span>`:""}</div>${pg?`<div class="prog2">${pg[0]} / ${pg[1]} ★</div>`:""}`;
+    const pg=a.prog?a.prog():null, other=pg&&pg[1]===0;
+    if(other&&!showAllLevels()) return;
+    const b=document.createElement("button"); b.className="act"+(other?" other":"");
+    b.innerHTML=`<h3>${a.t}</h3><p>${a.d}</p><div class="meta"><span class="lvl">${a.lvl}</span>${a.age?`<span>${a.age}</span>`:""}${a.page?`<span>Kitapta s. ${a.page}</span>`:""}${a.soon?`<span class="soon">Yakında</span>`:""}${other?`<span class="lvtag">Bu seviyede kapalı</span>`:""}</div>${pg&&!other?`<div class="prog2">${pg[0]} / ${pg[1]} ★</div>`:""}`;
     if(a.soon){ b.disabled=true; b.setAttribute("aria-label",`${a.t}, yakında`) }
     else b.onclick=a.open;
     box.appendChild(b);
   });
+  if(!box.children.length) box.innerHTML=`<p class="note" style="grid-column:1/-1;font-size:16px">${w.friend} bu seviyede henüz oyun hazırlamadı. Büyüyünce gel!</p>`;
   $("dNote").textContent="● okul öncesi  ●● 1. sınıf  ●●● ileri düzey · “Yakında” etkinlikler Bidik ile Düşün, Çöz, Kodla kitabından dijitale taşınıyor.";
 }
 // ===== Koordinat Avı (Şifre Adası) =====
@@ -3360,7 +3474,9 @@ function goHome(){
   const p=prof(), d=P();
   $("whoBtn").innerHTML=`<span class="avatar" style="background:${COLORS[p.color]}">${(p.name[0]||"?").toUpperCase()}</span><span>${esc(p.name)}</span>`;
   $("soundBtn").innerHTML=db.sound?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg>`:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>`;
+  applyLevelUI(); $("lvBtn").textContent=curLevel()?levelObj().name:"Seviye seç";
   renderMap();
+  if(!curLevel()) setTimeout(()=>{ if(!$("home").hidden&&$("overlay").hidden&&!curLevel()) openLevelPicker(true) },400);
   const now=new Date(), mon=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][now.getMonth()];
   $("dMon").textContent=mon; $("dDay").textContent=now.getDate();
   const ds=d.daily[todayKey()];
@@ -3371,35 +3487,35 @@ function goHome(){
 const BUG_LEVELS=[5,10,15,20,25,30,35,40,45,50,55,60];
 const DURAKS=[
  {no:1,name:"Yapboz Adası",kid:"Büyük işi küçük parçalara böl.",code:"B1 · Ayrıştırma",color:"#f08a24",acts:[
-   {t:"Yol Kur",d:"Parçaları seç, yolu kur. Altın, anahtar ve kapı gibi küçük hedeflere bölerek çiçeğe ulaş.",lvl:"● ●●",age:"4-8 yaş",open:()=>openLevels("yol"),prog:(d=P())=>[sumStars(d.yol,1,40),120]},
-   {t:"Piknik Ağacı",d:"Fil Pofi pikniğe hazırlanıyor. Eşyaları dallara böl, gerekmeyenleri ayır.",lvl:"●",age:"4-6 yaş",page:11,open:()=>openActLevels("piknik"),prog:(d=P())=>actProg("piknik",d)},
+   {t:"Yol Kur",d:"Parçaları seç, yolu kur. Altın, anahtar ve kapı gibi küçük hedeflere bölerek çiçeğe ulaş.",lvl:"● ●●",age:"4-8 yaş",open:()=>openLevels("yol"),prog:(d=P())=>lvlProg("yol",1,40,d)},
+   {t:"Piknik Ağacı",d:"Fil Pofi pikniğe hazırlanıyor. Eşyaları dallara böl, gerekmeyenleri ayır.",lvl:"●",age:"4-6 yaş",page:11,open:()=>openActLevels("piknik"),prog:(d=P())=>actProgL("piknik",d)},
    {soon:1,t:"Eksik Parça Hangisi?",d:"Bir işin adımlarından biri eksik. Hangisi?",lvl:"●●",page:14}]},
  {no:2,name:"Boncuk Adası",kid:"Ne tekrar ediyor? Sırada ne var?",code:"B2 · Örüntü tanıma",color:"#14a89a",acts:[
-   {t:"Boncuk Atölyesi",d:"Tuki'nin bileziklerini tamamla, ritmini dinle, uzun diziyi “birim × sayı” ile kısalt.",lvl:"● ●●",age:"4-8 yaş",page:"16-22",open:()=>openActLevels("boncuk"),prog:(d=P())=>actProg("boncuk",d)}]},
+   {t:"Boncuk Atölyesi",d:"Tuki'nin bileziklerini tamamla, ritmini dinle, uzun diziyi “birim × sayı” ile kısalt.",lvl:"● ●●",age:"4-8 yaş",page:"16-22",open:()=>openActLevels("boncuk"),prog:(d=P())=>actProgL("boncuk",d)}]},
  {no:3,name:"Büyüteç Adası",kid:"İşe yarayanı seç, gerisini bırak.",code:"B3 · Soyutlama",color:"#8a5cd6",acts:[
-   {t:"Kayıp Yavru",d:"Kiki'nin yavrusu kalabalığa karıştı. İşe yarayan bilgi kartlarını seç, en az kartla bul.",lvl:"● ●●",age:"4-8 yaş",page:26,open:()=>openActLevels("yavru"),prog:(d=P())=>actProg("yavru",d)},
+   {t:"Kayıp Yavru",d:"Kiki'nin yavrusu kalabalığa karıştı. İşe yarayan bilgi kartlarını seç, en az kartla bul.",lvl:"● ●●",age:"4-8 yaş",page:26,open:()=>openActLevels("yavru"),prog:(d=P())=>actProgL("yavru",d)},
    {soon:1,t:"Gölgesinden Tanı",d:"Renk ve desen yok; şekilden tanı.",lvl:"●●",page:31},
    {soon:1,t:"Kalabalık Izgara",d:"Yolu etkileyenleri seç, fazlalıkları at.",lvl:"●●",page:32}]},
  {no:4,name:"Pusula Adası",kid:"Önce ne, sonra ne?",code:"B4 · Algoritma",color:"#e0a100",acts:[
-   {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik yukarı bakarak başlar.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>[sumStars(d.kod,1,10),30]},
-   {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:(d=P())=>[sumStars(d.kod,11,20),30]},
-   {t:"Önce Ne, Sonra Ne?",d:"Panda Pati'nin günü karışmış. Resimli adımları sıraya diz, eksik adımı bul.",lvl:"●",age:"4-7 yaş",page:35,open:()=>openActLevels("sira"),prog:(d=P())=>actProg("sira",d)},
+   {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik yukarı bakarak başlar.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>lvlProg("kod",1,10,d)},
+   {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:(d=P())=>lvlProg("kod",11,20,d)},
+   {t:"Önce Ne, Sonra Ne?",d:"Panda Pati'nin günü karışmış. Resimli adımları sıraya diz, eksik adımı bul.",lvl:"●",age:"4-7 yaş",page:35,open:()=>openActLevels("sira"),prog:(d=P())=>actProgL("sira",d)},
    {soon:1,t:"Aynı Hedefe İki Yol",d:"İki yol bul; hangisi daha kısa?",lvl:"●●",page:41}]},
  {no:5,name:"Değirmen Adası",kid:"Kaç kez? Ne olursa ne yapayım?",code:"B5 · Döngü ve koşul",color:"#22a165",acts:[
-   {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>[sumStars(d.kod,21,30),30]},
-   {t:"Kodla Sür: Fonksiyonlar",d:"Tekrar eden hareket grubunu kendi bloğuna koy.",lvl:"●●",age:"7-10 yaş",open:()=>openLevels("kod",{ch:[3]}),prog:(d=P())=>[sumStars(d.kod,31,40),30]},
-   {t:"Kodla Sür: Koşullar",d:"“Eğer pembe kare”, “eğer önü kapalı”: tek bir akıllı kural yaz.",lvl:"●●",age:"8-12 yaş",open:()=>openLevels("kod",{ch:[4]}),prog:(d=P())=>[sumStars(d.kod,41,50),30]},
-   {t:"Kodla Sür: Usta",d:"Döngü ve fonksiyon birlikte. En kısa programı bul. Büyükler de dene!",lvl:"●●●",age:"9 yaş ve üstü",open:()=>openLevels("kod",{ch:[5]}),prog:(d=P())=>[sumStars(d.kod,51,60),30]},
-   {t:"Kural Makinesi",d:"Kunduz Kunku'nun makinesi: ışık, hava, kapı kuralları. “Eğer… ise…, değilse…” kur ve tahmin et.",lvl:"● ●●",age:"5-8 yaş",page:"50-52",open:()=>openActLevels("kural"),prog:(d=P())=>actProg("kural",d)}]},
+   {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>lvlProg("kod",21,30,d)},
+   {t:"Kodla Sür: Fonksiyonlar",d:"Tekrar eden hareket grubunu kendi bloğuna koy.",lvl:"●●",age:"7-10 yaş",open:()=>openLevels("kod",{ch:[3]}),prog:(d=P())=>lvlProg("kod",31,40,d)},
+   {t:"Kodla Sür: Koşullar",d:"“Eğer pembe kare”, “eğer önü kapalı”: tek bir akıllı kural yaz.",lvl:"●●",age:"8-12 yaş",open:()=>openLevels("kod",{ch:[4]}),prog:(d=P())=>lvlProg("kod",41,50,d)},
+   {t:"Kodla Sür: Usta",d:"Döngü ve fonksiyon birlikte. En kısa programı bul. Büyükler de dene!",lvl:"●●●",age:"9 yaş ve üstü",open:()=>openLevels("kod",{ch:[5]}),prog:(d=P())=>lvlProg("kod",51,60,d)},
+   {t:"Kural Makinesi",d:"Kunduz Kunku'nun makinesi: ışık, hava, kapı kuralları. “Eğer… ise…, değilse…” kur ve tahmin et.",lvl:"● ●●",age:"5-8 yaş",page:"50-52",open:()=>openActLevels("kural"),prog:(d=P())=>actProgL("kural",d)}]},
  {no:6,name:"Tamir Adası",kid:"Nerede takıldı? Nasıl düzelir?",code:"B6 · Hata ayıklama",color:"#e0457b",acts:[
-   {t:"Hata Avcısı",d:"Hazır programda bir hata var. Adım adım çalıştır, hatalı bloğu bul ve düzelt.",lvl:"● ●●",age:"5-12 yaş",open:()=>openLevels("kod",{list:BUG_LEVELS,title:"Hata Avcısı"}),prog:(d=P())=>[BUG_LEVELS.reduce((a,n)=>a+(d.kod[n]||0),0),36]},
-   {t:"İki Kod Yarışıyor",d:"İki Pengo aynı balığa gidiyor; biri takılacak. Tahmin et, hatalı bloğu bul, düzelt.",lvl:"●●",age:"6-9 yaş",page:61,open:()=>openActLevels("yaris"),prog:(d=P())=>actProg("yaris",d)},
+   {t:"Hata Avcısı",d:"Hazır programda bir hata var. Adım adım çalıştır, hatalı bloğu bul ve düzelt.",lvl:"● ●●",age:"5-12 yaş",open:()=>openLevels("kod",{list:BUG_LEVELS,title:"Hata Avcısı"}),prog:(d=P())=>lvlProgList("kod",BUG_LEVELS,d)},
+   {t:"İki Kod Yarışıyor",d:"İki Pengo aynı balığa gidiyor; biri takılacak. Tahmin et, hatalı bloğu bul, düzelt.",lvl:"●●",age:"6-9 yaş",page:61,open:()=>openActLevels("yaris"),prog:(d=P())=>actProgL("yaris",d)},
    {soon:1,t:"Tarifte Hata",d:"Tarifteki yanlış adımı bul, doğru yere taşı.",lvl:"●",page:60}]},
  {no:7,name:"Şifre Adası",kid:"Bu işaret ne demek? Nasıl gösteririm?",code:"B7 · Temsil ve sembol",color:"#1d3b6a",acts:[
-   {t:"Koordinat Avı",d:"Önce harf, sonra rakam: B3. Kareleri bul, gizli resmi ortaya çıkar, resmi sayılarla boya.",lvl:"● ●●",age:"5-8 yaş",page:"65-73",open:()=>openActLevels("koord"),prog:(d=P())=>actProg("koord",d)},
+   {t:"Koordinat Avı",d:"Önce harf, sonra rakam: B3. Kareleri bul, gizli resmi ortaya çıkar, resmi sayılarla boya.",lvl:"● ●●",age:"5-8 yaş",page:"65-73",open:()=>openActLevels("koord"),prog:(d=P())=>actProgL("koord",d)},
    
-   {t:"Kalem Bidik",d:"Bilge Bidik'e kalem bağladı: yürüdüğü yerde çizgi kalır. Kodla çizgi, kare, merdiven çiz.",lvl:"●●",age:"6-9 yaş",page:72,open:()=>openActLevels("kalem"),prog:(d=P())=>actProg("kalem",d)},
-   {t:"İki Renkli Dil",d:"Bilge'nin mektupları pembe ve mavi boncuklarla yazılmış. Sözlükle çöz, kendi mesajını yaz.",lvl:"●●",age:"6-9 yaş",page:74,open:()=>openActLevels("ikili"),prog:(d=P())=>actProg("ikili",d)}]}
+   {t:"Kalem Bidik",d:"Bilge Bidik'e kalem bağladı: yürüdüğü yerde çizgi kalır. Kodla çizgi, kare, merdiven çiz.",lvl:"●●",age:"6-9 yaş",page:72,open:()=>openActLevels("kalem"),prog:(d=P())=>actProgL("kalem",d)},
+   {t:"İki Renkli Dil",d:"Bilge'nin mektupları pembe ve mavi boncuklarla yazılmış. Sözlükle çöz, kendi mesajını yaz.",lvl:"●●",age:"6-9 yaş",page:74,open:()=>openActLevels("ikili"),prog:(d=P())=>actProgL("ikili",d)}]}
 ];
 const FINAL={name:"Çiçek Adası",kid:"Yedi tohumu getir, Büyük Çiçek'i yeniden aç. Bidik'in Bir Günü burada seni bekliyor.",page:"78-82"};
 const FLOWER=`<g transform="translate(50 46)">${[0,60,120,180,240,300].map(a=>`<ellipse cx="0" cy="-18" rx="11" ry="15" fill="#f49ac1" stroke="#fff" stroke-width="2.5" transform="rotate(${a})"/>`).join("")}<circle r="13" fill="#ffc93c" stroke="#d99a00" stroke-width="2.5"/><circle cx="-4.5" cy="-2" r="2" fill="#16324a"/><circle cx="4.5" cy="-2" r="2" fill="#16324a"/><path d="M-4.5 3.5 Q0 7 4.5 3.5" stroke="#16324a" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`;
@@ -3427,11 +3543,12 @@ let curDurak=null, lastLevels=null;
 function backToLevels(mode){ if(lastLevels&&lastLevels.mode===mode) openLevels(mode,lastLevels.opts); else openLevels(mode) }
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 $("dailyBtn").onclick=()=>Daily.open();
-$("soundBtn").onclick=()=>{db.sound=!db.sound;save();goHome();sfx.click()};
+$("soundBtn").onclick=()=>{db.sound=!db.sound;save();if(!db.sound)Voice.stop();goHome();sfx.click()};
 $("teacherBtn").onclick=()=>{db.teacher=!db.teacher;save();goHome();
-  if(db.teacher) overlay(`<span class="kicker">Öğretmen modu açık</span><h2>Tahtaya hazır</h2><p>Oyunlarda <b>Çözümü göster</b> düğmesi görünür: doğru çözüm yavaş hızda, adım adım oynatılır. Her bölümde <b>Konuşalım</b> sorusu var.</p><div class="btns"><button class="btn-main" id="ovOk2">Tamam</button></div>`), $("ovOk2").onclick=closeOverlay;
+  if(db.teacher) overlay(`<span class="kicker">Öğretmen modu açık</span><h2>Tahtaya hazır</h2><p>Oyunlarda <b>Çözümü göster</b> düğmesi görünür: doğru çözüm yavaş hızda, adım adım oynatılır. Her bölümde <b>Konuşalım</b> sorusu var. Ana ekrandaki <b>seviye</b> düğmesinden yaş / sınıf seviyesini değiştirebilirsiniz.</p><div class="btns"><button class="btn-main" id="ovOk2">Tamam</button></div>`), $("ovOk2").onclick=closeOverlay;
 };
 $("whoBtn").onclick=openProfiles;
+$("lvBtn").onclick=levelChipClick;
 $("reportBtn").onclick=openReport;
 
 function openLevels(mode,opts){
@@ -3444,10 +3561,11 @@ function openLevels(mode,opts){
   const total= mode==="yol"?40:60;
   $("lvlTitle").textContent= opts.title|| (opts.ch&&chs.length===1? (mode==="kod"?"Kodla Sür: ":"")+chs[0].name : (mode==="yol"?"Yol Kur":"Kodla Sür"));
   const levelsOf=c=>c.list||Array.from({length:c.to-c.from+1},(_,k)=>c.from+k);
-  const all=chs.flatMap(levelsOf);
+  const all=chs.flatMap(levelsOf).filter(n=>showAllLevels()||allowed(mode,n));
   $("lvlSub").textContent=`${all.reduce((a,n)=>a+(d[n]||0),0)} / ${all.length*3} yıldız`;
   chs.forEach((c,ci)=>{
-    const lv=levelsOf(c);
+    const lvAll=levelsOf(c), lv=showAllLevels()?lvAll:lvAll.filter(n=>allowed(mode,n));
+    if(!lv.length) return;
     const box=document.createElement("div"); box.className="chapter";
     const idx= mode==="yol"? Yol.TIERS.findIndex(t=>t.from===c.from) : Kod.CH.findIndex(x=>x.from===c.from);
     box.innerHTML=`<div class="ch-head"><span class="num">${c.list?"!":(idx+1)}</span><div><h2>${c.name}</h2><small>${c.sub}</small></div><span class="sc">${lv.reduce((a,n)=>a+(d[n]||0),0)} / ${lv.length*3} ★</span></div>`;
@@ -3462,6 +3580,7 @@ function openLevels(mode,opts){
       b.innerHTML=`${badge}${n}<span class="st">${st?starsTxt(st):(open?"&nbsp;":"kilitli")}</span>`;
       b.setAttribute("aria-label",`Bölüm ${n}`+(open?"":", kilitli"));
       b.onclick=()=>{ if(!open){sfx.no();return} mode==="yol"?Yol.start(n):Kod.start(n) };
+      if(!okLv){ const fl=firstLevelFor(mode,n,n); b.querySelector(".st").textContent=fl?fl.name:"" }
       g.appendChild(b);
     });
     box.appendChild(g); wrap.appendChild(box);
@@ -3519,7 +3638,7 @@ function openReport(){
     const daily=Object.keys(d.daily).length;
     const c=document.createElement("div"); c.className="rcard";
     const stamps=`<div class="stamps" aria-label="Pasaport pulları">${DURAKS.map(dk=>`<span class="${hasSeed(dk,d)?"on":""}" title="${WORLD[dk.no].kita}: ${WORLD[dk.no].friend}" style="${hasSeed(dk,d)?`border-color:${WORLD[dk.no].shade};background:${WORLD[dk.no].land}`:""}">${animalSVG(dk.no)}</span>`).join("")}</div>`;
-    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)} · ${seedCount(d)} / 7 dost</header>${stamps}
+    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)} · ${d.level?LEVELS[LVI(d.level)].name+" · ":""}${seedCount(d)} / 7 dost</header>${stamps}
       <div class="bars">${rows.map(([l,v,m,col])=>`<span>${l}</span><div class="meter"><i style="width:${v/m*100}%;background:${col}"></i></div><span class="v">${v}/${m}</span>`).join("")}</div>
       <p class="note" style="text-align:left">Çözülen günlük bulmaca: ${daily}</p>`;
     list.appendChild(c);
