@@ -559,7 +559,29 @@ h1,h2,h3{text-wrap:balance}
 .colors button{width:36px;height:36px;border-radius:50%;border:3px solid transparent}
 .colors button[aria-pressed="true"]{border-color:var(--ink)}
 .rcard{width:100%;background:var(--panel);border-radius:20px;border:2px solid var(--panel-line);padding:14px;display:flex;flex-direction:column;gap:10px}
-.rcard header{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
+.rcard header{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;flex-wrap:wrap}
+.rsub{font-size:13px;font-weight:700;color:var(--ink-soft);margin-left:4px}
+.rtablewrap{overflow-x:auto}
+.rtable{border-collapse:separate;border-spacing:3px;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+.rtable th{font-weight:800;text-align:center;color:var(--ink-soft);font-size:12px;padding:4px;line-height:1.15}
+.rtable tbody th{text-align:left;color:var(--ink);font-size:14px;white-space:nowrap}
+.rtable tbody th small{display:block;font-weight:700;color:var(--ink-soft);font-size:11px}
+.rtable td{text-align:center;font-weight:800;border-radius:8px;padding:8px 4px;min-width:44px}
+.rtable td.na{background:#f3f6f8;color:#9fb0bf}
+.bidrows{display:grid;gap:8px}
+.bidrow{display:grid;grid-template-columns:minmax(150px,1.1fr) 2fr 92px;gap:10px;align-items:center}
+.bidrow.off{opacity:.45}
+.bidname b{display:block;font-size:14px}.bidname small{font-size:12px;color:var(--ink-soft);font-weight:700}
+.bidbar{height:14px;border-radius:7px;background:#e3ece8;overflow:hidden}
+.bidbar i{display:block;height:100%;background:#16794a;border-radius:4px}
+.bidv{font-weight:800;font-size:14px;text-align:right;font-variant-numeric:tabular-nums}
+.bidv small{display:block;font-size:11px;color:var(--ink-soft);font-weight:700}
+.bidnote{background:#f4faf6;border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.45;color:var(--ink)}
+.bidmore summary{cursor:pointer;font-weight:800;font-size:13px;color:var(--ink-soft)}
+.bidmore .bars{margin-top:8px}
+@media (max-width:520px){ .bidrow{grid-template-columns:1fr 104px} .bidbar{grid-column:1/-1;grid-row:2} }
+@media print{ body.printrep .topbar,body.printrep #rPrint,body.printrep #overlay{display:none!important} body.printrep{background:#fff} body.printrep .rcard{break-inside:avoid;border-color:#ccc} body.printrep details{display:none} @page{size:A4 portrait;margin:12mm} }
+
 .bars{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:13px;font-weight:800}
 .bars .meter{height:12px}
 .bars span:last-child, .bars .v{font-variant-numeric:tabular-nums;color:var(--ink-soft)}
@@ -737,11 +759,11 @@ h1,h2,h3{text-wrap:balance}
 <section id="report" class="screen" hidden>
   <div class="topbar">
     <button class="iconbtn" data-home aria-label="Ana ekran"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="title"><strong>Hedef Defteri</strong><small>Öğretmen / veli paneli · beceri bazında ilerleme</small></div>
+    <div class="title"><strong>Hedef Defteri</strong><small>Bilgi işlemsel düşünme boyutlarına göre ilerleme</small></div>
     <span style="width:46px"></span>
   </div>
   <div class="list" id="rList"></div>
-  <p class="note">Yıldızlar sadece bu cihazda saklanır. 3 yıldız: ilk denemede, ipucusuz ve en az parça/blokla çözüldü demektir.</p>
+  <p class="note">Yıldızlar sadece bu cihazda saklanır, hiçbir yere gönderilmez. 3 yıldız: ilk denemede, ipucusuz ve en az parça/blokla çözüldü demektir.</p>
 </section>
 
 <div class="overlay" id="overlay" hidden></div>
@@ -1724,7 +1746,7 @@ function finish(){
   anim=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); $("kProg").classList.remove("running");
   const res=sess.res;
   let gtxt="";
-  if(guess&&guessRes==null){ const f=res.states[res.states.length-1]; guessRes=f.x===guess.x&&f.y===guess.y; gtxt=guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. " }
+  if(guess&&guessRes==null){ const f=res.states[res.states.length-1]; guessRes=f.x===guess.x&&f.y===guess.y; bidGuess(guessRes); gtxt=guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. " }
   if(res.ok){sfx.win();win();return}
   if(sess.steps.length) tries++; statsK(); sfx.fail();
   if(res.fail>=0&&sess.steps[res.fail]) highlight(sess.steps[res.fail].src,"err");
@@ -2899,7 +2921,7 @@ async function play(st){
     if(s.got.size!==before||s.carry!==bc){ setItems(st,s); sfx.coin() } else if(moved) sfx.step();
     setEnergy(st,s.used);
   }
-  if(st.guess&&st.guessRes==null) st.guessRes=s.x===st.guess.x&&s.y===st.guess.y;
+  if(st.guess&&st.guessRes==null){ st.guessRes=s.x===st.guess.x&&s.y===st.guess.y; if(!A.demo) bidGuess(st.guessRes) }
   st.runAt=-1; hl([]); if(pg) pg.classList.remove("running"); A.busy=false; aRefresh();
   return {fail, ok:!fail&&isDone(L,s)};
 }
@@ -3104,32 +3126,88 @@ $("pForm").addEventListener("submit",e=>{
   const id="p"+Date.now(); db.profiles.push({id,name,color:newColor}); db.cur=id; save(); $("pName").value=""; openProfiles();
 });
 
+// ===== BİD raporu: bilgi işlemsel düşünme boyutlarına göre ilerleme =====
+const BID=[
+  {id:"alg",name:"Algoritma tasarımı",desc:"Adımları doğru sırayla dizer."},
+  {id:"ayr",name:"Ayrıştırma",desc:"Büyük işi küçük parçalara böler."},
+  {id:"oru",name:"Örüntü ve genelleme",desc:"Tekrarı görür, döngüyle kısaltır."},
+  {id:"soy",name:"Soyutlama",desc:"Kendi bloğunu ve kuralını kurar."},
+  {id:"hat",name:"Hata ayıklama",desc:"Programdaki hatayı bulup düzeltir."},
+  {id:"deg",name:"Değerlendirme",desc:"Sonucu önceden tahmin eder, en kısa çözümü arar."}];
+function bidItems(){
+  const out=[], add=(mode,n,dims)=>out.push({mode,n,dims});
+  for(let n=1;n<=40;n++) add("yol",n,n>=4?["alg","ayr"]:["alg"]);
+  for(let n=1;n<=60;n++){ const d= n<=20?["alg"]: n<=30?["oru"]: n<=40?["soy"]: n<=50?["soy","oru"]:["soy","deg"]; if(Kod.isBug(n)) d.push("hat"); add("kod",n,d) }
+  ["golet","cicek","orman","donusum","gece","tarla"].forEach(id=>{ if(!ACT[id]) return; for(let n=1;n<=ACT[id].N;n++){
+    const d=[]; const dbg=id==="tarla"&&n>=4;
+    if(dbg) d.push("hat"); else d.push(n<=5?"alg":"oru");
+    if(id==="donusum"||n>=5) d.push("ayr"); if(id==="gece") d.push("deg");
+    add(id,n,[...new Set(d)]) } });
+  if(ACT.kalem) for(let n=1;n<=ACT.kalem.N;n++) add("kalem",n,n<=4?["alg"]:["oru"]);
+  if(ACT.yaris) for(let n=1;n<=ACT.yaris.N;n++) add("yaris",n,["hat","deg"]);
+  if(ACT.senlik) [["alg"],["ayr"],["alg"],["deg"],["hat"]].forEach((d,i)=>add("senlik",i+1,d));
+  return out;
+}
+function bidScores(d){
+  const items=bidItems(), r={};
+  BID.forEach(b=>r[b.id]={got:0,max:0,avail:0,played:0,next:null});
+  items.forEach(it=>{ if(!allowed(it.mode,it.n,d)) return;
+    const o=it.mode==="yol"||it.mode==="kod"?d[it.mode]:actData(it.mode,d), st=o[it.n]||0;
+    it.dims.forEach(k=>{ const x=r[k]; x.max+=3; x.avail++; if(st){ x.got+=st; x.played++ } if(st<3&&!x.next) x.next=it }) });
+  const ev=d.ev||{g:0,ok:0};
+  // başarı: oynanan bölümlerde alınan yıldız / en çok yıldız (oynamadığı bölüm başarıyı düşürmez)
+  BID.forEach(b=>{ const x=r[b.id]; x.none=!x.max; x.cov=x.played; x.pct=x.played?x.got/(3*x.played):null;
+    if(b.id==="deg"&&ev.g){ x.guess=ev; x.pct=x.pct==null?ev.ok/ev.g:(x.pct+ev.ok/ev.g)/2; x.none=false } });
+  return r;
+}
+function bidItemName(it){
+  if(it.mode==="yol") return `Yol Kur, Bölüm ${it.n}`;
+  if(it.mode==="kod") return `Kodla Sür, Bölüm ${it.n}`;
+  return `${ACT[it.mode].title}, Bölüm ${it.n}`;
+}
+// tek renk, açıktan koyuya (yüzde arttıkça koyulaşır)
+function bidShade(p){ const a=[234,246,240], b=[22,121,74], t=Math.max(0,Math.min(1,p)); return `rgb(${a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(",")})` }
 function openReport(){
   show("report");
   const list=$("rList"); list.innerHTML="";
-  db.profiles.forEach(p=>{
-    const d=P(p.id);
-    let bugS=0; for(let n=5;n<=60;n+=5) bugS+=d.kod[n]||0;
-    const rows=[
-      ["Yol Kur: planlama",sumStars(d.yol,1,40),120,"var(--rail)"],
-      ["İlk adımlar (sıralama)",sumStars(d.kod,1,10),30,"var(--green)"],
-      ["Dönüşler (Bidik'in yönü)",sumStars(d.kod,11,20),30,"#d6409f"],
-      ["Döngüler (örüntü)",sumStars(d.kod,21,30),30,"var(--orange)"],
-      ["Fonksiyonlar (soyutlama)",sumStars(d.kod,31,40),30,"var(--purple)"],
-      ["Koşullar (karar verme)",sumStars(d.kod,41,50),30,"#0e6f7c"],
-      ["Usta bölümler",sumStars(d.kod,51,60),30,"var(--blue)"],
-      ["Hata ayıklama",bugS,36,"var(--red)"],
-      ...Object.keys(ACT).map(id=>[ACT[id].title,actProg(id,d)[0],ACT[id].N*3,(DURAKS.find(x=>x.no===ACT[id].durak)||{color:"#e0457b"}).color]),
-    ];
-    const daily=Object.keys(d.daily).length;
+  const all=db.profiles.map(p=>({p,d:P(p.id)})).map(o=>({...o,sc:bidScores(o.d)}));
+  // sınıf özeti
+  const cell=x=>{ if(x.none) return `<td class="na" title="Bu seviyede yok">–</td>`;
+    if(x.pct==null) return `<td class="na" title="Henüz oynanmadı">·</td>`;
+    const v=Math.round(x.pct*100); return `<td style="background:${bidShade(x.pct)};color:${x.pct>.55?"#fff":"var(--ink)"}" title="${v}% başarı · ${x.cov} / ${x.avail} bölüm oynandı">${v}</td>` };
+  const sum=document.createElement("div"); sum.className="rcard";
+  sum.innerHTML=`<header>Sınıf özeti <span class="rsub">Bilgi işlemsel düşünme boyutlarında başarı yüzdesi</span><button class="chip" id="rPrint" style="margin-left:auto">Yazdır</button></header>
+    <div class="rtablewrap"><table class="rtable"><thead><tr><th>Öğrenci</th>${BID.map(b=>`<th title="${b.desc}">${b.name}</th>`).join("")}</tr></thead>
+    <tbody>${all.map(({p,d,sc})=>`<tr><th>${esc(p.name)}<small>${d.level?LEVELS[LVI(d.level)].name:""}</small></th>${BID.map(b=>cell(sc[b.id])).join("")}</tr>`).join("")}</tbody></table></div>
+    <p class="note" style="text-align:left;margin:0">Yüzde, oynanan bölümlerde alınan yıldızın en çok yıldıza oranıdır; oynanmayan bölüm başarıyı düşürmez. “·” henüz oynanmadı, “–” bu seviyede o boyutta bölüm yok demektir. Değerlendirme boyutuna “Önce tahmin et” sonuçları da katılır.</p>`;
+  list.appendChild(sum);
+  $("rPrint").onclick=()=>{ document.body.classList.add("printrep"); setTimeout(()=>{ try{ window.print() }catch(e){} setTimeout(()=>document.body.classList.remove("printrep"),500) },100) };
+  // öğrenci kartları
+  all.forEach(({p,d,sc})=>{
     const c=document.createElement("div"); c.className="rcard";
-    const stamps=`<div class="stamps" aria-label="Pasaport pulları">${DURAKS.map(dk=>`<span class="${hasSeed(dk,d)?"on":""}" title="${WORLD[dk.no].kita}: ${WORLD[dk.no].friend}" style="${hasSeed(dk,d)?`border-color:${WORLD[dk.no].shade};background:${WORLD[dk.no].land}`:""}">${animalSVG(dk.no)}</span>`).join("")}</div>`;
-    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)} · ${d.level?LEVELS[LVI(d.level)].name+" · ":""}${seedCount(d)} / 7 dost</header>${stamps}
-      <div class="bars">${rows.map(([l,v,m,col])=>`<span>${l}</span><div class="meter"><i style="width:${v/m*100}%;background:${col}"></i></div><span class="v">${v}/${m}</span>`).join("")}</div>
-      <p class="note" style="text-align:left">Çözülen günlük bulmaca: ${daily}</p>`;
+    const stamps=`<div class="stamps" aria-label="Dost pulları">${DURAKS.map(dk=>`<span class="${hasSeed(dk,d)?"on":""}" title="${WORLD[dk.no].kita}: ${WORLD[dk.no].friend}" style="${hasSeed(dk,d)?`border-color:${WORLD[dk.no].shade};background:${WORLD[dk.no].land}`:""}">${animalSVG(dk.no)}</span>`).join("")}</div>`;
+    const known=BID.filter(b=>sc[b.id].pct!=null&&(sc[b.id].played>=2||sc[b.id].guess));
+    const weak=known.slice().sort((a,b)=>sc[a.id].pct-sc[b.id].pct)[0];
+    const strong=known.slice().sort((a,b)=>sc[b.id].pct-sc[a.id].pct)[0];
+    const nx=weak&&sc[weak.id].next;
+    const rows=BID.map(b=>{ const x=sc[b.id];
+      const v=x.pct==null?null:Math.round(x.pct*100);
+      return `<div class="bidrow${x.none?" off":""}"><div class="bidname"><b>${b.name}</b><small>${b.desc}</small></div>
+        <div class="bidbar"><i style="width:${v||0}%"></i></div>
+        <span class="bidv">${x.none?"Bu seviyede yok":v==null?"Başlamadı":v+"%"}${!x.none&&x.avail?`<small>${x.cov} / ${x.avail} bölüm</small>`:""}</span></div>` }).join("");
+    const ev=d.ev||{g:0,ok:0};
+    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)}<span class="rsub">${d.level?LEVELS[LVI(d.level)].long+" · ":""}${seedCount(d)} / 7 dost</span></header>${stamps}
+      <div class="bidrows">${rows}</div>
+      <div class="bidnote">${known.length<2?"Henüz yeterli veri yok. Birkaç bölüm oynadıktan sonra güçlü ve gelişecek yönler burada görünecek.":
+        `<b>Güçlü yönü:</b> ${strong.name}. <b>Desteklenecek yönü:</b> ${weak.name}.${nx?` <b>Önerilen bölüm:</b> ${bidItemName(nx)}.`:""}`}
+        ${ev.g?` <b>Tahmin:</b> ${ev.g} tahminden ${ev.ok} tanesi doğru.`:""} <b>Günlük bulmaca:</b> ${Object.keys(d.daily).length}.</div>
+      <details class="bidmore"><summary>Etkinliklere göre ayrıntı</summary><div class="bars">${[
+        ["Yol Kur",lvlProg("yol",1,40,d)],["Kodla Sür",lvlProg("kod",1,60,d)],
+        ...Object.keys(ACT).map(id=>[ACT[id].title,actProgL(id,d)])].filter(r=>r[1][1]).map(([l,[v,m]])=>`<span>${l}</span><div class="meter"><i style="width:${v/m*100}%"></i></div><span class="v">${v}/${m}</span>`).join("")}</div></details>`;
     list.appendChild(c);
   });
 }
+function bidGuess(ok){ try{ const d=P(); d.ev=d.ev||{g:0,ok:0}; d.ev.g++; if(ok) d.ev.ok++; save() }catch(e){} }
 
 // Android geri tuşu (APK sarmalayıcısı çağırır)
 window.bidikBack=function(){
@@ -3143,7 +3221,7 @@ window.bidikBack=function(){
 window.__bidik={Yol,Kod,Daily,ACT,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
-  actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, P, DURAKS:()=>DURAKS};
+  actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS};
 if($("miniBot")) $("miniBot").innerHTML=MASCOT;
 $("mascot").innerHTML=MASCOT_FRONT;
 goHome();
