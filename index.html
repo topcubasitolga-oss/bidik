@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2fae9f">
+<link rel="icon" href="simgeler/simge-192.png">
+<link rel="apple-touch-icon" href="simgeler/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Bidik</title>
+<meta name="description" content="Bidik: çocuklar için bilgi işlemsel düşünme oyunu. Akıllı tahtada, tablette ve bilgisayarda ücretsiz, kurulum gerektirmeden çalışır.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Tanıtım sayfası: oyunla aynı turkuaz oyuncak dünyası; öğretmene hitap eden sade, okunaklı düzen. */
+:root{
+  --sky:#dff4f1; --sky-deep:#b9e4de; --ink:#16324a; --ink-soft:#466179;
+  --board:#2fae9f; --board-edge:#1f8577; --tile:#5cc9bb;
+  --rail:#ffc93c; --rail-edge:#d99a00; --red:#e8443a; --green:#22a165; --blue:#2f7fd8; --pink:#d6409f; --orange:#f08a24; --purple:#8a5cd6; --teal:#0e6f7c;
+  --panel:#ffffff; --panel-line:#cfe7e3;
+  --display:"Baloo 2","Trebuchet MS","Segoe UI",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{font-family:var(--display);line-height:1.05;text-wrap:balance;margin:0}
+p{margin:0}
+.btn{display:inline-flex;align-items:center;gap:10px;height:58px;padding:0 26px;border-radius:18px;font-family:var(--display);font-weight:800;font-size:22px;text-decoration:none;background:var(--rail);box-shadow:0 5px 0 var(--rail-edge);color:var(--ink)}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 var(--rail-edge)}
+.btn.ghost{background:var(--panel);box-shadow:0 5px 0 var(--panel-line);font-size:19px}
+.btn:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+
+/* üst bar */
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:16px}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--display);font-weight:800;font-size:28px;text-decoration:none}
+.logo span{color:var(--red)}
+.logo svg{width:40px;height:40px}
+.nav nav{display:flex;gap:18px;font-weight:800;font-size:15px}
+.nav nav a{text-decoration:none;color:var(--ink-soft)}
+@media (max-width:640px){.nav nav{display:none}}
+
+/* giriş */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:36px;align-items:center;padding-block:24px 56px}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.hero .kick{font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:13px;color:var(--teal)}
+.hero h1{font-size:clamp(40px,6vw,68px);margin:10px 0 14px}
+.hero h1 em{font-style:normal;color:var(--red)}
+.hero .lead{font-size:19px;color:var(--ink-soft);font-weight:600;max-width:34em}
+.bid{display:inline-flex;gap:6px;margin:16px 0 24px;font-weight:800}
+.bid span{background:var(--panel);border:2px solid var(--panel-line);border-radius:10px;padding:2px 10px}
+.bid b{color:var(--red)}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-art{background:var(--board);border-radius:28px;box-shadow:0 8px 0 var(--board-edge);padding:18px;max-width:100%}
+.hero-art svg{display:block;width:100%;height:auto}
+
+/* bölümler */
+section{padding-block:52px}
+.sec-head{max-width:46em;margin-bottom:28px}
+.sec-head .kick{font-weight:800;letter-spacing:1px;text-transform:uppercase;font-size:13px;color:var(--teal)}
+.sec-head h2{font-size:clamp(30px,4vw,44px);margin:6px 0 10px}
+.sec-head p{color:var(--ink-soft);font-weight:600}
+.band{background:var(--panel)}
+
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:860px){.skills{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.skills{grid-template-columns:1fr}}
+.skill{border:2px solid var(--panel-line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:8px;background:var(--sky)}
+.skill .chipblk{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;font-size:20px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.skill h3{font-size:22px}
+.skill p{font-size:15px;color:var(--ink-soft);font-weight:600}
+.skill small{font-size:12px;font-weight:800;color:var(--ink);text-transform:uppercase;letter-spacing:.6px}
+
+.games{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:760px){.games{grid-template-columns:1fr}}
+.game{background:var(--panel);border-radius:24px;border:3px solid var(--panel-line);padding:18px;display:flex;flex-direction:column;gap:10px}
+.game h3{font-size:30px}
+.game p{color:var(--ink-soft);font-weight:600;font-size:15.5px}
+.game ol{margin:0;padding-left:20px;font-size:15px;font-weight:700;color:var(--ink-soft);display:grid;gap:3px}
+.game ol b{color:var(--ink)}
+
+.class{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:st}
+@media (max-width:860px){.class{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.class{grid-template-columns:1fr}}
+.step{background:var(--sky);border-radius:20px;padding:18px;border:2px solid var(--panel-line)}
+.step .t{font-family:var(--display);font-weight:800;font-size:15px;color:var(--teal)}
+.step h3{font-size:21px;margin:4px 0 6px}
+.step p{font-size:15px;color:var(--ink-soft);font-weight:600}
+
+.devices{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:760px){.devices{grid-template-columns:1fr}}
+.dev{background:var(--panel);border-radius:20px;padding:18px;border:2px solid var(--panel-line)}
+.dev h3{font-size:21px;margin-bottom:6px}
+.dev p{font-size:15px;color:var(--ink-soft);font-weight:600}
+
+.faq{display:grid;gap:10px;max-width:820px}
+.faq details{background:var(--panel);border-radius:16px;border:2px solid var(--panel-line);padding:14px 18px}
+.faq summary{font-weight:800;cursor:pointer}
+.faq p{margin-top:8px;color:var(--ink-soft);font-weight:600;font-size:15.5px}
+
+.final{background:var(--board);color:#fff;border-radius:28px;padding:34px 26px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;box-shadow:0 8px 0 var(--board-edge)}
+.final h2{font-size:clamp(28px,4vw,40px)}
+.final p{font-weight:700;opacity:.9}
+footer{padding-block:34px;font-size:14px;color:var(--ink-soft);font-weight:700;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{font-weight:800}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header class="nav">
+    <a class="logo" href="index.html" aria-label="Bidik ana sayfa"><svg viewBox="-24 -24 48 48" aria-hidden="true"><g transform="rotate(-90) scale(.78)"><path d="M-4 -12 L4 -19" stroke="#5a6b80" stroke-width="4" stroke-linecap="round"/><path d="M-4 12 L4 19" stroke="#5a6b80" stroke-width="4" stroke-linecap="round"/><circle cx="6" cy="-21" r="6.5" fill="#2f7fd8" stroke="#fff" stroke-width="2"/><circle cx="6" cy="21" r="6.5" fill="#d6409f" stroke="#fff" stroke-width="2"/><circle r="15.5" fill="#f08a24" stroke="#a65a10" stroke-width="2.5"/><path d="M3 -12 A15 15 0 0 1 3 12 Z" fill="#fff3e0"/><circle cx="8" cy="-6" r="4" fill="#fff" stroke="#16324a" stroke-width="1.5"/><circle cx="9.5" cy="-6" r="2" fill="#16324a"/><circle cx="8" cy="6" r="4" fill="#fff" stroke="#16324a" stroke-width="1.5"/><circle cx="9.5" cy="6" r="2" fill="#16324a"/><circle cx="-5" cy="0" r="3.2" fill="#e8443a" stroke="#fff" stroke-width="1.5"/></g></svg><b style="font-weight:800">Bi<span>dik</span></b></a>
+    <nav aria-label="Sayfa içi"><a href="#beceriler">Beceriler</a><a href="#sinifta">Sınıfta kullanım</a><a href="rehber.html">Öğretmen rehberi</a><a href="#sss">Sorular</a></nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <span class="kick">Okul öncesi ve ilkokul için ücretsiz</span>
+      <h1>Kodlamadan önce <em>düşünmeyi</em> öğreten oyun</h1>
+      <p class="lead">Bidik, çocukların problemi adımlara bölmesini, örüntü bulmasını, kural yazmasını ve hatasını kendisi bulmasını oyunla öğretir. Akıllı tahtada, tablette ve bilgisayarda kurulum gerektirmeden açılır.</p>
+      <div class="bid" aria-label="Bidik adı Bilgi İşlemsel Düşünme'den gelir"><span><b>B</b>ilgi</span><span><b>İ</b>şlemsel</span><span><b>D</b>üşünme</span></div>
+      <div class="cta">
+        <a class="btn" href="oyna/index.html"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Hemen oyna</a>
+        <a class="btn ghost" href="rehber.html">Öğretmen rehberi</a>
+      </div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <svg viewBox="0 0 400 300">
+        <defs><g id="t"><rect width="92" height="92" rx="14" fill="#5cc9bb"/><circle cx="16" cy="16" r="3" fill="#45ad9f"/><circle cx="76" cy="16" r="3" fill="#45ad9f"/><circle cx="16" cy="76" r="3" fill="#45ad9f"/><circle cx="76" cy="76" r="3" fill="#45ad9f"/></g></defs>
+        <use href="#t" x="4" y="4"/><use href="#t" x="104" y="4"/><use href="#t" x="204" y="4"/><use href="#t" x="304" y="4"/>
+        <use href="#t" x="4" y="104"/><use href="#t" x="104" y="104"/><use href="#t" x="204" y="104"/><use href="#t" x="304" y="104"/>
+        <use href="#t" x="4" y="204"/><use href="#t" x="104" y="204"/><use href="#t" x="204" y="204"/><use href="#t" x="304" y="204"/>
+        <rect x="210" y="110" width="80" height="80" rx="12" fill="#f49ac1"/>
+        <path d="M250 50 l36 36 -36 36" fill="none"/>
+        <path d="M250 14 l36 36 -36 36 -36 -36z" fill="#1d5b78"/>
+        <path d="M50 250 V150 H250 V250" stroke="#fff" stroke-width="7" stroke-dasharray="2 16" stroke-linecap="round" fill="none" opacity=".9"/>
+        <g transform="translate(350 250)"><polygon points="0,-34 9,-22 24,-24 22,-9 34,0 22,9 24,24 9,22 0,34 -9,22 -24,24 -22,9 -34,0 -22,-9 -24,-24 -9,-22" fill="#e8443a"/><circle r="17" fill="#fff" stroke="#16324a" stroke-width="3"/><g fill="#16324a"><rect x="-12" y="-12" width="8" height="8"/><rect x="4" y="-12" width="8" height="8"/><rect x="-4" y="-4" width="8" height="8"/><rect x="-12" y="4" width="8" height="8"/><rect x="4" y="4" width="8" height="8"/></g></g>
+        <g transform="translate(250 150) scale(1.5)"><path d="M-4 -12 L4 -19" stroke="#5a6b80" stroke-width="4" stroke-linecap="round"/><path d="M-4 12 L4 19" stroke="#5a6b80" stroke-width="4" stroke-linecap="round"/><circle cx="6" cy="-21" r="6.5" fill="#2f7fd8" stroke="#fff" stroke-width="2"/><circle cx="6" cy="21" r="6.5" fill="#d6409f" stroke="#fff" stroke-width="2"/><circle r="15.5" fill="#f08a24" stroke="#a65a10" stroke-width="2.5"/><path d="M3 -12 A15 15 0 0 1 3 12 Z" fill="#fff3e0"/><circle cx="8" cy="-6" r="4" fill="#fff" stroke="#16324a" stroke-width="1.5"/><circle cx="9.5" cy="-6" r="2" fill="#16324a"/><circle cx="8" cy="6" r="4" fill="#fff" stroke="#16324a" stroke-width="1.5"/><circle cx="9.5" cy="6" r="2" fill="#16324a"/><circle cx="-5" cy="0" r="3.2" fill="#e8443a" stroke="#fff" stroke-width="1.5"/></g>
+        <g transform="translate(18 18)"><rect width="150" height="50" rx="12" fill="#fff"/><g transform="translate(7 7)"><rect width="36" height="36" rx="8" fill="#0e6f7c"/><rect x="5" y="9" width="17" height="17" rx="4" fill="#f49ac1" stroke="#fff" stroke-width="2"/><text x="29" y="25" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="16" fill="#fff">?</text></g><g transform="translate(57 7)"><rect width="36" height="36" rx="8" fill="#d6409f"/><path d="M12 28v-9a6 6 0 0 1 6-6h9M22 8l5 5-5 5" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(107 7)"><rect width="36" height="36" rx="8" fill="#22a165"/><path d="M18 28V9M11 16l7-7 7 7" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g></g>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<section class="band" id="beceriler">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kick">Ne öğretir?</span>
+      <h2>Bilgi işlemsel düşünmenin altı becerisi, altı oyun aşaması</h2>
+      <p>Her beceri oyunda ayrı bir bölüm grubuyla açılır. Öğretmen panelinde her öğrencinin hangi beceride ne kadar ilerlediği görünür.</p>
+    </div>
+    <div class="skills">
+      <div class="skill"><span class="chipblk" style="background:var(--green)">1</span><h3>Algoritma</h3><p>Komutları doğru sıraya dizmek, bir yolu adım adım planlamak.</p><small>Oklarla yol</small></div>
+      <div class="skill"><span class="chipblk" style="background:var(--orange)">3×</span><h3>Örüntü tanıma</h3><p>Tekrar eden hareketi fark edip döngüyle kısaltmak.</p><small>Döngüler</small></div>
+      <div class="skill"><span class="chipblk" style="background:var(--purple)">F</span><h3>Soyutlama</h3><p>Tekrar eden bir parçayı fonksiyona koyup yeniden kullanmak.</p><small>Fonksiyonlar</small></div>
+      <div class="skill"><span class="chipblk" style="background:var(--teal)">?</span><h3>Koşullu düşünme</h3><p>“Eğer önü kapalıysa sağa dön” gibi duruma göre karar veren kurallar yazmak.</p><small>Koşullar</small></div>
+      <div class="skill"><span class="chipblk" style="background:var(--blue)">◇</span><h3>Ayrıştırma</h3><p>Büyük problemi altın, anahtar, kapı gibi küçük hedeflere bölmek.</p><small>Yol Kur</small></div>
+      <div class="skill"><span class="chipblk" style="background:var(--red)">!</span><h3>Hata ayıklama</h3><p>Programı adım adım çalıştırıp hatanın nerede başladığını bulmak.</p><small>Hata avcısı görevleri</small></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kick">İki oyun</span>
+      <h2>Önce planla, sonra kodla</h2>
+      <p>Bidik, her adımda “bi-dik” diye ses çıkaran küçük bir robot. Çocuk programı çalıştırırken adımları kulağıyla da sayar.</p>
+    </div>
+    <div class="games">
+      <div class="game">
+        <h3>Yol Kur</h3>
+        <p>Çocuk parçaları kendisi seçer ve yerleştirir, sonra Bidik kurduğu yolu izler. 40 bölüm, dört zorluk seviyesi.</p>
+        <ol>
+          <li><b>Düz yol ve viraj</b> ile başlar</li>
+          <li><b>Köprü, kavşak, çift viraj</b> eklenir</li>
+          <li><b>Anahtar ve kapı:</b> sıra önemlidir</li>
+          <li><b>Tünel ve tek yön</b> kuralları gelir</li>
+        </ol>
+      </div>
+      <div class="game">
+        <h3>Kodla Sür</h3>
+        <p>Çocuk Bidik'e blok blok komut verir. 60 bölüm, altı aşama; her beşinci bölüm bir hata avcısı görevidir.</p>
+        <ol>
+          <li><b>Ekran oklarıyla</b> sıralama (okuma bilmeyenler için)</li>
+          <li><b>Döngüler:</b> 2×, 3×, 4×</li>
+          <li><b>Bidik'in yönleri:</b> ileri, sağa dön, sola dön</li>
+          <li><b>Fonksiyon, koşul</b> ve usta bölümler</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="sinifta">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kick">Sınıfta kullanım</span>
+      <h2>Bir ders saatinde dört adım</h2>
+      <p>Ayrıntılı ders akışı, kavram tablosu ve sorulacak sorular <a href="rehber.html">öğretmen rehberinde</a>.</p>
+    </div>
+    <div class="class">
+      <div class="step"><span class="t">5 dk</span><h3>Ekransız ısınma</h3><p>Bir öğrenci “robot” olur, sınıf ona “ileri, sağa dön” komutları verir.</p></div>
+      <div class="step"><span class="t">10 dk</span><h3>Tahtada birlikte</h3><p>Akıllı tahtada bir bölümü sınıfça çözün. Çalıştırmadan önce tahmin isteyin.</p></div>
+      <div class="step"><span class="t">20 dk</span><h3>İkili oyun</h3><p>Öğrenciler ikişer ikişer oynar: biri planlar, diğeri bloğu koyar, sonra yer değiştirir.</p></div>
+      <div class="step"><span class="t">5 dk</span><h3>Paylaşım</h3><p>“Hatanı nasıl buldun?” sorusuyla kapanış. En kısa programı yazan grubu tahtaya davet edin.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="kick">Cihazlar</span>
+      <h2>Okuldaki her ekranda çalışır</h2>
+    </div>
+    <div class="devices">
+      <div class="dev"><h3>Akıllı tahta</h3><p>Etkileşimli tahtanın tarayıcısında açın. Yatay ekranda oyun tahtası solda, bloklar sağda durur; dokunmatik çalışır.</p></div>
+      <div class="dev"><h3>Tablet ve telefon</h3><p>Tarayıcıdan açıp “Ana ekrana ekle” deyin; uygulama gibi tam ekran açılır. Android uygulaması da hazırlanıyor.</p></div>
+      <div class="dev"><h3>Bilgisayar laboratuvarı</h3><p>Kurulum yok. Bir kez açıldıktan sonra internet kesilse de çalışmaya devam eder.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="sss">
+  <div class="wrap">
+    <div class="sec-head"><span class="kick">Sorular</span><h2>Öğretmenlerin sık sorduğu sorular</h2></div>
+    <div class="faq">
+      <details><summary>Ücretli mi? Hesap açmak gerekiyor mu?</summary><p>Hayır. Bidik ücretsizdir; hesap, e-posta ya da giriş istemez.</p></details>
+      <details><summary>Öğrencilerin verileri nereye gidiyor?</summary><p>Hiçbir yere. Oyuncu adları ve yıldızlar yalnızca o cihazın tarayıcısında saklanır; sunucuya gönderilmez. Reklam ve takip aracı yoktur. Ayrıntılar <a href="gizlilik.html">gizlilik politikasında</a>.</p></details>
+      <details><summary>Aynı tablette birden fazla öğrenci oynayabilir mi?</summary><p>Evet. Ana ekrandaki oyuncu düğmesinden her öğrenci için ayrı profil açabilirsiniz. Öğretmen panelinde hepsinin beceri bazında ilerlemesi görünür.</p></details>
+      <details><summary>Okuma bilmeyen çocuklar oynayabilir mi?</summary><p>Evet. İlk aşamalar ekran oklarıyla oynanır; renkler, sesler ve görseller yönlendirir. Sağa-sola dönmeye, sağı solu ayırt edebilen yaşta geçilir.</p></details>
+      <details><summary>Bir bölümü tahtada göstermek istiyorum ama kilitli.</summary><p>Ana ekrandaki “Tüm bölümleri aç” düğmesine basın. Bütün bölümler açılır, istediğinizi seçebilirsiniz.</p></details>
+    </div>
+  </div>
+</section>
+
+<div class="wrap" style="padding-block:52px 0">
+  <div class="final">
+    <div><h2>Bidik sınıfınızı bekliyor</h2><p>Kurulum yok, hesap yok. Tarayıcıda açın ve başlayın.</p></div>
+    <a class="btn" href="oyna/index.html">Hemen oyna</a>
+  </div>
+  <footer>
+    <span>Bidik bir <b>TT Robotics</b> projesidir.</span>
+    <span><a href="rehber.html">Öğretmen rehberi</a> · <a href="gizlilik.html">Gizlilik</a></span>
+  </footer>
+</div>
+
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{scope:"./"}).catch(()=>{}))}</script>
+</body></html>
