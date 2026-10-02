@@ -134,9 +134,23 @@ h1,h2,h3{text-wrap:balance}
 @media (max-width:420px){.slots{grid-template-columns:repeat(6,1fr)}}
 .slot{aspect-ratio:1;max-width:100%;border-radius:10px;border:2px dashed var(--panel-line);display:grid;place-items:center;padding:0}
 .slot.filled{border:0}
-.slot.on .blk{outline:4px solid var(--ink);outline-offset:1px;transform:scale(1.06)}
+.slots{padding:6px 4px}
+.slot.on .blk{transform:scale(1.08);box-shadow:0 0 0 3px #fff,0 0 0 7px var(--ink),0 8px 16px rgba(22,50,74,.3);position:relative;z-index:1}
+#kProg.running .slot.filled:not(.on):not(.err) .blk{opacity:.35}
+.speedbar{width:min(100%,500px);display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.speedbar .lbl{font-weight:800;font-size:13px;color:var(--ink-soft);margin-right:2px}
+.spd{display:flex;align-items:center;gap:5px;height:46px;padding:0 10px 0 6px;border-radius:14px;background:var(--panel);border:2px solid var(--panel-line);box-shadow:0 3px 0 var(--panel-line);font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
+.spd svg{width:30px;height:30px;flex:none}
+.spd[aria-pressed="true"]{border-color:var(--ink);background:#fff3c4;box-shadow:0 3px 0 var(--ink)}
+.nowbar{width:min(100%,500px);min-height:60px;display:flex;align-items:center;gap:12px;background:var(--panel);border:2px solid var(--panel-line);border-radius:16px;padding:6px 14px}
+.nowbar .lbl{font-size:11px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.6px;line-height:1.2;width:62px;flex:none}
+.nowbar .nb{width:46px;height:46px;flex:none;display:grid}
+.nowbar .nb .blk{animation:pop .25s}
+.nowbar .txt{font-family:var(--display);font-weight:800;font-size:22px;line-height:1.1}
+.nowbar .txt small{display:block;font-family:var(--body);font-size:13px;color:var(--ink-soft)}
+.nowbar.idle .txt{font-family:var(--body);font-size:14px;color:var(--ink-soft);font-weight:700}
 .slot.err .blk{outline:4px solid var(--red);outline-offset:1px}
-.blk{width:100%;height:100%;border-radius:10px;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;font-size:20px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .12s}
+.blk{width:100%;height:100%;border-radius:10px;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;font-size:20px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .2s,opacity .2s,box-shadow .2s}
 .blk svg{width:64%;height:64%}
 .blk.g{background:var(--green)} .blk.b{background:var(--blue)} .blk.p{background:var(--purple)} .blk.o{background:var(--orange)} .blk.c{background:#0e6f7c} .blk.gd{background:#13704a} .blk.r{background:#d6409f}
 .bl{transform-box:fill-box;transform-origin:center}
@@ -302,6 +316,7 @@ h1,h2,h3{text-wrap:balance}
   <div class="board-wrap"><svg id="yBoard" class="board" xmlns="http://www.w3.org/2000/svg"></svg></div>
   <div class="tray" id="yTray"></div>
   <p class="tip" id="yTip"></p>
+  <div class="speedbar" id="ySpeedBar"></div>
   <button class="bigbtn" id="yRun"><svg width="26" height="26" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>Çalıştır</button>
   <div class="stats"><span id="yTries"></span><span id="yHints"></span><span id="yPieces"></span></div>
 </section>
@@ -316,6 +331,7 @@ h1,h2,h3{text-wrap:balance}
   </div>
   <p class="goal" id="kGoal"></p>
   <div class="board-wrap"><svg id="kBoard" class="board" xmlns="http://www.w3.org/2000/svg"></svg></div>
+  <div class="nowbar idle" id="kNow" aria-live="polite"></div>
   <div class="prog" id="kProg"></div>
   <div class="palette" id="kPal"></div>
   <div class="ctrls">
@@ -323,7 +339,8 @@ h1,h2,h3{text-wrap:balance}
     <button class="ctrl go" id="kRun"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4l13 8-13 8z"/></svg>Çalıştır</button>
     <button class="ctrl" id="kStop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg>Başa al</button>
   </div>
-  <div class="stats"><span id="kTries"></span><span id="kHints"></span><span id="kBlocks"></span><button class="chip" id="kSpeed" style="padding:2px 10px;font-size:12px">Hız 1×</button><button class="chip" id="kDrv" aria-pressed="false" style="padding:2px 10px;font-size:12px" hidden>Bidik yukarı baksın</button></div>
+  <div class="speedbar" id="kSpeedBar"></div>
+  <div class="stats"><span id="kTries"></span><span id="kHints"></span><span id="kBlocks"></span></div>
 </section>
 
 <!-- PROFİLLER -->
@@ -468,6 +485,21 @@ function winCard({stars,checks,msg,onAgain,onNext,nextLabel}){
 function introCard(c,then){
   overlay(`<span class="kicker">${c.kicker||"Yeni"}</span>${c.art?`<svg class="art" viewBox="0 0 100 100">${c.art}</svg>`:""}<h2>${c.title}</h2><p>${c.text}</p>${c.ex&&c.ex.length?`<div class="ex">${c.ex.map(t=>blkHTML(t)).join("")}</div>`:""}<div class="btns"><button class="btn-main" id="ovOk">Anladım, başla</button></div>`);
   $("ovOk").onclick=()=>{closeOverlay();then&&then()};
+}
+// Hız: küçük yaşlar için yavaş seçenekler (salyangoz 0,25× … çita 2×)
+const SPEEDS=[
+  {v:.25,name:"Salyangoz",svg:'<path d="M2 19 Q2 16.5 5 16.5 H17 Q21 16.5 21 13.5 L23 13.5 Q23 19 18 19Z" fill="#8fd16a"/><path d="M20.5 13.5 L19.5 9.5 M22 13.5 L23 9.8" stroke="#5aa043" stroke-width="1.4" stroke-linecap="round"/><circle cx="12.5" cy="11.5" r="6.5" fill="#f08a24" stroke="#a65a10" stroke-width="1.2"/><path d="M12.5 11.5 m0 -3.2 a3.2 3.2 0 1 1 -3.2 3.2 a1.6 1.6 0 1 1 1.6 -1.6" stroke="#a65a10" stroke-width="1.3" fill="none"/>'},
+  {v:.5,name:"Kaplumbağa",svg:'<rect x="5" y="15" width="3.4" height="4" rx="1.2" fill="#8fd16a"/><rect x="15.5" y="15" width="3.4" height="4" rx="1.2" fill="#8fd16a"/><circle cx="21" cy="13.2" r="2.6" fill="#8fd16a"/><circle cx="21.8" cy="12.6" r=".6" fill="#16324a"/><path d="M3.5 16 Q3.5 7 12 7 Q20.5 7 20.5 16Z" fill="#22a165" stroke="#16794a" stroke-width="1.2"/><path d="M8 10 L12 12.5 L16 10 M12 12.5 V16" stroke="#16794a" stroke-width="1.3" fill="none"/>'},
+  {v:1,name:"Tavşan",svg:'<ellipse cx="9" cy="6" rx="2.1" ry="5.2" fill="#d5dae2" stroke="#9aa5b4" stroke-width=".8"/><ellipse cx="15" cy="6" rx="2.1" ry="5.2" fill="#d5dae2" stroke="#9aa5b4" stroke-width=".8"/><ellipse cx="9" cy="6.5" rx=".9" ry="3.4" fill="#f49ac1"/><ellipse cx="15" cy="6.5" rx=".9" ry="3.4" fill="#f49ac1"/><circle cx="12" cy="15" r="6.8" fill="#eef1f5" stroke="#9aa5b4" stroke-width=".8"/><circle cx="9.7" cy="14" r="1.1" fill="#16324a"/><circle cx="14.3" cy="14" r="1.1" fill="#16324a"/><ellipse cx="12" cy="16.6" rx="1.2" ry=".9" fill="#f49ac1"/>'},
+  {v:2,name:"Çita",svg:'<path d="M1 9.5 H5.5 M1.8 13.5 H5.5 M1 17.5 H5.5" stroke="#f08a24" stroke-width="1.8" stroke-linecap="round"/><circle cx="9.8" cy="7.6" r="2.3" fill="#ffc93c" stroke="#d99a00" stroke-width=".8"/><circle cx="20.2" cy="7.6" r="2.3" fill="#ffc93c" stroke="#d99a00" stroke-width=".8"/><circle cx="15" cy="13.5" r="7" fill="#ffc93c" stroke="#d99a00" stroke-width=".9"/><circle cx="12.6" cy="12.3" r="1.1" fill="#16324a"/><circle cx="17.4" cy="12.3" r="1.1" fill="#16324a"/><path d="M12.6 13.5 Q12.1 15.6 13.4 17.2 M17.4 13.5 Q17.9 15.6 16.6 17.2" stroke="#16324a" stroke-width="1" fill="none"/><ellipse cx="15" cy="15.4" rx="1.3" ry=".9" fill="#16324a"/><circle cx="10.6" cy="16.3" r=".7" fill="#a65a10"/><circle cx="19.4" cy="16.3" r=".7" fill="#a65a10"/><circle cx="15" cy="9.3" r=".7" fill="#a65a10"/>'}
+];
+function getSpeed(){const v=P().speed; return SPEEDS.some(s=>s.v===v)?v:.5}
+function renderSpeedBars(){
+  ["kSpeedBar","ySpeedBar"].forEach(id=>{
+    const box=$(id); if(!box) return;
+    box.innerHTML=`<span class="lbl">Hız</span>`+SPEEDS.map(s=>`<button class="spd" data-v="${s.v}" aria-pressed="${s.v===getSpeed()}" aria-label="${s.name}, ${String(s.v).replace(".",",")} kat hız"><svg viewBox="0 0 24 24" aria-hidden="true">${s.svg}</svg>${String(s.v).replace(".",",")}×</button>`).join("");
+    box.querySelectorAll(".spd").forEach(b=>b.onclick=()=>{P().speed=+b.dataset.v; save(); renderSpeedBars(); sfx.click()});
+  });
 }
 function seenOnce(key,card,then){const d=P(); if(d.seen[key]){then&&then();return} d.seen[key]=1; save(); introCard(card,then)}
 function unlocked(mode,n){return db.teacher||n===1||!!P()[mode][n-1]}
@@ -711,7 +743,7 @@ function start(n,keep,daily){
   running=false;failCell=-1;tool="S";
   show("yol");
   $("yTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n; $("ySub").textContent=`Yol Kur · ${L.tier.name} · ${L.N}×${L.N}`;
-  setGoal(); renderTray(); render(); stats();
+  setGoal(); renderTray(); render(); stats(); renderSpeedBars();
   if(!keep&&!daily&&INTRO[n]) seenOnce("y"+n,INTRO[n]);
 }
 function setGoal(msg,cls){
@@ -808,7 +840,7 @@ function run(){
   $("yRun").disabled=true;
   const res=simulate(), car=$("yCar"); car.style.display="";
   const reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const per=reduce?120:400, total=res.segs.length+(res.ok?0:.6); let t0=null; const got=new Set();
+  const per=(reduce?120:400)/getSpeed(), total=res.segs.length+(res.ok?0:.6); let t0=null; const got=new Set();
   function frame(ts){
     if(t0==null) t0=ts;
     const p=(ts-t0)/per;
@@ -888,7 +920,7 @@ const CH=[
   {name:"İlk adımlar",sub:"Bee‑Bot gibi: ileri, geri, dön",from:1,to:10,pal:["F","G","L","R"],
    intro:{kicker:"Kodla Sür",title:"Bidik, Bee‑Bot gibi çalışır",text:"İleri bloğu Bidik'i yüzünün baktığı yöne bir kare götürür. Geri bloğu bir kare geri götürür. Sola dön ve sağa dön, Bidik'i yerinde çeyrek tur döndürür. Antenlerine bak: mavi anten sol, pembe anten sağ. Bloğa dokun, programa eklenir; programdaki bloğa dokun, silinir.",ex:["F","F","R","F"]}},
   {name:"Dönüşler",sub:"Bidik'in yerine geç",from:11,to:20,pal:["F","G","L","R"],
-   intro:{kicker:"Yeni zorluk",title:"Bidik'in yerine geç",text:"Artık Bidik her yöne bakabilir. Sağ ve sol, ekrana göre değil Bidik'e göredir; Bee‑Bot'u yere koyup arkasına geçtiğin gibi düşün. Zorlanırsan “Bidik yukarı baksın” düğmesine bas: tahta döner, Bidik'in sağı hep senin sağında kalır.",ex:["R","F","F","L","F"]}},
+   intro:{kicker:"Yeni zorluk",title:"Bidik'in yerine geç",text:"Artık Bidik her yöne bakabilir. Sağ ve sol, ekrana göre değil Bidik'e göredir; Bee‑Bot'u yere koyup arkasına geçtiğin gibi düşün. Antenlerine bak: mavi anten Bidik'in solu, pembe anten sağı.",ex:["R","F","F","L","F"]}},
   {name:"Döngüler",sub:"Tekrar eden adımları kısalt",from:21,to:30,pal:["F","G","L","R","2","3","4"],
    intro:{kicker:"Yeni kavram",title:"Döngü: tekrar et",text:"Aynı bloğu üst üste koymak yerine önüne bir sayı bloğu koy. “3× İleri” Bidik'i üç kare ileri götürür. Programda yer az, döngü kullanmak zorundasın!",ex:["3","F","R","2","F"]}},
   {name:"Fonksiyonlar",sub:"Kendi bloğunu yap",from:31,to:40,pal:["F","L","R","2","3","4","P"],
@@ -1107,7 +1139,7 @@ function makeLevel(n,seed){
 }
 
 // --- arayüz ---
-let L=null, prog=null, active="main", tries=0, hints=0, sess=null, anim=null, speed=1, isDaily=false;
+let L=null, prog=null, active="main", tries=0, hints=0, sess=null, anim=null, isDaily=false;
 function start(n,daily){
   isDaily=!!daily;
   L=daily?makeLevel(n,daily):makeLevel(n);
@@ -1116,7 +1148,7 @@ function start(n,daily){
   show("kod");
   $("kTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n;
   $("kSub").textContent=`Kodla Sür · ${L.ch.name}`+(L.bug?" · Hata avcısı":"");
-  goal(); renderBoard(); renderProg(); renderPal(); statsK(); renderDrv();
+  goal(); renderBoard(); renderProg(); renderPal(); statsK(); renderSpeedBars(); setNow(null);
   if(!daily){
     const bug=()=>{ if(L.bug) seenOnce("kbug",BUG) };
     const sensor=()=>{ if(n===SENSOR_FROM) seenOnce("k"+SENSOR_FROM,SENSOR_INTRO,bug); else bug() };
@@ -1163,10 +1195,7 @@ function startState(){const N=L.N;return {x:L.start%N,y:(L.start/N)|0,ang:L.d0*9
 function placeCar(st){
   $("kCar").setAttribute("transform",`translate(${st.x*100+50} ${st.y*100+50}) rotate(${st.ang}) scale(1.45)`);
   const c=L.N*50, w=$("kWorld");
-  if(w) w.setAttribute("transform", driverView()?`rotate(${-(st.ang+90)} ${c} ${c})`:"");
 }
-const driverView=()=>!!(L&&L.rel&&P().drv);
-function renderDrv(){const b=$("kDrv"); b.hidden=!L.rel; b.setAttribute("aria-pressed",!!P().drv); b.textContent=P().drv?"Bidik yukarı bakıyor ✓":"Bidik yukarı baksın"}
 function blink(dir){const c=$("kCar"); if(!c) return; c.classList.remove("blink-L","blink-R"); void c.getBBox; c.classList.add("blink-"+dir); clearTimeout(blink.t); blink.t=setTimeout(()=>c.classList.remove("blink-"+dir),900)}
 function renderProg(){
   const box=$("kProg"); box.innerHTML="";
@@ -1206,7 +1235,14 @@ function highlight(src,cls){
   document.querySelectorAll("#kProg .slot.on,#kProg .slot.err").forEach(e=>e.classList.remove("on","err"));
   (src||[]).forEach(s=>{const el=document.querySelector(`#kProg .slot[data-row="${s.row}"][data-i="${s.i}"]`); if(!el) return; const t=prog[s.row][s.i]; el.classList.add(cls==="err"&&(t==="F"||t==="L"||t==="R")?"err":"on")});
 }
-function resetSess(){sess=null;$("kFail").style.display="none";$("kTrail").setAttribute("points","");placeCar(startState());document.querySelectorAll("#kBoard [data-coin]").forEach(e=>e.setAttribute("opacity",1));highlight([])}
+function setNow(s){
+  const el=$("kNow"); if(!el) return;
+  if(!s){ el.className="nowbar idle"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="txt">Çalıştır'a bas: Bidik hareket ederken o an çalışan blok burada görünecek.</span>`; return }
+  const inFn=s.src&&s.src.some(x=>x.row==="fn");
+  const label= s.check? `${BLK[s.op].name}? <b style="color:${s.val?"var(--green)":"var(--red)"}">${s.val?"Evet":"Hayır"}</b>` : BLK[s.op].name;
+  el.className="nowbar"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="nb">${blkHTML(s.op)}</span><span class="txt">${label}${inFn?"<small>Fonksiyonun içinde</small>":""}</span>`;
+}
+function resetSess(){$("kProg").classList.remove("running");setNow(null);sess=null;$("kFail").style.display="none";$("kTrail").setAttribute("points","");placeCar(startState());document.querySelectorAll("#kBoard [data-coin]").forEach(e=>e.setAttribute("opacity",1));highlight([])}
 function stop(){ if(anim){cancelAnimationFrame(anim.raf);clearTimeout(anim.to);anim=null} sess=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); if(L&&$("kTrail")) resetSess() }
 function ensureSess(){
   if(sess) return sess;
@@ -1216,7 +1252,8 @@ function ensureSess(){
 const condText=s=>`${BLK[s.op].name}? ${s.val?"Evet":"Hayır"}`;
 function animateTo(i,then){
   const a=sess.res.states[i], b=sess.res.states[i+1], s=sess.steps[i];
-  const base=(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches?80:380)/speed;
+  const base=(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches?80:380)/getSpeed();
+  $("kProg").classList.add("running"); setNow(s);
   highlight(s.src);
   if(s.check){ highlight(s.src); goal(condText(s), s.val?"good":""); anim={to:setTimeout(then,base*.7)}; return }
   if(!b){ then(); return }
@@ -1235,7 +1272,7 @@ function animateTo(i,then){
   anim={raf:requestAnimationFrame(fr)};
 }
 function finish(){
-  anim=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false);
+  anim=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); $("kProg").classList.remove("running");
   const res=sess.res;
   if(res.ok){sfx.win();win();return}
   if(sess.steps.length) tries++; statsK(); sfx.fail();
@@ -1270,8 +1307,7 @@ $("kStep").onclick=()=>{
   animateTo(i,()=>{anim=null; if(sess.idx>end) finish()});
 };
 $("kStop").onclick=()=>{stop();goal()};
-$("kDrv").onclick=()=>{const d=P(); d.drv=!d.drv; save(); renderDrv(); placeCar(sess&&sess.res?sess.res.states[Math.min(sess.idx,sess.res.states.length-1)]:startState()); sfx.click()};
-$("kSpeed").onclick=()=>{speed=speed===1?2:speed===2?4:1;$("kSpeed").textContent=`Hız ${speed}×`};
+
 $("kClear").onclick=()=>{ if(anim) return; prog=L.pre?{main:L.pre.main.slice(),fn:L.pre.fn.slice()}:{main:[],fn:[]}; resetSess(); goal(); renderProg(); statsK() };
 $("kBack").onclick=()=>{ stop(); isDaily?goHome():openLevels("kod") };
 $("kHint").onclick=()=>{
