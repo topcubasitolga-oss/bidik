@@ -998,6 +998,8 @@ function setFriend(id,mode,n,daily){
   if(daily||typeof WORLD==="undefined"){ el.innerHTML=`<svg viewBox="0 0 200 200" style="margin-top:8px">${MASCOT_FRONT}</svg>`; el.style.background="#fde3ee"; el.title="Bidik"; return }
   const no=friendOf(mode,n), w=WORLD[no]; if(!w) return; el.innerHTML=animalSVG(no); el.style.background=w.land; el.title=w.friend;
 }
+// "Önce tahmin et" adımı isteğe bağlı: öğretmen menüden açar (varsayılan kapalı)
+function predictOn(){ return !!db.predict }
 const Yol=(()=>{
 const TYPES={
   S:{name:"Düz yol",rots:2,tip:"Düz yol: Bidik dümdüz geçer. Dokununca yatay/dikey olur."},
@@ -1811,7 +1813,7 @@ $("kBoard").addEventListener("click",e=>{
 $("kRun").onclick=()=>{
   if(anim) return;
   if(predicting) setPredict(false);
-  else if(!guess&&!guessDone&&tries===0&&!demo&&!isDaily&&used()){ guessDone=true; setPredict(true); goal("Önce tahmin et: Bidik en son hangi karede duracak? O kareye dokun."); return }
+  else if(predictOn()&&!guess&&!guessDone&&tries===0&&!demo&&!isDaily&&used()){ guessDone=true; setPredict(true); goal("Önce tahmin et: Bidik en son hangi karede duracak? O kareye dokun."); return }
   if(guessRes!=null&&$("kGuess")) $("kGuess").innerHTML="";
   if(sess&&sess.done) resetSess();
   ensureSess(); goal();
@@ -2950,7 +2952,7 @@ function reg(id){
       if(!st.prog.length) return "Önce program yaz.";
       const e=expand(st.prog); if(e.err) return e.err;
       if(st.predicting){ setPredict(st,false) }
-      else if(!st.guessAsked&&A.tries===0&&!A.demo){ st.guessAsked=true; setPredict(st,true); aGoal("Önce tahmin et: Bidik en son hangi karede duracak? O kareye dokun."); return null }
+      else if(predictOn()&&!st.guessAsked&&A.tries===0&&!A.demo){ st.guessAsked=true; setPredict(st,true); aGoal("Önce tahmin et: Bidik en son hangi karede duracak? O kareye dokun."); return null }
       const C=st.L.C; play(st).then(res=>{
         const gt=st.guessRes==null||st.guessShown?"":(st.guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. "); st.guessShown=true;
         const gc=st.guessRes!=null?[[st.guessRes,st.guessRes?"Tahminin doğru çıktı":"Tahmin: bir dahakine"]]:[];
@@ -3205,6 +3207,7 @@ function openMenu(){
   overlay(`<span class="kicker">Öğretmen / veli</span><h2 style="font-size:28px">Ayarlar ve takip</h2>
     <div class="menu">
       <button class="mi" id="miLv"><b>Seviye</b><small>Şu an: ${L}${teacherOn()?"":" · değiştirmek için önce öğretmen modunu açın"}</small></button>
+      <button class="mi" id="miTah"><b>Önce tahmin et: ${predictOn()?"açık":"kapalı"}</b><small>Açıksa çocuk Çalıştır'dan önce Bidik'in duracağı kareyi tahmin eder</small></button>
       <button class="mi" id="miT"><b>Öğretmen modu: ${teacherOn()?"açık":"kapalı"}</b><small>Akıllı tahtada “Çözümü göster” düğmesi ve seviye değiştirme</small></button>
       <button class="mi" id="miR"><b>Hedef Defteri</b><small>Her çocuğun beceri ve hedef ilerlemesi</small></button>
       ${/^https?:/.test(location.protocol)?`<a class="mi" href="../ogretmen.html" target="_blank" rel="noopener"><b>Öğretmen Odası</b><small>Ders planı, çalışma yaprağı, değerlendirme</small></a><a class="mi" href="../kartlar.html" target="_blank" rel="noopener"><b>Masa başı kartlar</b><small>Ekransız etkinlikler: yazdırıp sınıfta oynayın</small></a>`:""}
@@ -3213,6 +3216,7 @@ function openMenu(){
     </div><div class="btns"><button class="btn-main" id="miX">Kapat</button></div>`);
   $("miLv").onclick=()=>{ closeOverlay(); levelChipClick() };
   $("miT").onclick=()=>{ $("teacherBtn").click() };
+  $("miTah").onclick=()=>{ db.predict=!db.predict; save(); sfx.click(); openMenu() };
   $("miR").onclick=()=>{ closeOverlay(); openReport() };
   $("miP").onclick=()=>{ closeOverlay(); openProfiles() };
   $("miX").onclick=closeOverlay;
