@@ -186,6 +186,8 @@ h1,h2,h3{text-wrap:balance}
 .afriend svg{width:56px;height:56px;margin-top:5px}
 .abubble .goal{flex:1;margin:0;text-align:left;background:#fff;border-radius:18px;padding:10px 14px;font-size:16px;color:var(--ink);position:relative;box-shadow:0 3px 0 var(--panel-line)}
 .abubble .goal::before{content:"";position:absolute;left:-9px;top:50%;margin-top:-8px;border:8px solid transparent;border-right-color:#fff;border-left:0}
+.board.predict{outline:5px dashed #f0a800;outline-offset:3px;border-radius:26px;cursor:pointer;animation:predpulse 1.2s ease-in-out infinite}
+@keyframes predpulse{50%{outline-color:#ffd970}}
 .abubble .goal.bad{color:var(--red)}.abubble .goal.good{color:#178a52}
 .abody{width:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
 .abody .board.agrid{width:min(100%,520px)}
@@ -587,9 +589,10 @@ h1,h2,h3{text-wrap:balance}
 /* Akıllı tahta ve bilgisayar: yatay ekranda tahta solda, kontroller sağda */
 @media (min-width:900px) and (orientation:landscape){
   #yol,#kod{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);column-gap:32px;row-gap:12px;align-items:start;align-content:start;max-width:1640px}
-  #yol>.topbar,#kod>.topbar,#yol>.goal,#kod>.goal{grid-column:1/-1}
+  #yol>.topbar,#kod>.topbar,#yol>.goal,#kod>.goal,#yol>.abubble,#kod>.abubble{grid-column:1/-1}
   #yol>.board-wrap,#kod>.board-wrap{grid-column:1;grid-row:3/span 8}
-  #yol>*:not(.topbar):not(.goal):not(.board-wrap),#kod>*:not(.topbar):not(.goal):not(.board-wrap){grid-column:2;width:100%}
+  #yol>*:not(.topbar):not(.goal):not(.abubble):not(.board-wrap),#kod>*:not(.topbar):not(.goal):not(.abubble):not(.board-wrap){grid-column:2;width:100%}
+  #yol>.abubble,#kod>.abubble{width:min(100%,900px)}
   .board{width:min(100%,calc(100vh - 170px))}
   .prog,.palette,.ctrls,.tray,.bigbtn{width:100%}
   .goal{font-size:17px}
@@ -682,7 +685,7 @@ h1,h2,h3{text-wrap:balance}
     <button class="iconbtn" id="yHint" aria-label="İpucu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></button>
     <button class="iconbtn" id="yReset" aria-label="Tahtayı temizle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v5h5"/></svg></button>
   </div>
-  <p class="goal" id="yGoal"></p>
+  <div class="abubble"><span class="afriend" id="yFriend"></span><p class="goal" id="yGoal" aria-live="polite"></p></div>
   <div class="board-wrap"><svg id="yBoard" class="board" xmlns="http://www.w3.org/2000/svg"></svg></div>
   <div class="tray" id="yTray"></div>
   <p class="tip" id="yTip"></p>
@@ -700,7 +703,7 @@ h1,h2,h3{text-wrap:balance}
     <button class="iconbtn" id="kHint" aria-label="İpucu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></button>
     <button class="iconbtn" id="kClear" aria-label="Programı temizle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
   </div>
-  <p class="goal" id="kGoal"></p>
+  <div class="abubble"><span class="afriend" id="kFriend"></span><p class="goal" id="kGoal" aria-live="polite"></p></div>
   <div class="board-wrap"><svg id="kBoard" class="board" xmlns="http://www.w3.org/2000/svg"></svg></div>
   <div class="nowbar idle" id="kNow" aria-live="polite"></div>
   <div class="prog" id="kProg"></div>
@@ -921,6 +924,13 @@ function teacherOn(){return !!db.teacher}
 // =====================================================================
 // YOL KUR
 // =====================================================================
+// Kodla Sür ve Yol Kur'da görevi o bölgenin dostu söyler
+function friendOf(mode,n){ try{ const dk=DURAKS.find(d=>d.acts.some(a=>a.play&&a.play.mode===mode&&n>=a.play.from&&n<=a.play.to)); return dk?dk.no:(typeof curDurak!=="undefined"&&curDurak||1) }catch(e){ return 1 } }
+function setFriend(id,mode,n,daily){
+  const el=$(id); if(!el) return;
+  if(daily||typeof WORLD==="undefined"){ el.innerHTML=`<svg viewBox="0 0 200 200" style="margin-top:8px">${MASCOT_FRONT}</svg>`; el.style.background="#fde3ee"; el.title="Bidik"; return }
+  const no=friendOf(mode,n), w=WORLD[no]; if(!w) return; el.innerHTML=animalSVG(no); el.style.background=w.land; el.title=w.friend;
+}
 const Yol=(()=>{
 const TYPES={
   S:{name:"Düz yol",rots:2,tip:"Düz yol: Bidik dümdüz geçer. Dokununca yatay/dikey olur."},
@@ -1158,7 +1168,7 @@ function start(n,keep,daily){
   show("yol");
   $("yTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n; $("ySub").textContent=`Yol Kur · ${L.tier.name} · ${L.N}×${L.N}`;
   demo=false; $("ySolve").hidden=!teacherOn()||!!daily;
-  setGoal(); renderTray(); render(); stats(); renderSpeedBars();
+  setFriend("yFriend","yol",n,daily); setGoal(); renderTray(); render(); stats(); renderSpeedBars();
   if(!keep&&!daily&&INTRO[n]) seenOnce("y"+n,INTRO[n]);
 }
 function setGoal(msg,cls){
@@ -1576,7 +1586,7 @@ function makeLevel(n,seed){
 }
 
 // --- arayüz ---
-let L=null, prog=null, active="main", tries=0, hints=0, sess=null, anim=null, isDaily=false, demo=false;
+let L=null, prog=null, active="main", tries=0, hints=0, sess=null, anim=null, isDaily=false, demo=false, guess=null, predicting=false, guessDone=false, guessRes=null;
 function start(n,daily){
   isDaily=!!daily;
   L=daily?makeLevel(n,daily):makeLevel(n);
@@ -1587,7 +1597,7 @@ function start(n,daily){
   $("kTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n;
   $("kSub").textContent=`Kodla Sür · ${L.ch.name}`+(L.bug?" · Hata avcısı":"");
   demo=false; $("kSolve").hidden=!teacherOn()||!!daily;
-  goal(); renderBoard(); renderProg(); renderPal(); statsK(); renderSpeedBars(); setNow(null); fitBoard($("kBoard"),$("kRun"));
+  setFriend("kFriend","kod",n,daily); guess=null; predicting=false; guessDone=false; guessRes=null; goal(); renderBoard(); renderProg(); renderPal(); statsK(); renderSpeedBars(); setNow(null); fitBoard($("kBoard"),$("kRun"));
   if(!daily){
     const bug=()=>{ if(L.bug) seenOnce("kbug",BUG) };
     const sensor=()=>{ if(n===SENSOR_FROM) seenOnce("k"+SENSOR_FROM,SENSOR_INTRO,bug); else bug() };
@@ -1627,7 +1637,7 @@ function renderBoard(){
   g+=`<polyline id="kTrail" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 16" opacity=".85" points=""/>`;
   g+=`<rect id="kFail" x="3" y="3" width="94" height="94" rx="14" fill="none" stroke="var(--red)" stroke-width="6" stroke-dasharray="10 6" style="display:none"/>`;
   const badges="";
-  g+=`<g id="kCar"><g class="carbody">${CAR}</g>${badges}</g>`;
+  g+=`<g id="kGuess"></g><g id="kCar"><g class="carbody">${CAR}</g>${badges}</g>`;
   s.innerHTML=`<g id="kWorld">${g}</g>`; placeCar(startState());
 }
 function startState(){const N=L.N;return {x:L.start%N,y:(L.start/N)|0,ang:L.d0*90-90}}
@@ -1681,7 +1691,7 @@ function setNow(s){
   const label= s.check? `${BLK[s.op].name}? <b style="color:${s.val?"var(--green)":"var(--red)"}">${s.val?"Evet":"Hayır"}</b>` : BLK[s.op].name;
   el.className="nowbar"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="nb">${blkHTML(s.op)}</span><span class="txt">${label}${inFn?"<small>Fonksiyonun içinde</small>":""}</span>`;
 }
-function resetSess(){$("kProg").classList.remove("running");setNow(null);sess=null;$("kFail").style.display="none";$("kTrail").setAttribute("points","");placeCar(startState());document.querySelectorAll("#kBoard [data-coin]").forEach(e=>e.setAttribute("opacity",1));highlight([])}
+function resetSess(){if(predicting)setPredict(false);$("kProg").classList.remove("running");setNow(null);sess=null;$("kFail").style.display="none";$("kTrail").setAttribute("points","");placeCar(startState());document.querySelectorAll("#kBoard [data-coin]").forEach(e=>e.setAttribute("opacity",1));highlight([])}
 function stop(){ if(anim){cancelAnimationFrame(anim.raf);clearTimeout(anim.to);anim=null} sess=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); if(L&&$("kTrail")) resetSess() }
 function ensureSess(){
   if(sess) return sess;
@@ -1713,16 +1723,29 @@ function animateTo(i,then){
 function finish(){
   anim=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); $("kProg").classList.remove("running");
   const res=sess.res;
+  let gtxt="";
+  if(guess&&guessRes==null){ const f=res.states[res.states.length-1]; guessRes=f.x===guess.x&&f.y===guess.y; gtxt=guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. " }
   if(res.ok){sfx.win();win();return}
   if(sess.steps.length) tries++; statsK(); sfx.fail();
   if(res.fail>=0&&sess.steps[res.fail]) highlight(sess.steps[res.fail].src,"err");
   if(res.cell!=null){const [x,y]=cellXY(res.cell);const f=$("kFail");f.setAttribute("x",x+3);f.setAttribute("y",y+3);f.style.display=""}
-  goal(res.why+(res.fail>=0?" Kırmızı blok hatanın olduğu yer.":""),"bad");
+  goal(gtxt+res.why+(res.fail>=0?" Kırmızı blok hatanın olduğu yer.":""),"bad");
   sess.done=true;
 }
 function lastIndex(){const r=sess.res; return r.ok?r.end:(r.fail>=0?r.fail:-1)}
+function guessMark(x,y){ return `<g transform="translate(${x*100} ${y*100})"><rect x="6" y="6" width="88" height="88" rx="14" fill="rgba(255,201,60,.28)" stroke="#f0a800" stroke-width="6" stroke-dasharray="12 8"/><text x="50" y="68" text-anchor="middle" font-size="46" font-weight="800" fill="#c98a00" font-family="Baloo 2,Trebuchet MS,sans-serif">?</text></g>` }
+function setPredict(on){ predicting=on; $("kBoard").classList.toggle("predict",on); const r=$("kRun"); if(r&&r.lastChild&&r.lastChild.nodeType===3) r.lastChild.textContent=on?"Tahminsiz":"Çalıştır" }
+$("kBoard").addEventListener("click",e=>{
+  if(!predicting||anim) return;
+  const w=$("kWorld"), pt=new DOMPoint(e.clientX,e.clientY).matrixTransform(w.getScreenCTM().inverse()), x=Math.floor(pt.x/100), y=Math.floor(pt.y/100);
+  if(x<0||y<0||x>=L.N||y>=L.N) return;
+  guess={x,y}; setPredict(false); $("kGuess").innerHTML=guessMark(x,y); sfx.click(); $("kRun").click();
+});
 $("kRun").onclick=()=>{
   if(anim) return;
+  if(predicting) setPredict(false);
+  else if(!guess&&!guessDone&&tries===0&&!demo&&!isDaily&&used()){ guessDone=true; setPredict(true); goal("Önce tahmin et: Bidik en son hangi karede duracak? O kareye dokun."); return }
+  if(guessRes!=null&&$("kGuess")) $("kGuess").innerHTML="";
   if(sess&&sess.done) resetSess();
   ensureSess(); goal();
   const end=lastIndex();
@@ -1771,7 +1794,7 @@ function win(){
   else { const d=P().kod; if((d[n]||0)<stars){d[n]=stars;save()} }
   goal(`Harika! Program çalıştı, Bidik ${DESTS[DEST].yon} ulaştı.`,"good");
   document.querySelectorAll("#kBoard .finish").forEach(e=>e.classList.add("bloom"));
-  winCard({stars,checks:[[true,L.bug?"Hatayı buldun ve düzelttin":"Bidik bitişe ulaştı"],[first,"İlk denemede, ipucusuz"],[minimal,`En az blokla (${u} / ${L.ideal})`]],
+  winCard({stars,checks:[[true,L.bug?"Hatayı buldun ve düzelttin":"Bidik bitişe ulaştı"],[first,"İlk denemede, ipucusuz"],[minimal,`En az blokla (${u} / ${L.ideal})`]].concat(guessRes!=null?[[guessRes,guessRes?"Tahminin doğru çıktı":"Tahmin: bir dahakine"]]:[]),
     msg:stars===3?"Kusursuz algoritma!":!minimal?"Daha kısa bir program yazabilir misin? Döngü, fonksiyon ya da koşul dene.":"Adım düğmesiyle programı önce kafanda çalıştırmayı dene.",
     onAgain:()=>isDaily?Daily.open():start(n), onNext:()=>isDaily?goHome():(n<TOTAL&&allowed("kod",n+1)?start(n+1):backToLevels("kod")),nextLabel:isDaily?"Ana ekran":n<TOTAL&&allowed("kod",n+1)?"Sonraki":"Bölümler", talk:isDaily?null:talkFor("kod",n)});
 }
@@ -2587,7 +2610,13 @@ const REG={
   tarla:{title:"Sulama Robotu",durak:7,kind:"sula",mode:"collect",debug:true,tile:["#e2c98f","#d8bd80"],edge:"#8a6a3a",obs:"tas",item:["kuru"],done:"Tarla sulandı",
     goal:"Sulama programı bozuk! Programı çalıştır, nerede saptığını gör, hatalı bloğa dokun ve doğrusunu seç.",fail:{out:"Robot tarlanın dışına çıktı!",obs:"Taşa çarptı!"},
     intro:{title:"Tarla susuz kaldı",text:"Tavşan Pıtır'ın sulama robotunun programı bozulmuş. Önce <b>Çalıştır</b>'a bas ve izle. Robot nerede yanlış yaptı? Hatalı bloğa dokun, aşağıdan doğrusunu seç."},
-    talk:"Robot nerede saptı? Hata, saptığı yerde mi başlamıştı, yoksa daha önce mi? Suyu boşa harcamadan sulamak neden önemli? (Temiz su, açlığa son)"},
+    talk:"Robot nerede saptı? Hata, saptığı yerde mi başlamıştı, yoksa daha önce mi? Suyu boşa harcamadan sulamak neden önemli? (Temiz su, açlığa son)",
+    levels:{
+      1:{debug:false,goal:"Kuru fidelere git, hepsini sula!",li:{title:"Tarla susuz kaldı",text:"Tavşan Pıtır'ın fideleri kurumuş. Bidik'i kuru fidelere götür; geçtiği yer sulanır, fide yeşerir."},talk:"Tarla neden susuz kaldı? Suyu boşa harcamadan nasıl sularız? (Temiz su, açlığa son)"},
+      2:{debug:false,goal:"Kuru fidelere git, hepsini sula!",talk:"Bütün fidelere uğramak için hangi yoldan gittin? Daha kısa bir yol var mı?"},
+      3:{debug:false,goal:"Kuru fidelere git, hepsini sula!",talk:"Bütün fidelere uğramak için hangi yoldan gittin? Daha kısa bir yol var mı?"},
+      4:{li:{title:"Sulama robotu bozuldu",text:"Tavşan Pıtır'ın sulama robotunun programı bozulmuş. Önce <b>Çalıştır</b>'a bas ve izle. Robot nerede yanlış yaptı? Hatalı bloğa dokun, aşağıdan doğrusunu seç."}}
+    }},
   senlik:{title:"Kasaba Şenliği",durak:8,N:5,mode:"collect",tile:["#f3e6c8","#ead9b4"],edge:"#c98f2c",obs:"bank",kind:"bayrak",done:"Şenlik hazır",
     parts:[{name:"Şenlik Günü",sub:"Bütün dostlar birlikte: yedi bölgede öğrendiklerinin hepsi",from:1,to:5}],
     fail:{out:"Bidik meydanın dışına çıktı!",obs:"Banka çarptı!",wrong:"Yanlış kutu! Atığın rengine bak.",plant:"Burada saksı yok!",energy:"Enerji bitti! Daha kısa bir yol bul."},
@@ -2636,7 +2665,11 @@ const ART={
   balonok:`<path d="M50 86 V70" stroke="#16324a" stroke-width="2"/><circle cx="50" cy="76" r="5" fill="#22a165"/>`,
   yaprak:`<ellipse cx="50" cy="56" rx="38" ry="30" fill="#3fae5f"/><path d="M50 56 L82 40" stroke="#2f7a3e" stroke-width="3"/>`
 };
-function binArt(c){ const C=COLS[c]; return `<rect x="20" y="30" width="60" height="56" rx="6" fill="${C[0]}" stroke="${C[1]}" stroke-width="4"/><rect x="14" y="20" width="72" height="12" rx="5" fill="${C[0]}" stroke="${C[1]}" stroke-width="4"/><path d="M38 56 l12 -12 l12 12 M62 64 l-12 12 l-12 -12" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>` }
+function binArt(c){ const C=COLS[c]; return `<rect x="20" y="30" width="60" height="56" rx="6" fill="${C[0]}" stroke="${C[1]}" stroke-width="4"/><rect x="14" y="20" width="72" height="12" rx="5" fill="${C[0]}" stroke="${C[1]}" stroke-width="4"/>${BINICON[c]}` }
+const BINICON={
+  sari:`<path d="M45 40 h10 v6 c6 3 7 6 7 11 v20 a4 4 0 0 1 -4 4 h-16 a4 4 0 0 1 -4 -4 v-20 c0 -5 1 -8 7 -11z" fill="#fff"/>`,
+  mavi:`<rect x="36" y="42" width="28" height="36" rx="3" fill="#fff"/><path d="M41 52 h18 M41 60 h18 M41 68 h12" stroke="${COLS.mavi[0]}" stroke-width="3"/>`,
+  yesil:`<rect x="38" y="44" width="24" height="7" rx="2" fill="#fff"/><path d="M39 53 h22 v20 a6 6 0 0 1 -6 6 h-10 a6 6 0 0 1 -6 -6z" fill="#fff"/>`};
 function wasteArt(c){ return c==="sari"?ART.sise.replace("#cdeefa","#ffe9a3").replace("#4a9cc4","#d99a00").replace("#2f7fd8","#d99a00"):c==="mavi"?`<rect x="24" y="26" width="52" height="50" rx="3" fill="#cfe2f7" stroke="#2f7fd8" stroke-width="4" transform="rotate(-8 50 50)"/><path d="M32 40 H66 M32 50 H66 M32 60 H56" stroke="#2f7fd8" stroke-width="3" transform="rotate(-8 50 50)"/>`:`<path d="M42 16 H58 V30 C70 36 72 44 72 54 V80 a6 6 0 0 1 -6 6 H34 a6 6 0 0 1 -6 -6 V54 C28 44 30 36 42 30Z" fill="#bfe8c9" stroke="#22a165" stroke-width="4"/>` }
 // ---- kural motoru ----
 function expand(prog){ const out=[], map=[]; for(let i=0;i<prog.length;i++){ const t=prog[i]; if(isPre(t)){ const nx=prog[i+1]; if(!nx||isPre(nx)) return {err:"Tekrar bloğundan (2×, 3×, 4×) sonra bir hareket bloğu koy."}; for(let k=0;k<+t;k++){ out.push(nx); map.push(i+1) } i++ } else { out.push(t); map.push(i) } } return {cmds:out,map} }
@@ -2711,13 +2744,13 @@ function reg(id){
     title:R.title, durak:R.durak, N:R.N||12, speed:true, finaleLabel:R.finale?"Şenlik başlasın!":null, finale:R.finale?()=>openFestival():null,
     parts:R.parts||[{name:"Kolay",sub:"Okul öncesi",from:1,to:5},{name:"Orta",sub:"1-2. sınıf · 2×, 3×, 4× tekrar blokları",from:6,to:10},{name:"Usta",sub:"3-4. sınıf · büyük tahta",from:11,to:12}],
     doneText:R.done, talk:n=>cfg(id,n).talk,
-    intro:n=> cfg(id,n).li?{key:"s"+n,kicker:"Kasaba Şenliği · "+n+" / 5",title:cfg(id,n).li.title,art:FLOWER,text:cfg(id,n).li.text}
+    intro:n=> cfg(id,n).li?{key:"s"+n,kicker:R.finale?"Kasaba Şenliği · "+n+" / 5":WORLD[R.durak].kita,title:cfg(id,n).li.title,art:R.finale?FLOWER:`<g>${ANIMALS[WORLD[R.durak].anim]}</g>`,text:cfg(id,n).li.text}
       : n===1?{key:"g1",kicker:WORLD[R.durak].kita,title:R.intro.title,art:`<g transform="translate(0 0)">${ANIMALS[WORLD[R.durak].anim]}</g>`,text:R.intro.text}
       : n===LOOPS_FROM&&!cfg(id,n).debug?{key:"g2",kicker:"Yeni blok",title:"Tekrar blokları",art:`<rect x="14" y="30" width="34" height="40" rx="8" fill="#f08a24"/><text x="31" y="60" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">3×</text><rect x="54" y="30" width="34" height="40" rx="8" fill="#22a165"/><path d="M71 62V40M64 47l7-7 7 7" stroke="#fff" stroke-width="4" fill="none"/>`,text:"<b>3×</b> bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. İleri, İleri, İleri yerine 3× İleri!"}:null,
     setup(n){ const L=CACHE[id+n]||(CACHE[id+n]=gen(id,n)); const lim=L.C.debug?L.pre.length:L.ideal+(L.t<=5?3:L.t<=10?2:1);
       return {n,L,lim,prog:L.C.debug?L.pre.slice():[],sel:-1,run:null,runAt:-1,fail:null,errAt:-1,built:false} },
     goal(st){ return st.L.C.goal },
-    checkLabel(){ return "Çalıştır" },
+    checkLabel(st){ return st&&st.predicting?"Tahminsiz çalıştır":"Çalıştır" },
     info(st){ return `Blok: ${st.prog.length} · En iyi: ${st.L.C.debug?st.L.pre.length:st.L.ideal}`+(st.L.energy?` · Enerji: ${st.L.budget}`:"") },
     render(st){
       const L=st.L, C=L.C;
@@ -2734,13 +2767,17 @@ function reg(id){
     check(st){
       if(!st.prog.length) return "Önce program yaz.";
       const e=expand(st.prog); if(e.err) return e.err;
+      if(st.predicting){ setPredict(st,false) }
+      else if(!st.guessAsked&&A.tries===0&&!A.demo){ st.guessAsked=true; setPredict(st,true); aGoal("Önce tahmin et: Bidik en son hangi karede duracak? O kareye dokun."); return null }
       const C=st.L.C; play(st).then(res=>{
+        const gt=st.guessRes==null||st.guessShown?"":(st.guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. "); st.guessShown=true;
+        const gc=st.guessRes!=null?[[st.guessRes,st.guessRes?"Tahminin doğru çıktı":"Tahmin: bir dahakine"]]:[];
         if(res.ok){ const used=st.prog.length, best=st.L.ideal;
-          aWin(C.debug?null:{stars:A.tries===0&&A.hints===0&&used<=best?3:A.tries<=2?2:1,
-            checks:[[true,C.done],[A.tries===0,"İlk denemede"],[used<=best,`En az blokla (${used} / ${best})`]],
+          aWin(C.debug?(gc.length?{checks:[[true,C.done],[A.tries===0,"İlk denemede"],[A.hints===0,"Yardım almadan"]].concat(gc)}:null):{stars:A.tries===0&&A.hints===0&&used<=best?3:A.tries<=2?2:1,
+            checks:[[true,C.done],[A.tries===0,"İlk denemede"],[used<=best,`En az blokla (${used} / ${best})`]].concat(gc),
             msg:used<=best?"Harika, en kısa program!":"Daha kısa bir program yazabilir misin?"+(st.L.t>=LOOPS_FROM?" Tekrar bloklarını dene.":"")}) }
-        else if(res.fail) aBad((C.fail[res.fail]||"Olmadı, bir daha dene.")+" Kırmızı blok hatanın olduğu yer.");
-        else aBad(L_left(st)) });
+        else if(res.fail) aBad(gt+(C.fail[res.fail]||"Olmadı, bir daha dene.")+" Kırmızı blok hatanın olduğu yer.");
+        else aBad(gt+L_left(st)) });
       return null;
     },
     play(st){ return play(st) },
@@ -2785,9 +2822,15 @@ function buildBoard(st){
   s+=`<polyline id="gTrail" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 16" opacity=".85" points=""/>`;
   s+=`<rect id="gFail" x="3" y="3" width="94" height="94" rx="14" fill="none" stroke="#e8443a" stroke-width="6" stroke-dasharray="10 6" style="display:none"/>`;
   const leaf=C.kind==="cop"?`<g transform="scale(1.25)">${ART.yaprak.replace('cx="50" cy="56"','cx="0" cy="4"').replace('M50 56 L82 40','M0 4 L32 -12')}</g>`:"";
-  s+=`<g id="gCar">${leaf}<g id="gRot"><g transform="scale(1.45)">${ROBOT}</g></g><g id="gCarry"></g></g>`;
+  s+=`<g id="gGuess"></g><g id="gCar">${leaf}<g id="gRot"><g transform="scale(1.45)">${ROBOT}</g></g><g id="gCarry"></g></g>`;
   svg.innerHTML=s;
+  svg.onclick=e=>{ if(!st.predicting||A.busy) return;
+    const pt=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse()), x=Math.floor(pt.x/CS), y=Math.floor(pt.y/CS);
+    if(x<0||y<0||x>=N||y>=N) return;
+    st.guess={x,y}; setPredict(st,false); $("gGuess").innerHTML=`<g transform="translate(${x*CS} ${y*CS})"><rect x="6" y="6" width="88" height="88" rx="14" fill="rgba(255,201,60,.28)" stroke="#f0a800" stroke-width="6" stroke-dasharray="12 8"/><text x="50" y="68" text-anchor="middle" font-size="46" font-weight="800" fill="#c98a00" font-family="Baloo 2,Trebuchet MS,sans-serif">?</text></g>`;
+    sfx.click(); $("aCheck").click() };
 }
+function setPredict(st,on){ st.predicting=on; const b=$("gBoard"); if(b) b.classList.toggle("predict",on); const c=$("aCheck"); if(c) c.textContent=on?"Tahminsiz çalıştır":"Çalıştır" }
 function placeCar(x,y,ang){ const c=$("gCar"), r=$("gRot"); if(!c||!r) return; c.setAttribute("transform",`translate(${x*CS+50} ${y*CS+50})`); r.setAttribute("transform",`rotate(${ang})`) }
 function setItems(st,s){
   const L=st.L;
@@ -2811,7 +2854,7 @@ function resetVis(st){
   placeCar(L.sx,L.sy,L.sd*90-90); setItems(st,initState(L)); setTrail([]); setEnergy(st,0); setNow(null);
   const f=$("gFail"); if(f) f.style.display="none"; const p=$("gProg"); if(p) p.classList.remove("running");
 }
-function clearRun(st){ st.run=null; st.fail=null; st.runAt=-1; st.errAt=-1; if(st.built&&$("gBoard")) resetVis(st) }
+function clearRun(st,keepGuess){ st.run=null; st.fail=null; st.runAt=-1; st.errAt=-1; if(st.built&&$("gBoard")) resetVis(st); if(!keepGuess&&st.guessShown&&$("gGuess")) $("gGuess").innerHTML=""; if(!keepGuess&&st.predicting) setPredict(st,false) }
 function renderProg(st){
   const box=$("gProg"); if(!box) return; const L=st.L, dbg=!!L.C.debug;
   let sl=""; for(let i=0;i<st.lim;i++){ const t=st.prog[i];
@@ -2837,7 +2880,7 @@ const dur=()=>((window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)"
 function tween(a,b,ms){ return new Promise(res=>{ let t0=null; const fr=ts=>{ if(t0==null) t0=ts; const t=Math.min(1,(ts-t0)/ms), e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   placeCar(a.x+(b.x-a.x)*e,a.y+(b.y-a.y)*e,a.ang+(b.ang-a.ang)*e); if(t<1&&$("gCar")) requestAnimationFrame(fr); else res() }; requestAnimationFrame(fr) }) }
 async function play(st){
-  A.busy=true; clearRun(st); const e=expand(st.prog), L=st.L, s=initState(L); st.run=s;
+  A.busy=true; clearRun(st,true); const e=expand(st.prog), L=st.L, s=initState(L); st.run=s;
   const pg=$("gProg"); if(pg) pg.classList.add("running");
   let ang=L.sd*90-90, fail=null; const trail=[[s.x,s.y]];
   await aWait(120);
@@ -2856,6 +2899,7 @@ async function play(st){
     if(s.got.size!==before||s.carry!==bc){ setItems(st,s); sfx.coin() } else if(moved) sfx.step();
     setEnergy(st,s.used);
   }
+  if(st.guess&&st.guessRes==null) st.guessRes=s.x===st.guess.x&&s.y===st.guess.y;
   st.runAt=-1; hl([]); if(pg) pg.classList.remove("running"); A.busy=false; aRefresh();
   return {fail, ok:!fail&&isDone(L,s)};
 }
