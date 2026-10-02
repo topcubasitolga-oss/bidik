@@ -2926,7 +2926,7 @@ async function play(st){
   return {fail, ok:!fail&&isDone(L,s)};
 }
 Object.keys(REG).forEach(reg);
-window.__gorev={REG,cfg};
+window.__gorev={REG,cfg,ART,BL,bH,bin:Object.fromEntries(Object.keys(COLS).map(c=>[c,binArt(c)])),waste:Object.fromEntries(Object.keys(COLS).map(c=>[c,wasteArt(c)]))};
 })();
 // ===== Final: Kasaba Şenliği kutlaması ve Kahraman Belgesi (bölümler 80-gorev.js içinde) =====
 // ---- şenlik kutlaması ve Kahraman Belgesi ----
@@ -3047,6 +3047,7 @@ function openMenu(){
       <button class="mi" id="miLv"><b>Seviye</b><small>Şu an: ${L}${teacherOn()?"":" · değiştirmek için önce öğretmen modunu açın"}</small></button>
       <button class="mi" id="miT"><b>Öğretmen modu: ${teacherOn()?"açık":"kapalı"}</b><small>Akıllı tahtada “Çözümü göster” düğmesi ve seviye değiştirme</small></button>
       <button class="mi" id="miR"><b>Hedef Defteri</b><small>Her çocuğun beceri ve hedef ilerlemesi</small></button>
+      ${/^https?:/.test(location.protocol)?`<a class="mi" href="../kartlar.html" target="_blank" rel="noopener"><b>Masa başı kartlar</b><small>Ekransız etkinlikler: yazdırıp sınıfta oynayın</small></a>`:""}
       <button class="mi" id="miP"><b>Oyuncular</b><small>Öğrenci ekle, değiştir</small></button>
       <a class="mi" href="${$("fbBtn").getAttribute("href")}"><b>Görüş / hata bildir</b><small>E-posta ile bize yazın</small></a>
     </div><div class="btns"><button class="btn-main" id="miX">Kapat</button></div>`);
@@ -3221,7 +3222,8 @@ window.bidikBack=function(){
 window.__bidik={Yol,Kod,Daily,ACT,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
-  actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS};
+  actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS,
+  ART:()=>({ANIMALS,ROBOT,MASCOT_FRONT,homeArt,coinArt,FLOWER,dest:[0,1,2,3,4].map(destArt),house:[0,1,2,3].map(k=>blockArt(0,k)),tree:blockArt(1,0),BLK:Object.fromEntries(["F","L","R","G","2","3","4"].map(t=>[t,blkHTML(t)]))})};
 if($("miniBot")) $("miniBot").innerHTML=MASCOT;
 $("mascot").innerHTML=MASCOT_FRONT;
 goHome();
