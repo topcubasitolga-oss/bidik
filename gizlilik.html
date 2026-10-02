@@ -13,6 +13,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:"Nunito","Segoe
 h1,h2{font-family:"Baloo 2","Trebuchet MS",sans-serif;line-height:1.15}
 p{color:var(--ink-soft);font-weight:600}
 a{color:var(--teal);font-weight:800}
+.ttr{display:flex;align-items:center;gap:14px;justify-content:center;padding:18px 0 30px;border-top:1px solid rgba(22,50,74,.12);margin-top:8px}.ttr img{width:96px;height:auto;flex:none}.ttr p{margin:0;font-size:13px;line-height:1.5;color:#4a6378;font-weight:600}.ttr b{color:#16324a}
 </style>
 </head><body>
 <div class="wrap">
@@ -30,7 +31,8 @@ a{color:var(--teal);font-weight:800}
 <p>Bidik, çocuklardan hiçbir kişisel veri almadan, 6698 sayılı Kişisel Verilerin Korunması Kanunu ve Google Play Aile Politikası ile uyumlu olacak şekilde tasarlanmıştır.</p>
 <h2>İletişim</h2>
 <p>Sorularınız için: [e-posta adresinizi buraya yazın]</p>
-</div>
+</div><div class="wrap"><div class="ttr"><img src="simgeler/ttrobotics-logo.png" alt="TT Robotics logosu" width="96" height="72"><p><b>Bidik bir TT Robotics ürünüdür.</b><br>© 2026 TT Robotics. Tüm hakları saklıdır.</p></div></div>
+
 
 <script>if("serviceWorker" in navigator){const had=!!navigator.serviceWorker.controller;let done=false;navigator.serviceWorker.addEventListener("controllerchange",()=>{if(had&&!done){done=true;location.reload()}});window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{scope:"./",updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}))}</script>
 </body></html>
