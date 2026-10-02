@@ -286,6 +286,32 @@ h1,h2,h3{text-wrap:balance}
 .blkopt{display:flex;flex-direction:column;align-items:center;gap:2px;height:auto;padding:6px 10px}
 .blkopt .blk{width:44px;height:44px}
 .blkopt small{font-family:var(--body);font-size:12px}
+
+.kalemb{width:min(100%,460px)!important}
+.kprog{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:center;background:#fff;border:3px solid var(--panel-line);border-radius:16px;padding:8px;min-height:62px;width:min(100%,560px)}
+.kb2{width:40px;height:40px;display:block;border-radius:11px;border:3px solid transparent}
+.kb2.on{border-color:#ffc93c;transform:translateY(-3px)}
+.xsel{display:flex;align-items:center;gap:4px;margin-left:8px;font-family:var(--display);font-weight:800;font-size:24px}
+.xsel .xbtn{width:42px;height:42px;border-radius:12px;background:var(--sky);border:3px solid var(--panel-line);font-family:var(--display);font-weight:800;font-size:22px}
+.xsel .xbtn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.kpal{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.kpb{display:flex;flex-direction:column;align-items:center;gap:3px;background:#fff;border:3px solid var(--panel-line);border-radius:16px;padding:6px 8px;box-shadow:0 4px 0 var(--panel-line);min-width:76px}
+.kpb .blk{width:50px;height:50px}
+.kpb small{font-weight:800;font-size:11.5px}
+.kpb.undo svg{width:50px;height:50px;padding:10px}
+.dict{background:#fff;border:3px solid #b59be0;border-radius:18px;padding:8px 12px;box-shadow:0 4px 0 #7a5eb0;width:min(100%,560px)}
+.dict>b{font-family:var(--display);font-size:18px;color:#7a5eb0}
+.dgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.dent{display:flex;align-items:center;justify-content:center;gap:3px;background:#f5f0fd;border-radius:12px;padding:4px}
+.dbe{display:inline-flex;gap:1px}
+.deq{font-weight:800}
+.msg{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.mword{display:flex;flex-direction:column;align-items:center;gap:6px;background:#fff;border:3px solid var(--panel-line);border-radius:18px;padding:10px;min-width:96px;box-shadow:0 4px 0 var(--panel-line)}
+.mword.sel{border-color:var(--ink);background:#fff7dc}
+.mans{height:50px;display:grid;place-items:center}
+.mans b{font-family:var(--display);font-size:32px;color:#b59be0}
+.tcard.sm{width:84px}
+@media (max-width:480px){.dgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -2924,6 +2950,136 @@ regAct("yaris",{
   }
 });
 })();
+// ===== Kalem Bidik (Avrupa · Baykuş Bilge) =====
+(function(){
+const DX=[0,1,0,-1], DY=[-1,0,1,0];
+const B={F:["İleri (çiz)","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>']};
+const bHTML=t=>`<span class="blk ${B[t][1]}" aria-label="${B[t][0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${B[t][2]}</svg></span>`;
+const LV={
+  1:{name:"Çizgi",sol:"FFF",x:1,s:[2,4]},2:{name:"L harfi",sol:"FFRFF",x:1,s:[1,4]},3:{name:"Köprü",sol:"FFRFFRFF",x:1,s:[1,4]},
+  4:{name:"Kare",sol:"FFRFFRFFRFF",x:1,s:[1,4]},5:{name:"Küçük kare",sol:"FR",x:4,s:[2,3],rep:true},6:{name:"Büyük kare",sol:"FFR",x:4,s:[1,4],rep:true},
+  7:{name:"Merdiven",sol:"FRFL",x:3,s:[0,5],rep:true},8:{name:"Kapı",sol:"FFFRFR",x:2,s:[1,5],rep:true}
+};
+const NP=6, CS=80, PAD=40;
+function run(L,prog,x){
+  let px=L.s[0],py=L.s[1],d=0; const segs=[], steps=[[px,py,d]];
+  for(let k=0;k<x;k++) for(const c of prog){
+    if(c==="L") d=(d+3)%4; else if(c==="R") d=(d+1)%4;
+    else { const nx=px+DX[d], ny=py+DY[d]; if(nx<0||ny<0||nx>=NP||ny>=NP) return {segs,steps,out:true}; segs.push([px,py,nx,ny]); px=nx; py=ny }
+    steps.push([px,py,d]);
+  }
+  return {segs,steps,out:false};
+}
+const key=s=>{ const a=[s[0],s[1]].join(","), b=[s[2],s[3]].join(","); return a<b?a+"|"+b:b+"|"+a };
+regAct("kalem",{
+  title:"Kalem Bidik", durak:7, N:8, speed:true,
+  parts:[{name:"Kodla Çiz",sub:"Bidik yürürken iz bırakır",from:1,to:4},{name:"Tekrarla Çiz",sub:"Kısa kod, tekrar sayısı: büyük şekil",from:5,to:8}],
+  doneText:"Şekil tamam",
+  talk:n=> n<=4?"Kareyi çizmek için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık ne çizerdi?",
+  intro:n=> n===1?{key:"p1",kicker:"Avrupa",title:"Kalem Bidik",art:`<path d="M30 80 V30 H70" stroke="#e0457b" stroke-width="6" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Baykuş Bilge Bidik'e bir kalem bağladı! Bidik <b>İleri</b> gidince arkasında çizgi kalır. Kesikli şekli çizecek kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
+        : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. (İleri, Sağa dön) × 4 = kare!"}:null,
+  setup(n){ const L=LV[n], tg=run(L,L.sol.split(""),L.x); return {n,L,target:new Set(tg.segs.map(key)),tsegs:tg.segs,prog:[],x:L.rep?1:1,drawn:[],pos:[L.s[0],L.s[1],0],running:false,err:null} },
+  goal(st){ return st.L.rep?`${st.L.name}: kısa bir kod yaz ve tekrar sayısını seç.`:`${st.L.name}: kesikli çizgiyi çizecek kodu yaz.` },
+  checkLabel(){ return "Çiz" },
+  info(st){ return `Blok: ${st.prog.length}` },
+  render(st){
+    const W=PAD*2+(NP-1)*CS, P=v=>PAD+v*CS;
+    let s=`<svg class="board agrid kalemb" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#fffaf0"/>`;
+    st.tsegs.forEach(g=>s+=`<path d="M${P(g[0])} ${P(g[1])} L${P(g[2])} ${P(g[3])}" stroke="#c9b6ef" stroke-width="10" stroke-dasharray="4 14" stroke-linecap="round"/>`);
+    for(let y=0;y<NP;y++) for(let x=0;x<NP;x++) s+=`<circle cx="${P(x)}" cy="${P(y)}" r="5" fill="#b9a5e3"/>`;
+    st.drawn.forEach(g=>s+=`<path d="M${P(g[0])} ${P(g[1])} L${P(g[2])} ${P(g[3])}" stroke="#e0457b" stroke-width="9" stroke-linecap="round"/>`);
+    s+=`<circle cx="${P(st.L.s[0])}" cy="${P(st.L.s[1])}" r="12" fill="none" stroke="#7a5eb0" stroke-width="3" stroke-dasharray="4 4"/>`;
+    s+=`<g transform="translate(${P(st.pos[0])} ${P(st.pos[1])}) rotate(${st.pos[2]*90-90}) scale(.8)">${ROBOT}</g></svg>`;
+    let h=s;
+    h+=`<div class="kprog">${st.prog.length?st.prog.map((t,i)=>`<span class="kb2 ${st.runAt===i?"on":""}">${bHTML(t)}</span>`).join(""):`<span class="ahelp">Kod boş. Aşağıdaki bloklara dokun.</span>`}${st.L.rep?`<span class="xsel">×${[1,2,3,4].map(x=>`<button class="xbtn" data-x="${x}" aria-pressed="${st.x===x}">${x}</button>`).join("")}</span>`:""}</div>`;
+    h+=`<div class="kpal">${Object.keys(B).map(t=>`<button class="kpb" data-t="${t}" aria-label="${B[t][0]}">${bHTML(t)}<small>${B[t][0]}</small></button>`).join("")}<button class="kpb undo" data-t="-" aria-label="Son bloğu sil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg><small>Sil</small></button></div>`;
+    const body=$("aBody"); body.innerHTML=h;
+    body.querySelectorAll(".kpb").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
+      if(t==="-") st.prog.pop(); else { if(st.prog.length>=12){ aGoal("En fazla 12 blok. Tekrar kullanmayı dene!","bad"); return } st.prog.push(t) }
+      st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.click(); aRefresh() });
+    body.querySelectorAll(".xbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.x=+b.dataset.x; st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.click(); aRefresh() });
+  },
+  check(st){
+    if(!st.prog.length) return "Önce kod yaz.";
+    this.play(st).then(r=>{
+      if(r.out) aBad("Bidik kâğıttan çıktı! Kodu kontrol et.");
+      else if(r.ok) aWin({stars:A.tries===0&&A.hints===0&&st.prog.length<=st.L.sol.length?3:A.tries<=2?2:1,
+        checks:[[true,"Şekil tamam"],[A.tries===0,"İlk denemede"],[st.prog.length<=st.L.sol.length,`En kısa kodla (${st.prog.length} / ${st.L.sol.length} blok)`]]});
+      else aBad("Çizim şekle uymadı. Kesikli çizgiyi parmağınla izle, Bidik'in yönünü düşün.");
+    });
+    return null;
+  },
+  async play(st){
+    A.busy=true; const r=run(st.L,st.prog,st.x); st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; aRefresh();
+    let si=0;
+    for(let k=1;k<r.steps.length;k++){ const p=r.steps[k], q=r.steps[k-1];
+      st.runAt=(k-1)%st.prog.length;
+      if(p[0]!==q[0]||p[1]!==q[1]){ st.drawn.push(r.segs[si++]); sfx.step() } else sfx.turn();
+      st.pos=p; aRefresh(); await aWait(420) }
+    st.runAt=-1; A.busy=false; aRefresh();
+    const got=new Set(r.segs.map(key));
+    return {out:r.out, ok:!r.out&&got.size===st.target.size&&[...st.target].every(k=>got.has(k))};
+  },
+  solved(st){ const r=run(st.L,st.prog,st.x), got=new Set(r.segs.map(key)); return !r.out&&got.size===st.target.size&&[...st.target].every(k=>got.has(k)) },
+  auto(st){ st.prog=st.L.sol.split(""); st.x=st.L.x; return true },
+  async solve(st){
+    for(const t of st.L.sol){ st.prog.push(t); sfx.click(); aRefresh(); aGoal(`Kod: ${st.prog.length} blok`); await aWait(450) }
+    if(st.L.rep){ st.x=st.L.x; aGoal(`Bu kodu ${st.L.x} kez tekrarla`); aRefresh(); await aWait(900) }
+    await this.play(st); A.busy=true;
+  }
+});
+})();
+// ===== İki Renkli Dil (Avrupa · Baykuş Bilge) =====
+(function(){
+const C={P:["#e0457b","#a82a5c","pembe"],M:["#2f7fd8","#1d5b9a","mavi"]};
+const D2={PP:"yildiz",PM:"kalp",MP:"elma",MM:"top"};
+const D3={PPP:"yildiz",PPM:"kalp",PMP:"elma",PMM:"top",MPP:"cicek",MPM:"sandvic",MMP:"ucurtma",MMM:"kek"};
+const NM={yildiz:"Yıldız",kalp:"Kalp",elma:"Elma",top:"Top",cicek:"Çiçek",sandvic:"Sandviç",ucurtma:"Uçurtma",kek:"Kek"};
+const LV={1:{m:"oku",msg:["PP","MM"]},2:{m:"oku",msg:["PM","MP","PP"]},3:{m:"oku",msg:["MM","PM","MP"]},4:{m:"oku",msg:["MP","MM","PM","PP"]},
+  5:{m:"yaz",msg:["PM","MM"]},6:{m:"yaz",msg:["MP","PP","MM"]},7:{m:"yaz",msg:["PP","MP","PM","MM"]},8:{m:"oku",msg:["MPP","PMM","MMM"],three:true}};
+const bead=(k,r)=>`<svg viewBox="0 0 40 40" width="${r||34}" height="${r||34}"><circle cx="20" cy="20" r="16" fill="${C[k][0]}" stroke="${C[k][1]}" stroke-width="3"/><ellipse cx="14" cy="13" rx="5" ry="3" fill="#fff" opacity=".5"/></svg>`;
+regAct("ikili",{
+  title:"İki Renkli Dil", durak:7, N:8,
+  parts:[{name:"Mesajı Çöz",sub:"Boncuk çiftlerini sözlükle oku",from:1,to:4},{name:"Mesaj Yaz",sub:"Resimleri boncuk diline çevir",from:5,to:7},{name:"Üç Boncuk",sub:"Üç boncukla daha çok kelime",from:8,to:8}],
+  doneText:"Gizli mesaj tamam",
+  talk:n=> n<8?"Sadece iki renkle dört farklı resim anlattık! Üçüncü bir renk olsaydı kaç resim anlatabilirdik?":"İki boncukla 4, üç boncukla 8 farklı şey anlattık. Dört boncukla kaç olur? Bilgisayarlar da sadece iki işaret kullanır: 0 ve 1.",
+  intro:n=> n===1?{key:"p1",kicker:"Avrupa",title:"Bilge'nin gizli dili",art:`<circle cx="32" cy="50" r="16" fill="#e0457b"/><circle cx="68" cy="50" r="16" fill="#2f7fd8"/>`,text:"Baykuş Bilge mektuplarını sadece iki renk boncukla yazıyor: pembe ve mavi. Her <b>iki boncuk</b> bir resim demek. Sözlüğe bak, mesajı çöz!"}
+        : n===5?{key:"p2",kicker:"Yeni görev",title:"Sen yaz!",art:ICONS.kalp,text:"Şimdi tersini yap: resimleri boncuk diline çevir. Pembe ya da mavi boncuğa dokun, sırayla dizilsin."}:null,
+  setup(n){ const L=LV[n], dict=L.three?D3:D2; return {n,L,dict,ans:L.msg.map(()=>null),beads:[],sel:0} },
+  goal(st){ return st.L.m==="oku"?"Gizli mesajı çöz: her boncuk grubunun altına doğru resmi seç.":"Resimleri boncuk diline çevir: sırayla pembe ve mavi boncuk koy." },
+  checkLabel(){ return "Kontrol et" },
+  render(st){
+    const body=$("aBody"), L=st.L;
+    let h=`<div class="dict ${L.three?"three":""}"><b>Sözlük</b><div class="dgrid">${Object.entries(st.dict).map(([k,v])=>`<div class="dent"><span class="dbe">${k.split("").map(c=>bead(c,22)).join("")}</span><span class="deq">=</span>${cardIcon(v,34)}</div>`).join("")}</div></div>`;
+    if(L.m==="oku"){
+      h+=`<div class="msg">${L.msg.map((code,i)=>`<button class="mword ${st.sel===i?"sel":""}" data-i="${i}"><span class="dbe">${code.split("").map(c=>bead(c,30)).join("")}</span><span class="mans">${st.ans[i]?cardIcon(st.ans[i],46):`<b>?</b>`}</span></button>`).join("")}</div>`;
+      h+=`<div class="tray">${Object.values(st.dict).map(v=>`<button class="tcard sm" data-v="${v}">${cardIcon(v,44)}<small>${NM[v]}</small></button>`).join("")}</div>`;
+      body.innerHTML=h;
+      body.querySelectorAll(".mword").forEach(b=>b.onclick=()=>{ st.sel=+b.dataset.i; sfx.click(); aRefresh() });
+      body.querySelectorAll(".tcard").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.ans[st.sel]=b.dataset.v; const nx=st.ans.findIndex(x=>!x); if(nx>=0) st.sel=nx; sfx.place(); aRefresh() });
+      return;
+    }
+    const w=L.msg[0].length;
+    h+=`<div class="msg">${L.msg.map((code,i)=>{ const part=st.beads.slice(i*w,i*w+w); return `<div class="mword write">${cardIcon(st.dict[code],46)}<span class="dbe">${[0,1].slice(0,w).map(j=>part[j]?bead(part[j],30):`<svg viewBox="0 0 40 40" width="30" height="30"><circle cx="20" cy="20" r="15" fill="#fff" stroke="#9fb4c9" stroke-width="3" stroke-dasharray="5 4"/></svg>`).join("")}</span></div>` }).join("")}</div>`;
+    h+=`<div class="apal"><button class="apc" data-k="P" style="background:${C.P[0]}" aria-label="Pembe boncuk"></button><button class="apc" data-k="M" style="background:${C.M[0]}" aria-label="Mavi boncuk"></button><button class="apc undo" data-k="" aria-label="Son boncuğu sil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button></div>`;
+    body.innerHTML=h;
+    body.querySelectorAll(".apc").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const k=b.dataset.k; if(!k) st.beads.pop(); else if(st.beads.length<L.msg.length*w) st.beads.push(k); sfx.place(); aRefresh() });
+  },
+  check(st){
+    const L=st.L;
+    if(L.m==="oku"){ if(st.ans.includes(null)) return "Her boncuk grubuna bir resim seç."; const bad=L.msg.findIndex((c,i)=>st.dict[c]!==st.ans[i]); return bad<0?true:`${bad+1}. kelime yanlış. Boncukların sırasına dikkat: pembe-mavi ile mavi-pembe farklı!` }
+    const w=L.msg[0].length; if(st.beads.length<L.msg.length*w) return "Bütün boncuk yerlerini doldur.";
+    const bad=L.msg.findIndex((c,i)=>st.beads.slice(i*w,i*w+w).join("")!==c); return bad<0?true:`${bad+1}. resmin kodu yanlış. Sözlüğe bak.`;
+  },
+  solved(st){ return this.check(st)===true },
+  auto(st){ if(st.L.m==="oku") st.ans=st.L.msg.map(c=>st.dict[c]); else st.beads=st.L.msg.join("").split(""); return true },
+  async solve(st){
+    const L=st.L;
+    if(L.m==="oku"){ for(let i=0;i<L.msg.length;i++){ st.sel=i; aGoal(`${L.msg[i].split("").map(c=>C[c][2]).join("-")} = ${NM[st.dict[L.msg[i]]]}`); st.ans[i]=st.dict[L.msg[i]]; sfx.place(); aRefresh(); await aWait(1000) } return }
+    for(const code of L.msg){ aGoal(`${NM[st.dict[code]]} = ${code.split("").map(c=>C[c][2]).join("-")}`); for(const c of code){ st.beads.push(c); sfx.place(); aRefresh(); await aWait(450) } await aWait(300) }
+  }
+});
+})();
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
@@ -2971,8 +3127,8 @@ const DURAKS=[
  {no:7,name:"Şifre Adası",kid:"Bu işaret ne demek? Nasıl gösteririm?",code:"B7 · Temsil ve sembol",color:"#1d3b6a",acts:[
    {t:"Koordinat Avı",d:"Önce harf, sonra rakam: B3. Kareleri bul, gizli resmi ortaya çıkar, resmi sayılarla boya.",lvl:"● ●●",age:"5-8 yaş",page:"65-73",open:()=>openActLevels("koord"),prog:(d=P())=>actProg("koord",d)},
    
-   {soon:1,t:"Kalem Bidik",d:"Bidik yürürken iz bıraksın: kodla şekil çiz.",lvl:"●●",page:72},
-   {soon:1,t:"İki Renkli Dil",d:"İki renkli boncuklarla gizli mesaj yaz ve çöz.",lvl:"●●",page:74}]}
+   {t:"Kalem Bidik",d:"Bilge Bidik'e kalem bağladı: yürüdüğü yerde çizgi kalır. Kodla çizgi, kare, merdiven çiz.",lvl:"●●",age:"6-9 yaş",page:72,open:()=>openActLevels("kalem"),prog:(d=P())=>actProg("kalem",d)},
+   {t:"İki Renkli Dil",d:"Bilge'nin mektupları pembe ve mavi boncuklarla yazılmış. Sözlükle çöz, kendi mesajını yaz.",lvl:"●●",age:"6-9 yaş",page:74,open:()=>openActLevels("ikili"),prog:(d=P())=>actProg("ikili",d)}]}
 ];
 const FINAL={name:"Çiçek Adası",kid:"Yedi tohumu getir, Büyük Çiçek'i yeniden aç. Bidik'in Bir Günü burada seni bekliyor.",page:"78-82"};
 const FLOWER=`<g transform="translate(50 46)">${[0,60,120,180,240,300].map(a=>`<ellipse cx="0" cy="-18" rx="11" ry="15" fill="#f49ac1" stroke="#fff" stroke-width="2.5" transform="rotate(${a})"/>`).join("")}<circle r="13" fill="#ffc93c" stroke="#d99a00" stroke-width="2.5"/><circle cx="-4.5" cy="-2" r="2" fill="#16324a"/><circle cx="4.5" cy="-2" r="2" fill="#16324a"/><path d="M-4.5 3.5 Q0 7 4.5 3.5" stroke="#16324a" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`;
