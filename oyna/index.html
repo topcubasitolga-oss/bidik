@@ -139,6 +139,51 @@ h1,h2,h3{text-wrap:balance}
 }
 /* telefon: Çalıştır düğmesi hep görünsün */
 @media (max-width:699px){ #yRun{position:sticky;bottom:12px;z-index:5} }
+/* bölge filmi */
+#film{position:fixed;inset:0;z-index:60;background:rgba(22,50,74,.72);display:grid;place-items:center;padding:12px}
+#film .fcard{width:min(100%,1280px,calc((100vh - 230px) * 16 / 9 + 28px));max-height:100%;overflow:auto;background:#fff;border-radius:24px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.fsteps{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.fsteps span{font-weight:800;font-size:13px;padding:4px 12px;border-radius:999px;background:#eef3f6;color:var(--ink-soft);transition:background .3s,color .3s}
+.fsteps span.on{background:var(--ink);color:#fff}
+.fstage{position:relative;aspect-ratio:16/9;border-radius:18px;overflow:hidden}
+.fbg{position:absolute;inset:0;width:100%;height:100%;transition:opacity 1.4s ease}
+.fbg.b1{opacity:0}
+#film.s1 .fbg.b0{animation:fzoom 9s ease-out both}
+#film.s3 .fbg.b1{opacity:1}#film.s3 .fbg.b0{opacity:0}
+@keyframes fzoom{from{transform:scale(1.12)}to{transform:scale(1)}}
+.fprops{position:absolute;left:6%;bottom:8%;display:flex;gap:2%;width:46%;transition:opacity .8s,transform .8s}
+.fprops svg{width:30%;animation:fbob 2.4s ease-in-out infinite;animation-delay:calc(var(--i)*.4s);filter:drop-shadow(0 4px 4px rgba(0,0,0,.18))}
+@keyframes fbob{50%{transform:translateY(-10%) rotate(-6deg)}}
+#film.s3 .fprops{opacity:0;transform:translateY(-40%) scale(.6)}
+.ffriend{position:absolute;right:4%;bottom:6%;width:22%;aspect-ratio:1;border-radius:50%;border:4px solid #fff;overflow:hidden;display:grid;place-items:center;box-shadow:0 6px 0 rgba(22,50,74,.18)}
+.ffriend svg{width:96%;height:96%;margin-top:8%}
+#film.s1 .ffriend{animation:fsad 1.6s ease-in-out infinite}
+#film.s3 .ffriend{animation:fjoy .7s ease-in-out infinite}
+@keyframes fsad{50%{transform:rotate(-6deg) translateY(3%)}}
+@keyframes fjoy{50%{transform:translateY(-12%) scale(1.05)}}
+.fbidik{position:absolute;left:30%;top:24%;width:26%;transform:translateX(-260%);transition:transform 1s cubic-bezier(.3,1.4,.5,1)}
+.fbidik svg{width:100%;filter:drop-shadow(0 8px 8px rgba(0,0,0,.2))}
+#film.s2 .fbidik,#film.s3 .fbidik{transform:none}
+#film.s3 .fbidik svg{animation:fjoy .8s ease-in-out infinite}
+.fprog{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);display:flex;gap:8px;background:rgba(255,255,255,.92);padding:8px;border-radius:16px;opacity:0;transition:opacity .4s}
+.fprog .fb{width:clamp(36px,8vw,62px);aspect-ratio:1;display:grid}
+#film.s2 .fprog{opacity:1}
+#film.s2 .fprog .fb{animation:fpop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(.6s + var(--i)*.55s)}
+@keyframes fpop{from{transform:scale(0) rotate(-20deg)}}
+.fska{position:absolute;left:50%;top:6%;transform:translateX(-50%);display:flex;gap:10px;opacity:0;transition:opacity .5s}
+#film.s3 .fska{opacity:1}
+#film.s3 .skab{animation:fpop .6s cubic-bezier(.3,1.6,.5,1) both}
+#film.s3 .skab:nth-child(2){animation-delay:.35s}
+.skab{background:var(--c);color:#fff;border-radius:14px;padding:6px 12px 8px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 0 rgba(0,0,0,.18);max-width:240px}
+.skab b{font-family:var(--display);font-size:34px;line-height:1}
+.skab span{font-weight:800;font-size:13px;line-height:1.15}
+.fspark i{position:absolute;left:var(--x);top:var(--y);width:10px;height:10px;background:#fff6a8;border-radius:50%;opacity:0;box-shadow:0 0 12px #ffe14d}
+#film.s3 .fspark i{animation:fspk 1.6s ease-in-out infinite;animation-delay:var(--d)}
+@keyframes fspk{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.2)}}
+.fcap{margin:0;min-height:3.2em;font-size:clamp(16px,2.3vw,21px);font-weight:700;line-height:1.35;color:var(--ink);text-align:center;text-wrap:balance}
+#film .btns{display:flex;gap:10px}#film .btns button{flex:1;height:52px;border-radius:16px;font-weight:800;font-size:17px}
+.filmbtn{background:var(--ink)!important;color:#fff!important}
+@media (max-width:520px){ .skab span{font-size:11px} .skab b{font-size:26px} .fska{gap:6px;width:94%;justify-content:center} }
 @media (prefers-reduced-motion:reduce){.balloon,.seedglow{animation:none}}
 .conts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media (min-width:700px){.conts{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -2344,7 +2389,8 @@ function openDurak(no){
   const h=$("dHead"); h.style.background=w.land;
   h.innerHTML=`<div class="scene">${sceneSVG(no,ok)}</div>
     <div class="dtext"><h2>${w.kita}</h2><p class="friend"><b>${w.friend}:</b> “${w.sorun}”</p><p class="sir">${w.sir}</p>
-    <div class="dmeta"><span class="code">${dk.code}</span><span class="code">${w.ska}</span><span class="seed">${seedTxt}</span></div></div>`;
+    <div class="dmeta"><span class="code">${dk.code}</span><span class="code">${w.ska}</span><span class="seed">${seedTxt}</span><button class="chip filmbtn" id="dFilm">▶ Filmi izle</button></div></div>`;
+  $("dFilm").onclick=()=>playFilm(no);
   const box=$("dActs"); box.innerHTML="";
   dk.acts.forEach(a=>{
     const pg=a.prog?a.prog():null, other=pg&&pg[1]===0;
@@ -2357,6 +2403,7 @@ function openDurak(no){
   });
   if(!box.children.length) box.innerHTML=`<p class="note" style="grid-column:1/-1;font-size:16px">${w.friend} bu seviye için henüz oyun hazırlamadı. Yakında!</p>`;
   $("dNote").textContent="● okul öncesi  ●● 1. sınıf  ●●● ileri düzey";
+  if(typeof FILM!=="undefined"&&FILM[no]&&!filmSeen(no)) setTimeout(()=>{ if(!$("durak").hidden&&curDurak===no) playFilm(no) },350);
 }
 // ---- Devam et: kaldığı bölgeden, seviyesine uygun ilk çözülmemiş bölüm ----
 function continuePlay(){
@@ -2365,9 +2412,113 @@ function continuePlay(){
     for(const a of dk.acts){ if(!a.play) continue; const p=a.play;
       const mode=p.mode, list=p.list||Array.from({length:p.to-p.from+1},(_,k)=>p.from+k), o=mode==="yol"||mode==="kod"?d[mode]:actData(mode,d);
       const n=list.find(k=>allowed(mode,k,d)&&!o[k]);
-      if(n){ d.lastIsle=no; save(); curDurak=no; if(mode==="yol") Yol.start(n); else if(mode==="kod") Kod.start(n); else startAct(mode,n); return }
+      if(n){ d.lastIsle=no; save(); curDurak=no; const go=()=>{ if(mode==="yol") Yol.start(n); else if(mode==="kod") Kod.start(n); else startAct(mode,n) }; if(typeof FILM!=="undefined"&&FILM[no]&&!filmSeen(no)) playFilm(no,go); else go(); return }
     } }
   openDurak(start);
+}
+// ===== Bölge filmi: Sorun → Görev → Dünyaya katkı (SKA) =====
+// Oyunun kendi çizimleriyle, kod içinde kısa animasyon. Ses: ses/<dosya>.mp3 varsa onu çalar, yoksa cihaz sesi.
+const SKA={
+  1:["Yoksulluğa Son","#E5243B"],2:["Açlığa Son","#DDA63A"],3:["Sağlık ve Kaliteli Yaşam","#4C9F38"],4:["Nitelikli Eğitim","#C5192D"],
+  5:["Toplumsal Cinsiyet Eşitliği","#FF3A21"],6:["Temiz Su ve Sanitasyon","#26BDE2"],7:["Erişilebilir ve Temiz Enerji","#FCC30B"],
+  8:["İnsana Yakışır İş ve Ekonomik Büyüme","#A21942"],9:["Sanayi, Yenilikçilik ve Altyapı","#FD6925"],10:["Eşitsizliklerin Azaltılması","#DD1367"],
+  11:["Sürdürülebilir Şehirler ve Topluluklar","#FD9D24"],12:["Sorumlu Üretim ve Tüketim","#BF8B2E"],13:["İklim Eylemi","#3F7E44"],
+  14:["Sudaki Yaşam","#0A97D9"],15:["Karasal Yaşam","#56C02B"],16:["Barış, Adalet ve Güçlü Kurumlar","#00689D"],17:["Amaçlar için Ortaklıklar","#19486A"]};
+const skaNums=no=>(WORLD[no].ska.match(/\d+/g)||[]).map(Number);
+// her bölge: görev cümlesi, katkı cümlesi, görevi anlatan bloklar, sorunu canlandıran nesneler
+const FILM={
+  1:{gorev:"Görevin: Yol parçalarıyla Bidik'in evinden okula ve parka güvenli bir yol kur.",
+     katki:"Güvenli yollar ve bisiklet yolları, herkesin rahatça yaşadığı bir şehir demek. Böylece Amaç 11'e, Sürdürülebilir Şehirler ve Topluluklar'a katkı sağlarsın.",
+     blocks:["yol-duz","yol-viraj","yol-duz"],props:["koni","koni","koni"]},
+  2:{gorev:"Görevin: Bloklarla Bidik'e yol göster, göletteki bütün çöpleri topla.",
+     katki:"Temiz su bütün canlılar için hayat demek. Göleti temizleyerek Amaç 6, Temiz Su ve Amaç 14, Sudaki Yaşam için çalışırsın.",
+     blocks:["F","F","R"],props:["sise","teneke","poset"]},
+  3:{gorev:"Görevin: Bidik'i bütün solgun çiçeklere götür, arılar için polen taşısın.",
+     katki:"Arılar çiçekleri tozlaştırınca meyve ve sebze yetişir. Böylece Amaç 15, Karasal Yaşam ve Amaç 2, Açlığa Son için çalışırsın.",
+     blocks:["F","3","F"],props:["solcicek","solcicek","solcicek"]},
+  4:{gorev:"Görevin: Bidik'i çukurlara götür ve Fidan dik bloğuyla ağaç dik.",
+     katki:"Ağaçlar havayı temizler, iklimi korur, hayvanlara yuva olur. Böylece Amaç 13, İklim Eylemi ve Amaç 15, Karasal Yaşam için çalışırsın.",
+     blocks:["F","D","R"],props:["kutuk","kutuk","kutuk"]},
+  5:{gorev:"Görevin: Her atığı aynı renkli kutuya taşı. Plastik sarıya, kâğıt maviye, cam yeşile.",
+     katki:"Ayrı toplanan atık yeniden kullanılır, dünya daha az kirlenir. Böylece Amaç 12, Sorumlu Üretim ve Tüketim için çalışırsın.",
+     blocks:["F","R","F"],props:["w:sari","w:mavi","w:yesil"]},
+  6:{gorev:"Görevin: En kısa yoldan git, boşuna yanan lambaları söndür, enerjiyi koru.",
+     katki:"Enerjiyi boşa harcamamak havamızı ve iklimimizi korur. Böylece Amaç 7, Temiz Enerji ve Amaç 13, İklim Eylemi için çalışırsın.",
+     blocks:["F","L","2"],props:["lamba","lamba","lamba"]},
+  7:{gorev:"Görevin: Sulama programındaki hatayı bul, düzelt ve tarlayı sula.",
+     katki:"Suyu boşa harcamadan doğru yere vermek, herkese yetecek yiyecek demek. Böylece Amaç 6, Temiz Su ve Amaç 2, Açlığa Son için çalışırsın.",
+     blocks:["F","R","F"],props:["kuru","kuru","kuru"]}
+};
+// ses: önce kayıt (ElevenLabs), yoksa cihaz sesi; bitince ya da süre dolunca devam
+// ses/ klasörüne eklenen kayıtların adları (ElevenLabs dosyaları gelince doldurulur); listede olmayan satır cihaz sesiyle okunur
+const SES_DOSYA=new Set([]);
+let filmAudio=null;
+function sayLine(file,text){
+  return new Promise(res=>{
+    const min=Math.max(4200,text.length*64);
+    let done=false; const fin=()=>{ if(!done){ done=true; res() } };
+    const fallback=()=>{ Voice.say(text,true); setTimeout(fin,min) };
+    if(!db.sound){ setTimeout(fin,min); return }
+    if(!SES_DOSYA.has(file)){ fallback(); return }
+    try{
+      const a=new Audio(`ses/${file}.mp3`); filmAudio=a;
+      a.onended=()=>setTimeout(fin,400);
+      a.onerror=()=>{ if(filmAudio===a) fallback() };
+      a.play().catch(()=>{ if(filmAudio===a&&!a.error) fallback() });
+    }catch(e){ fallback() }
+  });
+}
+function stopFilmAudio(){ try{ if(filmAudio){ filmAudio.onended=null; filmAudio.onerror=null; filmAudio.pause() } }catch(e){} filmAudio=null; Voice.stop() }
+function propArt(k){
+  const G=window.__gorev||{ART:{},waste:{}};
+  if(k.startsWith("w:")) return G.waste[k.slice(2)]||"";
+  if(k==="koni") return `<path d="M50 14 L74 84 H26Z" fill="#f08a24" stroke="#c4621a" stroke-width="3"/><path d="M40 46 H60 M34 64 H66" stroke="#fff" stroke-width="7"/><rect x="18" y="82" width="64" height="8" rx="3" fill="#c4621a"/>`;
+  return G.ART[k]||"";
+}
+function filmBlock(t){
+  if(t==="yol-duz") return `<span class="blk" style="background:#6b7685"><svg viewBox="0 0 24 24"><path d="M12 3v18" stroke="#fff" stroke-width="2.4" stroke-dasharray="3 3"/></svg></span>`;
+  if(t==="yol-viraj") return `<span class="blk" style="background:#6b7685"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22 A10 10 0 0 1 22 12" stroke="#fff" stroke-width="2.4" stroke-dasharray="3 3"/></svg></span>`;
+  if(t==="D") return window.__gorev&&window.__gorev.bH?window.__gorev.bH("D"):blkHTML("F");
+  return blkHTML(t);
+}
+function skaBadge(n){ const s=SKA[n]; return `<div class="skab" style="--c:${s[1]}"><b>${n}</b><span>${s[0]}</span></div>` }
+function filmSeen(no){ return !!(P().seen||{})["film"+no] }
+function playFilm(no,then){
+  const w=WORLD[no], F=FILM[no]; if(!w||!F){ then&&then(); return }
+  const d=P(); d.seen=d.seen||{}; d.seen["film"+no]=1; save();
+  const [x,y]=PLACE[no], vb=`${x-160} ${y-92} 320 180`;
+  let el=$("film"); if(!el){ el=document.createElement("div"); el.id="film"; document.body.appendChild(el) }
+  const nums=skaNums(no);
+  el.innerHTML=`<div class="fcard" role="dialog" aria-modal="true" aria-label="${w.kita} filmi">
+    <div class="fsteps"><span data-s="1">1 · Sorun</span><span data-s="2">2 · Görev</span><span data-s="3">3 · Dünyaya katkı</span></div>
+    <div class="fstage" style="background:${w.sky[1]}">
+      <svg class="fbg b0" viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${regionArt(no,false)}</svg>
+      <svg class="fbg b1" viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${regionArt(no,true)}</svg>
+      <div class="fprops">${F.props.map((p,i)=>`<svg viewBox="0 0 100 100" style="--i:${i}">${propArt(p)}</svg>`).join("")}</div>
+      <div class="ffriend" style="background:${w.land}">${animalSVG(no)}</div>
+      <div class="fbidik"><svg viewBox="-50 -50 100 100"><g transform="rotate(0) scale(1.3)">${ROBOT}</g></svg></div>
+      <div class="fprog">${F.blocks.map((t,i)=>`<span class="fb" style="--i:${i}">${filmBlock(t)}</span>`).join("")}</div>
+      <div class="fska">${nums.map(skaBadge).join("")}</div>
+      <div class="fspark">${Array.from({length:14},(_,i)=>`<i style="--x:${(i*37)%100}%;--y:${(i*53)%80+5}%;--d:${(i%7)*.18}s"></i>`).join("")}</div>
+    </div>
+    <p class="fcap" aria-live="polite"></p>
+    <div class="btns"><button class="btn-alt" id="fSkip">Geç</button><button class="btn-main" id="fGo" hidden>Hadi başlayalım!</button></div>
+  </div>`;
+  el.hidden=false; el.className="";
+  const cap=el.querySelector(".fcap"); let alive=true;
+  const step=s=>{ el.className="s"+s; el.querySelectorAll(".fsteps span").forEach(e=>e.classList.toggle("on",+e.dataset.s===s)) };
+  const end=()=>{ if(!alive) return; alive=false; stopFilmAudio(); el.hidden=true; el.innerHTML=""; then&&then() };
+  $("fSkip").onclick=end; $("fGo").onclick=end;
+  (async()=>{
+    step(1); cap.innerHTML=`<b>${w.friend}:</b> “${w.sorun}”`; friendChirp&&setTimeout(()=>alive&&friendChirp(no),300);
+    await sayLine(`film-${no}-sorun`,w.sorun); if(!alive) return;
+    step(2); cap.innerHTML=`<b>Bidik:</b> ${F.gorev}`; sfx.place&&sfx.place();
+    await sayLine(`film-${no}-gorev`,F.gorev); if(!alive) return;
+    step(3); cap.innerHTML=`<b>Dünyaya katkın:</b> ${F.katki}`; sfx.win&&sfx.win();
+    await sayLine(`film-${no}-katki`,F.katki); if(!alive) return;
+    $("fSkip").textContent="Tekrar izle"; $("fSkip").onclick=()=>{ alive=false; stopFilmAudio(); playFilm(no,then) };
+    $("fGo").hidden=false; $("fGo").focus();
+  })();
 }
 // ===== İki Kod Yarışıyor (Tarla · iki sulama robotu) =====
 (function(){
