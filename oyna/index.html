@@ -3574,7 +3574,7 @@ function openLevels(mode,opts){
     lv.forEach((n,j)=>{
       const b=document.createElement("button"), st=d[n]||0;
       const open= c.list? (BETA_ALL_OPEN||teacherOn()||j===0||!!d[lv[j-1]]||!!d[n]) : unlocked(mode,n);
-      b.className="lv"+(st?" done":"")+(open?"":" locked");
+      const okLv=allowed(mode,n); b.className="lv"+(st?" done":"")+(open&&okLv?"":" locked")+(okLv?"":" other");
       let badge="";
       if(mode==="kod"&&Kod.isBug(n)&&!c.list) badge=`<span class="badge" title="Hata avcısı">!</span>`;
       if(mode==="yol"&&Object.values(Yol.UNLOCK).includes(n)) badge=`<span class="badge" title="Yeni parça">+</span>`;
