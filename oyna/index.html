@@ -13,11 +13,12 @@
 :root{
   --sky:#dff4f1; --sky-deep:#b9e4de;
   --ink:#16324a; --ink-soft:#466179;
-  --board:#2fae9f; --board-edge:#1f8577;
-  --tile:#5cc9bb; --tile-2:#53bfb1; --tile-dot:#45ad9f;
+  --board:#5aa84c; --board-edge:#3d8a3a;
+  --tile:#a8dc8a; --tile-2:#9ed37f; --tile-dot:#86c26a;
+  --road:#6b7685; --road-edge:#4d5866; --road-dash:#ffffff;
   --block:#1d5b78; --block-hi:#2f7698;
   --rail:#ffc93c; --rail-edge:#d99a00; --rail-dash:#e2742b;
-  --cross:#a9dcf3; --cross-edge:#6fb8da;
+  --cross:#8a96a6; --cross-edge:#6b7685;
   --water:#3b86d9; --water-hi:#8cc4f5;
   --wood:#b97a44; --wood-dark:#7d4c22;
   --tunnel:#7b55c7; --tunnel-dark:#3a2466;
@@ -747,19 +748,32 @@ function show(id){SCREENS.forEach(s=>$(s).hidden=s!==id);$("overlay").hidden=tru
 document.querySelectorAll("[data-home]").forEach(b=>b.onclick=goHome);
 
 // çizim parçaları
-function railPath(d){return `<path d="${d}" stroke="var(--rail-edge)" stroke-width="50" fill="none"/><path d="${d}" stroke="var(--rail)" stroke-width="42" fill="none"/><path d="${d}" stroke="var(--rail-dash)" stroke-width="4" stroke-dasharray="9 8" fill="none"/>`}
+function railPath(d){return `<path d="${d}" stroke="var(--road-edge)" stroke-width="52" fill="none"/><path d="${d}" stroke="var(--road)" stroke-width="42" fill="none"/><path d="${d}" stroke="var(--road-dash)" stroke-width="4" stroke-dasharray="10 9" fill="none"/>`}
 function star8(fill){let s="";for(let k=0;k<16;k++){const rr=k%2?32:46,a=Math.PI*k/8-Math.PI/2;s+=`${(50+rr*Math.cos(a)).toFixed(1)},${(50+rr*Math.sin(a)).toFixed(1)} `}return `<polygon points="${s}" fill="${fill}" stroke="#a8261e" stroke-width="3" stroke-linejoin="round"/>`}
 function waterArt(){return `<rect x="2" y="2" width="96" height="96" rx="12" fill="var(--water)"/><path d="M14 34q9-8 18 0t18 0 18 0 18 0M14 62q9-8 18 0t18 0 18 0 18 0" stroke="var(--water-hi)" stroke-width="5" fill="none" stroke-linecap="round"/>`}
-function tileBg(i,N){return `<rect x="3" y="3" width="94" height="94" rx="14" fill="${((i%N)+((i/N)|0))%2?"var(--tile)":"var(--tile-2)"}"/><g fill="var(--tile-dot)"><circle cx="20" cy="20" r="3"/><circle cx="80" cy="20" r="3"/><circle cx="20" cy="80" r="3"/><circle cx="80" cy="80" r="3"/></g>`}
-function blockArt(v){return v?`<path d="M50 8 L92 50 L50 92 L8 50Z" fill="var(--block)" stroke="var(--block-hi)" stroke-width="4" stroke-linejoin="round"/><path d="M50 22 L78 50 L50 78 L22 50Z" fill="var(--block-hi)" opacity=".5"/>`:`<rect x="12" y="12" width="76" height="76" rx="10" fill="var(--block)" stroke="var(--block-hi)" stroke-width="4"/><path d="M12 88 Q12 12 88 12" stroke="var(--block-hi)" stroke-width="6" fill="none"/>`}
-function finishArt(i){return `<g class="finish"><ellipse cx="50" cy="88" rx="30" ry="5" fill="#16324a" opacity=".12"/>
-  <path d="M50 58 V86" stroke="#22a165" stroke-width="5" stroke-linecap="round"/>
-  <path d="M50 78 Q38 72 33 76 Q40 84 50 80Z" fill="#22a165"/><path d="M50 71 Q62 65 67 69 Q60 77 50 73Z" fill="#22a165"/>
-  <g transform="translate(50 42)"><g class="petals">${[0,60,120,180,240,300].map(a=>`<ellipse cx="0" cy="-18" rx="11" ry="15" fill="#f49ac1" stroke="#fff" stroke-width="2.5" transform="rotate(${a})"/>`).join("")}</g>
-  <circle r="13" fill="#ffc93c" stroke="#d99a00" stroke-width="2.5"/>
-  <circle cx="-4.5" cy="-2" r="2" fill="#16324a"/><circle cx="4.5" cy="-2" r="2" fill="#16324a"/>
-  <path d="M-4.5 3.5 Q0 7 4.5 3.5" stroke="#16324a" stroke-width="1.8" fill="none" stroke-linecap="round"/></g></g>`}
-const coinArt=`<g class="coin"><circle cx="50" cy="50" r="15" fill="#ffe27a" stroke="var(--rail-edge)" stroke-width="4"/><path d="M50 42v16" stroke="var(--rail-edge)" stroke-width="4" stroke-linecap="round"/></g>`;
+function tileBg(i,N){return `<rect x="3" y="3" width="94" height="94" rx="14" fill="${((i%N)+((i/N)|0))%2?"var(--tile)":"var(--tile-2)"}"/><path d="M16 26 l3 -7 l3 7 M74 82 l3 -7 l3 7 M70 20 l2 -5 l2 5" stroke="var(--tile-dot)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`}
+function blockArt(v,i){
+  i=i||0;
+  if(v){ return `<ellipse cx="50" cy="86" rx="38" ry="7" fill="#16324a" opacity=".12"/><rect x="46" y="58" width="8" height="26" fill="#7a4a20"/><circle cx="50" cy="40" r="28" fill="#3d8a4a"/><circle cx="30" cy="56" r="17" fill="#4a9a54"/><circle cx="70" cy="56" r="17" fill="#4a9a54"/><circle cx="40" cy="30" r="8" fill="#fff" opacity=".18"/>` }
+  const k=i%4, roofs=["#e8443a","#2f7fd8","#8a5cd6","#f08a24"];
+  if(k===1) return `<ellipse cx="50" cy="92" rx="34" ry="5" fill="#16324a" opacity=".12"/><rect x="22" y="12" width="56" height="78" rx="4" fill="#f3d6b5" stroke="#c98a52" stroke-width="3"/><rect x="22" y="12" width="56" height="8" fill="#c98a52"/>${[24,42,60].map(y=>[30,48,62].map(x=>`<rect x="${x}" y="${y}" width="9" height="10" fill="#7fd0ea" stroke="#fff" stroke-width="1.5"/>`).join("")).join("")}<rect x="43" y="74" width="14" height="16" fill="#b5743c"/>`;
+  if(k===3) return `<ellipse cx="50" cy="90" rx="42" ry="6" fill="#16324a" opacity=".12"/><rect x="24" y="40" width="52" height="40" fill="#fff6e6" stroke="#d9b56a" stroke-width="3"/><path d="M16 42 L50 14 L84 42Z" fill="#22a165" stroke="#16794a" stroke-width="2" stroke-linejoin="round"/><rect x="43" y="56" width="14" height="24" fill="#b5743c"/><rect x="29" y="50" width="10" height="10" fill="#7fd0ea"/><path d="M6 88 H94 M10 78 V92 M24 78 V92 M76 78 V92 M90 78 V92" stroke="#fff" stroke-width="3"/><circle cx="14" cy="70" r="6" fill="#e0457b"/><circle cx="86" cy="70" r="6" fill="#ffc93c"/>`;
+  return `<ellipse cx="50" cy="90" rx="42" ry="6" fill="#16324a" opacity=".12"/><rect x="16" y="44" width="68" height="44" fill="#fff6e6" stroke="#d9b56a" stroke-width="3"/><path d="M8 46 L50 10 L92 46Z" fill="${roofs[(i>>2)%4]}" stroke="#16324a" stroke-opacity=".25" stroke-width="2" stroke-linejoin="round"/><rect x="42" y="62" width="16" height="26" fill="#b5743c"/><rect x="22" y="54" width="14" height="14" fill="#7fd0ea" stroke="#fff" stroke-width="2"/><rect x="64" y="54" width="14" height="14" fill="#7fd0ea" stroke="#fff" stroke-width="2"/>`;
+}
+// hedef binalar (bitiş): okul, park, hastane, kütüphane, market
+let DEST=0;
+const DESTS=[{ad:"okul",yon:"okula"},{ad:"park",yon:"parka"},{ad:"hastane",yon:"hastaneye"},{ad:"kütüphane",yon:"kütüphaneye"},{ad:"pazar",yon:"pazara"}];
+function destArt(k){
+  const flag=`<path d="M80 40 V6" stroke="#16324a" stroke-width="3"/><path d="M80 6 L98 12 L80 18Z" fill="#e8443a"/>`;
+  if(k===0) return `<rect x="10" y="40" width="80" height="50" fill="#ffd9a8" stroke="#c98f2c" stroke-width="3"/><path d="M4 42 L50 12 L96 42Z" fill="#2f7fd8"/><rect x="42" y="62" width="16" height="28" fill="#7a5eb0"/>${[18,30,62,74].map(x=>`<rect x="${x}" y="52" width="8" height="8" fill="#7fd0ea"/>`).join("")}<path d="M50 12 V0 L62 4 L50 8" fill="#e8443a" stroke="#16324a" stroke-width="1.5"/>`;
+  if(k===1) return `<rect x="6" y="40" width="88" height="52" rx="10" fill="#7cc35a"/><path d="M14 92 V64 H40 L52 40" stroke="#e0457b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M60 92 V60 a12 12 0 0 1 24 0 V92" stroke="#2f7fd8" stroke-width="5" fill="none"/><path d="M60 72 H84" stroke="#2f7fd8" stroke-width="4"/><circle cx="26" cy="30" r="16" fill="#3d8a4a"/><rect x="23" y="40" width="6" height="12" fill="#7a4a20"/>${flag}`;
+  if(k===2) return `<rect x="8" y="24" width="84" height="66" rx="4" fill="#fff" stroke="#c9d3de" stroke-width="3"/><rect x="38" y="30" width="24" height="24" rx="4" fill="#e8443a"/><path d="M50 34 V50 M42 42 H58" stroke="#fff" stroke-width="6"/><rect x="40" y="66" width="20" height="24" fill="#7fd0ea"/>${[16,72].map(x=>`<rect x="${x}" y="62" width="12" height="12" fill="#7fd0ea"/>`).join("")}`;
+  if(k===3) return `<rect x="10" y="34" width="80" height="56" fill="#efe8ff" stroke="#7a5eb0" stroke-width="3"/><path d="M4 36 L50 10 L96 36Z" fill="#7a5eb0"/>${[18,32,46,60,74].map(x=>`<rect x="${x}" y="44" width="8" height="40" fill="#d3c3f2"/>`).join("")}<rect x="22" y="56" width="10" height="16" fill="#e8443a"/><rect x="34" y="58" width="8" height="14" fill="#2f7fd8"/><rect x="62" y="56" width="10" height="16" fill="#22a165"/>`;
+  return `<rect x="10" y="40" width="80" height="50" fill="#fff6e6" stroke="#d9b56a" stroke-width="3"/><path d="M6 40 L16 20 H84 L94 40Z" fill="#f08a24"/>${[12,32,52,72].map((x,j)=>`<path d="M${x} 40 a8 8 0 0 0 16 0" fill="${j%2?"#fff":"#ffc93c"}"/>`).join("")}<circle cx="30" cy="70" r="8" fill="#e8443a"/><circle cx="50" cy="70" r="8" fill="#ffc93c"/><circle cx="70" cy="70" r="8" fill="#22a165"/>`;
+}
+const homeArt=`<ellipse cx="50" cy="90" rx="40" ry="6" fill="#16324a" opacity=".14"/><rect x="18" y="46" width="64" height="42" fill="#fff6e6" stroke="#d9b56a" stroke-width="3"/><path d="M8 48 L50 12 L92 48Z" fill="#e8443a" stroke="#a8261e" stroke-width="3" stroke-linejoin="round"/><circle cx="36" cy="34" r="4.5" fill="#16324a"/><circle cx="60" cy="30" r="4.5" fill="#16324a"/><circle cx="52" cy="42" r="4" fill="#16324a"/><rect x="42" y="62" width="16" height="26" fill="#b5743c"/><circle cx="74" cy="76" r="11" fill="#22a165" stroke="#fff" stroke-width="3"/><path d="M71 70 L80 76 L71 82Z" fill="#fff"/>`;
+function finishArt(i){return `<g class="finish"><circle cx="50" cy="52" r="46" fill="#fff7c2" opacity=".85"/><circle cx="50" cy="52" r="45" fill="none" stroke="#ffc93c" stroke-width="4" stroke-dasharray="8 6"/><g transform="translate(8 8) scale(.84)">${destArt(DEST)}</g><g transform="translate(70 4)"><path d="M4 30 V2" stroke="#16324a" stroke-width="3"/><path d="M4 2 L24 8 L4 14Z" fill="#e8443a"/></g></g>`}
+const coinArt=`<g class="coin"><ellipse cx="50" cy="84" rx="16" ry="4" fill="#16324a" opacity=".15"/><rect x="47" y="52" width="6" height="32" fill="#5f7489"/><path d="M30 34 a20 20 0 0 1 40 0 V56 H30Z" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="3"/><rect x="38" y="38" width="24" height="5" rx="2" fill="#16324a"/><path d="M70 30 V16 H82 V24 H70" fill="#e8443a"/></g>`;
 const keyArt=`<g class="key" transform="translate(50 50) rotate(-35)"><circle cx="-10" cy="0" r="11" fill="#ffd23f" stroke="#a87700" stroke-width="4"/><circle cx="-10" cy="0" r="4" fill="var(--tile)"/><rect x="0" y="-4" width="24" height="8" rx="3" fill="#ffd23f" stroke="#a87700" stroke-width="3"/><rect x="14" y="2" width="5" height="9" fill="#ffd23f" stroke="#a87700" stroke-width="2"/></g>`;
 const LOCK=`<g transform="translate(76 6)"><rect width="18" height="15" y="7" rx="3" fill="var(--ink)"/><path d="M3.5 8V5a5.5 5.5 0 0 1 11 0v3" stroke="var(--ink)" stroke-width="2.6" fill="none"/></g>`;
 const ROBOT=`<g class="robot" transform="translate(-6 0) scale(.8)">
@@ -899,7 +913,7 @@ function features(n){
 }
 const INTRO={
   1:{kicker:"Yol Kur",title:"Yolu sen kur",text:"Aşağıdan bir parça seç, boş kareye dokun. Parçaya tekrar dokunursan döner. Hazır olunca Çalıştır'a bas.",art:railPath("M0 50 Q50 50 50 100")},
-  4:{kicker:"Yeni hedef",title:"Altınları topla",text:"Altın olan kareler yolun üstünde olmalı. Bidik bitişe varmadan hepsinden geçmeli.",art:coinArt},
+  4:{kicker:"Yeni hedef",title:"Posta kutuları",text:"Bidik bugün postacı! Yol bütün posta kutularının önünden geçmeli; Bidik hedefe varmadan hepsine mektup bırakır.",art:coinArt},
   6:{kicker:"Yeni parça",title:"Köprü",text:"Tahtada nehir var. Suyun üstüne sadece köprü konur, Bidik ancak köprüden karşıya geçer.",art:waterArt()+pieceArt({type:"B",rot:0})},
   8:{kicker:"Yeni parça",title:"Kavşak",text:"Kavşakta Bidik hep dümdüz gider. Yolun kendi üstünden çapraz geçmesini sağlar.",art:pieceArt({type:"X",rot:0})},
   14:{kicker:"Yeni parça",title:"Çift viraj",text:"Tek karede iki ayrı viraj. Bidik bu kareden bir kez bir yana, sonra bir kez öbür yana dönerek geçebilir.",art:pieceArt({type:"D",rot:0})},
@@ -1051,7 +1065,7 @@ function pieceArt(p){
     return s+`<rect x="22" y="0" width="7" height="100" fill="var(--wood-dark)"/><rect x="71" y="0" width="7" height="100" fill="var(--wood-dark)"/></g>`;
   }
   if(p.type==="D"){
-    const ps=pairs(p); const narrow=d=>`<path d="${d}" stroke="var(--rail-edge)" stroke-width="34" fill="none"/><path d="${d}" stroke="var(--rail)" stroke-width="27" fill="none"/><path d="${d}" stroke="var(--rail-dash)" stroke-width="3" stroke-dasharray="7 7" fill="none"/>`;
+    const ps=pairs(p); const narrow=d=>`<path d="${d}" stroke="var(--road-edge)" stroke-width="34" fill="none"/><path d="${d}" stroke="var(--road)" stroke-width="27" fill="none"/><path d="${d}" stroke="var(--road-dash)" stroke-width="3" stroke-dasharray="7 7" fill="none"/>`;
     return ps.map(([a,b])=>narrow(`M${EDGE[a]} Q50 50 ${EDGE[b]}`)).join("");
   }
   const [[a,b]]=pairs(p);
@@ -1066,11 +1080,11 @@ function cellSVG(c,i){
   const N=L.N, x=(i%N)*100, y=((i/N)|0)*100, water=L.terrain[i]==="water";
   let g=`<g class="cell" data-i="${i}" transform="translate(${x} ${y})">`;
   g+= water? waterArt() : tileBg(i,N);
-  if(c.kind==="obstacle") g+=blockArt(c.v);
+  if(c.kind==="obstacle") g+=blockArt(c.v,i);
   if(c.kind==="piece"){ g+=pieceArt(c); if(c.oneway!=null) g+=onewayArt(c.oneway); if(c.gate) g+=`<g class="gate" transform="rotate(${pairs(c)[0][0]%2?0:90} 50 50)">${gateArt}</g>`; if(c.fixed&&!c.gate&&c.oneway==null) g+=LOCK; }
   if(c.kind==="start"||c.kind==="finish"){
     g+=railPath(`M50 50 L${EDGE[c.dir]}`);
-    if(c.kind==="start") g+=star8("var(--red)")+`<circle cx="50" cy="50" r="22" fill="#fff" stroke="var(--ink)" stroke-width="3"/><path d="M43 39 L61 50 L43 61Z" fill="var(--green)"/>`;
+    if(c.kind==="start") g+=homeArt;
     else g+=finishArt(i);
   }
   if(c.kind==="tunnel") g+=railPath(`M50 50 L${EDGE[c.dir]}`)+tunnelArt(c.dir);
@@ -1086,7 +1100,7 @@ function toolIcon(k){
 }
 function start(n,keep,daily){
   isDaily=!!daily;
-  L=daily?makeLevel(n,daily):makeLevel(n); grid=L.cells.map(c=>({...c}));
+  L=daily?makeLevel(n,daily):makeLevel(n); grid=L.cells.map(c=>({...c})); DEST=(n+(daily?1:0))%DESTS.length;
   if(!keep){tries=0;hints=0}
   running=false;failCell=-1;tool="S";
   show("yol");
@@ -1098,8 +1112,8 @@ function start(n,keep,daily){
 function setGoal(msg,cls){
   const g=$("yGoal"); g.className="goal"+(cls?" "+cls:"");
   if(msg){g.textContent=msg;return}
-  const parts=["Çiçeğe giden yolu kur"];
-  if(L.coins.length) parts.push(`${L.coins.length} altının hepsinden geç`);
+  const parts=[`Bidik'in evinden ${DESTS[DEST].yon} yol yap`];
+  if(L.coins.length) parts.push(`${L.coins.length} posta kutusunun hepsine uğra`);
   if(L.key>=0) parts.push("kapıdan önce anahtarı al");
   if(L.terrain.includes("water")) parts.push("nehri köprüyle aş");
   if(L.hasTunnel) parts.push("tüneli kullan");
@@ -1156,7 +1170,7 @@ function simulate(){
       if(c.dir!==ent) return {ok:false,segs,fail:ni,why:"Bitişe yanlış taraftan gelindi."};
       segs.push({i:ni,a:ent,b:null});
       const missing=L.coins.filter(k=>!seen.has(k));
-      if(missing.length) return {ok:false,segs,fail:missing[0],why:`Bitişe vardın ama ${missing.length} altın alınmadı.`};
+      if(missing.length) return {ok:false,segs,fail:missing[0],why:`Hedefe vardın ama ${missing.length} posta kutusuna uğramadın.`};
       return {ok:true,segs};
     }
     if(c.kind==="tunnel"){
@@ -1221,7 +1235,7 @@ function win(){
   const stars=1+(first?1:0)+(minimal?1:0), n=L.n;
   if(isDaily){ const d=P(); const key=todayKey(); d.daily[key]=Math.max(d.daily[key]||0,stars); save(); }
   else { const d=P().yol; if((d[n]||0)<stars){d[n]=stars;save()} }
-  setGoal("Harika! Bidik çiçeğe ulaştı.","good");
+  setGoal(`Harika! Bidik ${DESTS[DEST].yon} ulaştı.`,"good");
   document.querySelectorAll("#yBoard .finish").forEach(e=>e.classList.add("bloom"));
   winCard({stars,checks:[[true,"Bidik bitişe ulaştı"],[first,"İlk denemede, ipucusuz"],[minimal,`En az parçayla (${used} / ${L.best})`]],
     msg:stars===3?"Kusursuz plan!":!minimal?"Daha kısa bir yol bulabilir misin?":"Çalıştırmadan önce yolu parmağınla izlemeyi dene.",
@@ -1366,7 +1380,7 @@ function execute(lv,prog,maxSteps=200){
   if(st) return {...base,ok:false,fail:steps.length-1,why:st.why,cell:at};
   if(!steps.length) return {...base,ok:false,fail:-1,why:"Program boş. Önce aşağıdan blok ekle."};
   const miss=lv.coins.length-got.size;
-  return {...base,ok:false,fail:steps.length-1,why: at===lv.fin?`Bitiştesin ama ${miss} altın eksik.`:"Program bitti ama Bidik bitişe ulaşmadı.",cell:at};
+  return {...base,ok:false,fail:steps.length-1,why: at===lv.fin?`Hedeftesin ama ${miss} posta kutusu eksik.`:"Program bitti ama Bidik bitişe ulaşmadı.",cell:at};
 }
 
 // --- bölüm üretici ---
@@ -1507,6 +1521,7 @@ let L=null, prog=null, active="main", tries=0, hints=0, sess=null, anim=null, is
 function start(n,daily){
   isDaily=!!daily;
   L=daily?makeLevel(n,daily):makeLevel(n);
+  DEST=(n+(daily?2:0))%DESTS.length;
   prog=L.pre?{main:L.pre.main.slice(),fn:L.pre.fn.slice()}:{main:[],fn:[]};
   active="main"; tries=0; hints=0; stop();
   show("kod");
@@ -1530,7 +1545,7 @@ function goal(msg,cls){
     g.textContent=`Bidik ${parts.join(", ")} dönmeli. “Eğer” ve “∞” bloklarıyla tek bir kural yaz.`; return;
   }
   if(L.sensor){g.textContent="Bidik duvara gelince dönmeli. “Eğer önü kapalı” bloğuyla kural yaz.";return}
-  g.textContent=(L.coins.length?`${L.coins.length} altını topla ve `:"")+"çiçeğe ulaş."+(L.rel?" Sağ ve sol Bidik'e göredir.":"")+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":"");
+  g.textContent=(L.coins.length?`${L.coins.length} posta kutusuna uğra ve `:"")+`${DESTS[DEST].yon} ulaş.`+(L.rel?" Sağ ve sol Bidik'e göredir.":"")+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":"");
 }
 const used=()=>prog.main.length+prog.fn.length;
 function statsK(){$("kTries").textContent="Deneme: "+tries;$("kHints").textContent="İpucu: "+hints;$("kBlocks").textContent=`Blok: ${used()} · En iyi: ${L.ideal}`}
@@ -1544,7 +1559,7 @@ function renderBoard(){
     g+=`<g class="cell" transform="translate(${x} ${y})">`+(c.kind==="water"?waterArt():tileBg(i,N));
     const pt=L.paint&&L.paint[i];
     if(pt) g+=`<rect x="8" y="8" width="84" height="84" rx="12" fill="${pt==="A"?TILE_A:TILE_Y}"/><rect x="8" y="8" width="84" height="84" rx="12" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="6 7" opacity=".8"/>`;
-    if(c.kind==="block") g+=blockArt(c.v);
+    if(c.kind==="block") g+=blockArt(c.v,i);
     if(i===L.start) g+=`<g opacity=".9">${star8("var(--green)").replace("#a8261e","#16794a")}</g>`;
     if(i===L.fin) g+=finishArt(i);
     if(L.coins.includes(i)) g+=`<g data-coin="${i}">${coinArt}</g>`;
@@ -1695,7 +1710,7 @@ function win(){
   const stars=1+(first?1:0)+(minimal?1:0);
   if(isDaily){ const d=P(), key=todayKey(); d.daily[key]=Math.max(d.daily[key]||0,stars); save(); }
   else { const d=P().kod; if((d[n]||0)<stars){d[n]=stars;save()} }
-  goal("Harika! Program çalıştı, Bidik çiçeğe ulaştı.","good");
+  goal(`Harika! Program çalıştı, Bidik ${DESTS[DEST].yon} ulaştı.`,"good");
   document.querySelectorAll("#kBoard .finish").forEach(e=>e.classList.add("bloom"));
   winCard({stars,checks:[[true,L.bug?"Hatayı buldun ve düzelttin":"Bidik bitişe ulaştı"],[first,"İlk denemede, ipucusuz"],[minimal,`En az blokla (${u} / ${L.ideal})`]],
     msg:stars===3?"Kusursuz algoritma!":!minimal?"Daha kısa bir program yazabilir misin? Döngü, fonksiyon ya da koşul dene.":"Adım düğmesiyle programı önce kafanda çalıştırmayı dene.",
@@ -2233,7 +2248,7 @@ function continuePlay(){
     } }
   openDurak(start);
 }
-// ===== İki Kod Yarışıyor (Antarktika · Penguen Pengo) =====
+// ===== İki Kod Yarışıyor (Tarla · iki sulama robotu) =====
 (function(){
 const DX=[0,1,0,-1], DY=[-1,0,1,0];
 const B={F:["İleri","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],G:["Geri","gd",'<path d="M12 4v16M6 14l6 6 6-6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>']};
@@ -2282,37 +2297,37 @@ function gen(n){
   throw new Error("yarış üretilemedi "+n);
 }
 const CACHE={};
-function pengo(scarf){ return `<g><ellipse cx="0" cy="4" rx="27" ry="31" fill="#22344d"/><path d="M-27 2 C-34 10 -32 22 -24 24 M27 2 C34 10 32 22 24 24" stroke="#22344d" stroke-width="8" stroke-linecap="round" fill="none"/>
-  <ellipse cx="0" cy="-8" rx="17" ry="15" fill="#fff"/><circle cx="-6" cy="-12" r="3.6" fill="#16324a"/><circle cx="6" cy="-12" r="3.6" fill="#16324a"/><circle cx="-5" cy="-13.5" r="1.3" fill="#fff"/><circle cx="7" cy="-13.5" r="1.3" fill="#fff"/>
-  <path d="M-6 -24 L0 -38 L6 -24Z" fill="#ff9b2f" stroke="#d96e10" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M-22 10 C-10 16 10 16 22 10 L21 18 C10 24 -10 24 -21 18Z" fill="${scarf}"/></g>` }
+function pengo(c){ return `<g><rect x="-30" y="-14" width="10" height="34" rx="4" fill="#3a4250"/><rect x="20" y="-14" width="10" height="34" rx="4" fill="#3a4250"/>
+  <rect x="-22" y="-24" width="44" height="50" rx="12" fill="#e6ecf2" stroke="#5f7489" stroke-width="3"/><rect x="-22" y="6" width="44" height="12" fill="${c}"/>
+  <circle cx="-8" cy="-8" r="5" fill="#fff" stroke="#16324a" stroke-width="2"/><circle cx="8" cy="-8" r="5" fill="#fff" stroke="#16324a" stroke-width="2"/><circle cx="-7" cy="-9" r="2" fill="#16324a"/><circle cx="9" cy="-9" r="2" fill="#16324a"/>
+  <rect x="-4" y="-40" width="8" height="18" rx="3" fill="#5f7489"/><path d="M-10 -44 L0 -38 L10 -44" stroke="#7fd0ea" stroke-width="4" fill="none" stroke-linecap="round"/></g>` }
 const COL={A:"#e8443a",B:"#2f7fd8"};
 const GEN={A:"A'nın",B:"B'nin"};
 regAct("yaris",{
-  title:"İki Kod Yarışıyor", durak:7, N:8, speed:true,
-  parts:[{name:"Tahmin Et, Bul, Düzelt",sub:"İki Pengo aynı balığa gidiyor; biri takılacak",from:1,to:4},{name:"Uzun Kodlar",sub:"Daha büyük buz, daha uzun program",from:5,to:8}],
+  title:"İki Sulama Robotu", durak:7, N:8, speed:true,
+  parts:[{name:"Tahmin Et, Bul, Düzelt",sub:"İki sulama robotu aynı fideye gidiyor; biri takılacak",from:1,to:4},{name:"Uzun Kodlar",sub:"Daha büyük tarla, daha uzun program",from:5,to:8}],
   doneText:"Hata bulundu ve düzeltildi",
-  talk:n=>"Takılan Pengo'nun kodu hangi adımda ayrıldı? İki kodu karşılaştırmak hatayı bulmayı neden kolaylaştırdı?",
-  intro:n=> n===1?{key:"p1",kicker:"Antarktika",title:"İki Pengo yarışıyor!",art:`<g transform="translate(50 54)">${pengo("#e8443a")}</g>`,text:"İki Pengo aynı balığa gidiyor. Kodlar neredeyse aynı ama birinde tek bir hata var. 1) Hangisi balığa ulaşır, <b>tahmin et</b>. 2) Yarışı izle. 3) Hatalı bloğu <b>bul</b> ve <b>düzelt</b>. Komutlar Pengo'ya göre: Sola dön, Pengo'nun soluna."}:null,
+  talk:n=>"Takılan Robot'nun kodu hangi adımda ayrıldı? İki kodu karşılaştırmak hatayı bulmayı neden kolaylaştırdı?",
+  intro:n=> n===1?{key:"p1",kicker:"Tarla",title:"İki sulama robotu",art:`<g transform="translate(50 54)">${pengo("#e8443a")}</g>`,text:"İki Robot aynı kuru fideye gidiyor. Kodlar neredeyse aynı ama birinde tek bir hata var. 1) Hangisi kuru fideye ulaşır, <b>tahmin et</b>. 2) Yarışı izle. 3) Hatalı bloğu <b>bul</b> ve <b>düzelt</b>. Komutlar Robot'ya göre: Sola dön, Robot'nun soluna."}:null,
   setup(n){ const L=CACHE[n]||(CACHE[n]=gen(n)); return {n,L,phase:"guess",guess:null,pos:{A:null,B:null},runAt:-1,sel:null,fixed:null,fail:{}} },
   goal(st){ const bad=st.L.good==="A"?"B":"A";
-    return {guess:"Hangi Pengo balığa ulaşır? Kodlara bak, tahmin et.",race:"Yarış başladı!",find:`Pengo ${bad} takıldı! Kodunda hatalı blok hangisi? Ona dokun.`,fix:"Bu bloğun yerine hangisi gelmeli?",done:"İki Pengo da balığa ulaştı!"}[st.phase] },
+    return {guess:"Hangi Robot kuru fideye ulaşır? Kodlara bak, tahmin et.",race:"Yarış başladı!",find:`Robot ${bad} takıldı! Kodunda hatalı blok hangisi? Ona dokun.`,fix:"Bu bloğun yerine hangisi gelmeli?",done:"İki Robot da kuru fideye ulaştı!"}[st.phase] },
   render(st){
     const L=st.L, N=L.N, cs=100, W=N*cs+16, bad=L.good==="A"?"B":"A";
-    let s=`<svg class="board agrid" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#bfe3f7"/><g transform="translate(8 8)">`;
+    let s=`<svg class="board agrid" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#8a6a3a"/><g transform="translate(8 8)">`;
     for(let y=0;y<N;y++) for(let x=0;x<N;x++){
       const hole=L.holes.some(h=>h[0]===x&&h[1]===y);
-      s+=`<rect x="${x*cs+4}" y="${y*cs+4}" width="${cs-8}" height="${cs-8}" rx="14" fill="${(x+y)%2?"#f2f8ff":"#e4f1fc"}"/>`;
-      if(hole) s+=`<ellipse cx="${x*cs+50}" cy="${y*cs+52}" rx="36" ry="30" fill="#1d5b9a"/><ellipse cx="${x*cs+50}" cy="${y*cs+52}" rx="24" ry="18" fill="none" stroke="#7fd0ea" stroke-width="3"/>`;
+      s+=`<rect x="${x*cs+4}" y="${y*cs+4}" width="${cs-8}" height="${cs-8}" rx="14" fill="${(x+y)%2?"#e2c98f":"#d8bd80"}"/>`;
+      if(hole) s+=`<path d="M${x*cs+18} ${y*cs+76} C${x*cs+14} ${y*cs+56} ${x*cs+28} ${y*cs+34} ${x*cs+48} ${y*cs+32} C${x*cs+70} ${y*cs+30} ${x*cs+86} ${y*cs+48} ${x*cs+84} ${y*cs+70} C${x*cs+82} ${y*cs+84} ${x*cs+24} ${y*cs+88} ${x*cs+18} ${y*cs+76}Z" fill="#9aa6b4" stroke="#5f7489" stroke-width="4"/>`;
     }
-    s+=`<g transform="translate(${L.gx*cs+50} ${L.gy*cs+52})"><path d="M-26 0 C-14 -16 12 -16 22 0 C12 16 -14 16 -26 0Z" fill="#ff9b2f" stroke="#d96e10" stroke-width="3"/><path d="M20 0 L36 -12 V12Z" fill="#ff9b2f" stroke="#d96e10" stroke-width="3" stroke-linejoin="round"/><circle cx="-14" cy="-3" r="3.5" fill="#16324a"/></g>`;
-    ["A","B"].forEach((k,ki)=>{ const p=st.pos[k]||[L.sx,L.sy,L.sd], off=ki?14:-14, fell=st.fail[k]==="hole";
+    s+=`<g transform="translate(${L.gx*cs} ${L.gy*cs})"><circle cx="50" cy="52" r="42" fill="#fff7c2" opacity=".8"/><circle cx="50" cy="52" r="41" fill="none" stroke="#ffc93c" stroke-width="3" stroke-dasharray="7 5"/><ellipse cx="50" cy="74" rx="22" ry="7" fill="#8a6a3a"/><path d="M50 74 C50 62 52 54 58 50" stroke="#a89a6a" stroke-width="4" fill="none"/><path d="M52 60 q-12 -2 -14 -10 q10 0 14 8Z M56 52 q10 -6 16 -2 q-8 8 -16 4Z" fill="#c9b98a"/></g>`;
+    ["A","B"].forEach((k,ki)=>{ const p=st.pos[k]||[L.sx,L.sy,L.sd], off=ki?14:-14, fell=false;
       s+=`<g transform="translate(${p[0]*cs+50+off} ${p[1]*cs+50}) rotate(${p[2]*90}) scale(${fell?.5:.78})" opacity="${fell?.5:1}">${pengo(COL[k])}</g>` });
     s+=`</g></svg>`;
     const row=k=>{ const prog=k===L.good?L.prog:(st.fixed?L.prog:L.badProg);
-      return `<div class="prow" style="--c:${COL[k]}"><span class="ptag">Pengo ${k}</span><div class="pblocks">${prog.map((t,i)=>`<button class="pb2 ${st.runAt===i?"on":""} ${st.phase==="fix"&&k===bad&&i===st.sel?"sel":""} ${st.fail[k]&&st.fail[k+"at"]===i?"err":""}" data-k="${k}" data-i="${i}">${bHTML(t)}</button>`).join("")}</div></div>` };
+      return `<div class="prow" style="--c:${COL[k]}"><span class="ptag">Robot ${k}</span><div class="pblocks">${prog.map((t,i)=>`<button class="pb2 ${st.runAt===i?"on":""} ${st.phase==="fix"&&k===bad&&i===st.sel?"sel":""} ${st.fail[k]&&st.fail[k+"at"]===i?"err":""}" data-k="${k}" data-i="${i}">${bHTML(t)}</button>`).join("")}</div></div>` };
     let h=s+`<div class="progs">${row("A")}${row("B")}</div>`;
-    if(st.phase==="guess") h+=`<div class="aopts"><button class="aopt" data-g="A" style="color:${COL.A}">Pengo A</button><button class="aopt" data-g="B" style="color:${COL.B}">Pengo B</button></div>`;
+    if(st.phase==="guess") h+=`<div class="aopts"><button class="aopt" data-g="A" style="color:${COL.A}">Robot A</button><button class="aopt" data-g="B" style="color:${COL.B}">Robot B</button></div>`;
     if(st.phase==="fix") h+=`<div class="aopts">${Object.keys(B).filter(t=>t!=="G"||st.n>=7).map(t=>`<button class="aopt blkopt" data-t="${t}">${bHTML(t)}<small>${B[t][0]}</small></button>`).join("")}</div>`;
     const body=$("aBody"); body.innerHTML=h;
     body.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>this.guess(st,b.dataset.g));
@@ -2324,7 +2339,7 @@ regAct("yaris",{
     st.guess=g; if(g!==st.L.good) A.tries++;
     sfx.click(); await this.race(st,false);
     const bad=st.L.good==="A"?"B":"A";
-    aGoal(g===st.L.good?`Tahminin doğru! Pengo ${bad} takıldı. Şimdi hatayı bul.`:`Pengo ${bad} takıldı. Tahmin tutmadı ama sorun yok: hatayı bul!`, g===st.L.good?"good":"bad");
+    aGoal(g===st.L.good?`Tahminin doğru! Robot ${bad} takıldı. Şimdi hatayı bul.`:`Robot ${bad} takıldı. Tahmin tutmadı ama sorun yok: hatayı bul!`, g===st.L.good?"good":"bad");
     st.phase="find"; aRefresh(); setTimeout(()=>{ if(A&&A.st===st&&st.phase==="find") aGoal() },2200);
   },
   async race(st,fixedOnly){
@@ -2347,13 +2362,13 @@ regAct("yaris",{
   pickBlock(st,k,i){
     if(A.busy||A.won||st.phase!=="find") return;
     const bad=st.L.good==="A"?"B":"A";
-    if(k!==bad){ aBad(`Pengo ${k} balığa ulaştı; onun kodu doğru. Takılanın koduna bak.`); return }
+    if(k!==bad){ aBad(`Robot ${k} kuru fideye ulaştı; onun kodu doğru. Takılanın koduna bak.`); return }
     if(i!==st.L.badAt){ aBad("Bu blok doğru görünüyor. İki kodu blok blok karşılaştır: nerede farklılar?"); return }
     st.sel=i; st.phase="fix"; sfx.place(); aRefresh(); aGoal();
   },
   async fix(st,t){
     if(A.busy||A.won||st.phase!=="fix") return;
-    if(t!==st.L.prog[st.L.badAt]){ aBad(`${B[t][0]} olmaz. Pengo ${GEN[st.L.good]} kodunda bu adımda ne var?`); return }
+    if(t!==st.L.prog[st.L.badAt]){ aBad(`${B[t][0]} olmaz. Robot ${GEN[st.L.good]} kodunda bu adımda ne var?`); return }
     st.fixed=true; st.sel=null; st.phase="done"; sfx.place(); aRefresh();
     await this.race(st,true); aWin();
   },
@@ -2363,7 +2378,7 @@ regAct("yaris",{
     const L=st.L, bad=L.good==="A"?"B":"A";
     aGoal(`Kodları karşılaştıralım… ${L.badAt+1}. blok farklı!`); await aWait(1300);
     st.guess=L.good; await this.race(st,false);
-    st.phase="find"; aRefresh(); aGoal(`Pengo ${GEN[bad]} ${L.badAt+1}. bloğu hatalı.`); await aWait(1200);
+    st.phase="find"; aRefresh(); aGoal(`Robot ${GEN[bad]} ${L.badAt+1}. bloğu hatalı.`); await aWait(1200);
     st.sel=L.badAt; st.phase="fix"; aRefresh(); await aWait(900);
     st.fixed=true; st.phase="done"; st.sel=null; aRefresh(); await this.race(st,true); A.busy=true;
   }
@@ -2372,7 +2387,7 @@ regAct("yaris",{
 // ===== Kalem Bidik (Avrupa · Baykuş Bilge) =====
 (function(){
 const DX=[0,1,0,-1], DY=[-1,0,1,0];
-const B={F:["İleri (çiz)","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>']};
+const B={F:["İleri (fidan dik)","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>']};
 const bHTML=t=>`<span class="blk ${B[t][1]}" aria-label="${B[t][0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${B[t][2]}</svg></span>`;
 const LV={
   1:{name:"Çizgi",sol:"FFF",x:1,s:[2,4]},2:{name:"L harfi",sol:"FFRFF",x:1,s:[1,4]},3:{name:"Köprü",sol:"FFRFFRFF",x:1,s:[1,4]},
@@ -2391,22 +2406,24 @@ function run(L,prog,x){
 }
 const key=s=>{ const a=[s[0],s[1]].join(","), b=[s[2],s[3]].join(","); return a<b?a+"|"+b:b+"|"+a };
 regAct("kalem",{
-  title:"Kalem Bidik", durak:4, N:8, speed:true,
-  parts:[{name:"Kodla Çiz",sub:"Bidik yürürken iz bırakır",from:1,to:4},{name:"Tekrarla Çiz",sub:"Kısa kod, tekrar sayısı: büyük şekil",from:5,to:8}],
-  doneText:"Şekil tamam",
-  talk:n=> n<=4?"Kareyi çizmek için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık ne çizerdi?",
-  intro:n=> n===1?{key:"p1",kicker:"Avrupa",title:"Kalem Bidik",art:`<path d="M30 80 V30 H70" stroke="#e0457b" stroke-width="6" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Sincap Fındık Bidik'e bir kalem bağladı! Bidik <b>İleri</b> gidince arkasında çizgi kalır. Kesikli şekli çizecek kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
+  title:"Fidanlarla Desen", durak:4, N:8, speed:true,
+  parts:[{name:"Fidan Sırası",sub:"Bidik yürüdüğü yere fidan diker",from:1,to:4},{name:"Tekrarla Orman Kur",sub:"Kısa kod, tekrar sayısı: büyük orman deseni",from:5,to:8}],
+  doneText:"Orman deseni tamam",
+  talk:n=> n<=4?"Kare biçiminde orman kurmak için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi? Ağaçlar kasabaya ne kazandırır?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık nasıl bir desen çıkardı? (İklim eylemi)",
+  intro:n=> n===1?{key:"p1",kicker:"Orman",title:"Fidanlarla desen",art:`<path d="M30 80 V30 H70" stroke="#a8693d" stroke-width="8" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Sincap Fındık Bidik'e fidan dolu bir çanta verdi! Bidik <b>İleri</b> gidince geçtiği yere sıra sıra fidan diker. Kesikli çizgideki orman desenini kuracak kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
         : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. (İleri, Sağa dön) × 4 = kare!"}:null,
   setup(n){ const L=LV[n], tg=run(L,L.sol.split(""),L.x); return {n,L,target:new Set(tg.segs.map(key)),tsegs:tg.segs,prog:[],x:L.rep?1:1,drawn:[],pos:[L.s[0],L.s[1],0],running:false,err:null} },
-  goal(st){ return st.L.rep?`${st.L.name}: kısa bir kod yaz ve tekrar sayısını seç.`:`${st.L.name}: kesikli çizgiyi çizecek kodu yaz.` },
+  goal(st){ return st.L.rep?`${st.L.name} biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.`:`${st.L.name} biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.` },
   checkLabel(){ return "Çiz" },
   info(st){ return `Blok: ${st.prog.length}` },
   render(st){
     const W=PAD*2+(NP-1)*CS, P=v=>PAD+v*CS;
-    let s=`<svg class="board agrid kalemb" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#fffaf0"/>`;
-    st.tsegs.forEach(g=>s+=`<path d="M${P(g[0])} ${P(g[1])} L${P(g[2])} ${P(g[3])}" stroke="#c9b6ef" stroke-width="10" stroke-dasharray="4 14" stroke-linecap="round"/>`);
-    for(let y=0;y<NP;y++) for(let x=0;x<NP;x++) s+=`<circle cx="${P(x)}" cy="${P(y)}" r="5" fill="#b9a5e3"/>`;
-    st.drawn.forEach(g=>s+=`<path d="M${P(g[0])} ${P(g[1])} L${P(g[2])} ${P(g[3])}" stroke="#e0457b" stroke-width="9" stroke-linecap="round"/>`);
+    let s=`<svg class="board agrid kalemb" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#a8dc8a"/><rect x="6" y="6" width="${W-12}" height="${W-12}" rx="18" fill="none" stroke="#8cc56e" stroke-width="3" stroke-dasharray="2 10"/>`;
+    st.tsegs.forEach(g=>s+=`<path d="M${P(g[0])} ${P(g[1])} L${P(g[2])} ${P(g[3])}" stroke="#f6fbef" stroke-width="10" stroke-dasharray="4 14" stroke-linecap="round" opacity=".9"/>`);
+    for(let y=0;y<NP;y++) for(let x=0;x<NP;x++) s+=`<ellipse cx="${P(x)}" cy="${P(y)+2}" rx="7" ry="4" fill="#8a6a3a" opacity=".55"/>`;
+    st.drawn.forEach(g=>s+=`<path d="M${P(g[0])} ${P(g[1])} L${P(g[2])} ${P(g[3])}" stroke="#a8693d" stroke-width="12" stroke-linecap="round"/>`);
+    const pts=new Set(); st.drawn.forEach(g=>{ pts.add(g[0]+","+g[1]); pts.add(g[2]+","+g[3]) });
+    pts.forEach(k=>{ const [x,y]=k.split(",").map(Number); s+=`<g transform="translate(${P(x)} ${P(y)})"><circle cy="-10" r="13" fill="#2f8a4a"/><circle cx="-9" cy="-3" r="9" fill="#3fae5f"/><circle cx="9" cy="-3" r="9" fill="#3fae5f"/><rect x="-2" y="0" width="4" height="8" fill="#7a4a20"/></g>` });
     s+=`<circle cx="${P(st.L.s[0])}" cy="${P(st.L.s[1])}" r="12" fill="none" stroke="#7a5eb0" stroke-width="3" stroke-dasharray="4 4"/>`;
     s+=`<g transform="translate(${P(st.pos[0])} ${P(st.pos[1])}) rotate(${st.pos[2]*90-90}) scale(.8)">${ROBOT}</g></svg>`;
     let h=s;
@@ -2423,8 +2440,8 @@ regAct("kalem",{
     this.play(st).then(r=>{
       if(r.out) aBad("Bidik kâğıttan çıktı! Kodu kontrol et.");
       else if(r.ok) aWin({stars:A.tries===0&&A.hints===0&&st.prog.length<=st.L.sol.length?3:A.tries<=2?2:1,
-        checks:[[true,"Şekil tamam"],[A.tries===0,"İlk denemede"],[st.prog.length<=st.L.sol.length,`En kısa kodla (${st.prog.length} / ${st.L.sol.length} blok)`]]});
-      else aBad("Çizim şekle uymadı. Kesikli çizgiyi parmağınla izle, Bidik'in yönünü düşün.");
+        checks:[[true,"Orman deseni tamam"],[A.tries===0,"İlk denemede"],[st.prog.length<=st.L.sol.length,`En kısa kodla (${st.prog.length} / ${st.L.sol.length} blok)`]]});
+      else aBad("Fidanlar desene uymadı. Kesikli çizgiyi parmağınla izle, Bidik'in yönünü düşün.");
     });
     return null;
   },
@@ -2751,7 +2768,7 @@ function goHome(){
 const BUG_LEVELS=[5,10,15,20,25,30,35,40,45,50,55,60];
 const DURAKS=[
  {no:1,name:"Mahalle",kid:"Büyük işi küçük parçalara böl.",code:"B1 · Ayrıştırma",color:"#c98f2c",acts:[
-   {t:"Yol Kur",d:"Mahalleye yol yap: evleri okula, parka bağla. Büyük yolu altın, anahtar, kapı gibi küçük hedeflere bölerek kur.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openLevels("yol"),prog:(d=P())=>lvlProg("yol",1,40,d),play:{mode:"yol",from:1,to:40}}]},
+   {t:"Yol Kur",d:"Mahalleye yol yap: Bidik'in evini okula, parka, hastaneye bağla. Büyük yolu posta kutusu, anahtar, köprü gibi küçük hedeflere bölerek kur.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openLevels("yol"),prog:(d=P())=>lvlProg("yol",1,40,d),play:{mode:"yol",from:1,to:40}}]},
  {no:2,name:"Gölet",kid:"Önce ne, sonra ne?",code:"B4 · Algoritma",color:"#2f8fb8",acts:[
    {t:"Göleti Temizle",d:"Bidik yaprak sandalıyla yüzüyor. Bloklarla yol yaz, gölete atılan çöpleri topla.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("golet"),prog:(d=P())=>actProgL("golet",d),play:{mode:"golet",from:1,to:12}},
    {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik'i adım adım kodla.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>lvlProg("kod",1,10,d),play:{mode:"kod",from:1,to:10}},
@@ -2761,7 +2778,7 @@ const DURAKS=[
    {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt. Arı gibi her çiçeğe aynı düzenle uğra.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>lvlProg("kod",21,30,d),play:{mode:"kod",from:21,to:30}}]},
  {no:4,name:"Orman",kid:"Tekrar eden parçaya ad ver.",code:"B3 · Soyutlama",color:"#3d8a4a",acts:[
    {t:"Fidan Dik",d:"Çukurlara git, Fidan dik bloğuyla orman kur. Yanlış yerde dikilmez!",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("orman"),prog:(d=P())=>actProgL("orman",d),play:{mode:"orman",from:1,to:12}},
-   {t:"Kalem Bidik",d:"Bidik yürüdüğü yere iz bırakır: kodla çizgi, kare, merdiven çiz. Tekrarla büyük şekiller yap.",lvl:"●●",age:"6-9 yaş",open:()=>openActLevels("kalem"),prog:(d=P())=>actProgL("kalem",d),play:{mode:"kalem",from:1,to:8}},
+   {t:"Fidanlarla Desen",d:"Bidik yürüdüğü yere fidan diker: kodla sıra, kare, merdiven biçiminde orman kur. Tekrarla büyük desenler yap.",lvl:"●●",age:"6-9 yaş",open:()=>openActLevels("kalem"),prog:(d=P())=>actProgL("kalem",d),play:{mode:"kalem",from:1,to:8}},
    {t:"Kodla Sür: Fonksiyonlar",d:"Tekrar eden hareket grubunu kendi bloğuna koy, istediğin yerde kullan.",lvl:"●●●",age:"7-10 yaş",open:()=>openLevels("kod",{ch:[3]}),prog:(d=P())=>lvlProg("kod",31,40,d),play:{mode:"kod",from:31,to:40}}]},
  {no:5,name:"Geri Dönüşüm",kid:"Ne olursa ne yapmalı?",code:"B5 · Koşul",color:"#5f7489",acts:[
    {t:"Kutusuna Taşı",d:"Atığı al, aynı renkli kutuya götür: plastik sarıya, kâğıt maviye, cam yeşile.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("donusum"),prog:(d=P())=>actProgL("donusum",d),play:{mode:"donusum",from:1,to:12}},
@@ -2772,7 +2789,7 @@ const DURAKS=[
  {no:7,name:"Tarla",kid:"Nerede takıldı? Nasıl düzelir?",code:"B6 · Hata ayıklama",color:"#8a6a3a",acts:[
    {t:"Sulama Robotu",d:"Sulama programı bozuk. Çalıştır, nerede saptığını gör, hatalı bloğu düzelt.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("tarla"),prog:(d=P())=>actProgL("tarla",d),play:{mode:"tarla",from:1,to:12}},
    {t:"Hata Avcısı",d:"Hazır programda bir hata var. Adım adım çalıştır, hatalı bloğu bul ve düzelt.",lvl:"● ●● ●●●",age:"5-10 yaş",open:()=>openLevels("kod",{list:BUG_LEVELS,title:"Hata Avcısı"}),prog:(d=P())=>lvlProgList("kod",BUG_LEVELS,d),play:{mode:"kod",list:BUG_LEVELS}},
-   {t:"İki Kod Yarışıyor",d:"İki program aynı hedefe gidiyor; biri takılacak. Tahmin et, iki kodu karşılaştır, hatalı bloğu bul ve düzelt.",lvl:"●●",age:"6-9 yaş",open:()=>openActLevels("yaris"),prog:(d=P())=>actProgL("yaris",d),play:{mode:"yaris",from:1,to:8}}]}
+   {t:"İki Sulama Robotu",d:"İki robot aynı kuru fideye gidiyor; birinin programı bozuk. Tahmin et, kodları karşılaştır, hatalı bloğu bul ve düzelt.",lvl:"●●",age:"6-9 yaş",open:()=>openActLevels("yaris"),prog:(d=P())=>actProgL("yaris",d),play:{mode:"yaris",from:1,to:8}}]}
 ];
 const FINAL={name:"Kasaba Şenliği",kid:"Yedi tohumu getir, Büyük Çiçek'i yeniden aç. Bidik'in Bir Günü burada seni bekliyor.",page:"78-82"};
 const FLOWER=`<g transform="translate(50 46)">${[0,60,120,180,240,300].map(a=>`<ellipse cx="0" cy="-18" rx="11" ry="15" fill="#f49ac1" stroke="#fff" stroke-width="2.5" transform="rotate(${a})"/>`).join("")}<circle r="13" fill="#ffc93c" stroke="#d99a00" stroke-width="2.5"/><circle cx="-4.5" cy="-2" r="2" fill="#16324a"/><circle cx="4.5" cy="-2" r="2" fill="#16324a"/><path d="M-4.5 3.5 Q0 7 4.5 3.5" stroke="#16324a" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`;
