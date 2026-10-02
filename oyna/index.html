@@ -116,6 +116,35 @@ h1,h2,h3{text-wrap:balance}
 .stop .cnt.soon{background:#eef2f6;color:var(--ink-soft)}
 .stop.final{grid-column:1/-1;flex-direction:row;justify-content:center;gap:14px;text-align:left}
 .stop.final svg{width:58px;height:58px;flex:none}
+
+/* Ada yolculuğu */
+.map{display:block!important;width:100%}
+.map svg.sea{width:100%;height:auto;display:block;border-radius:28px;box-shadow:0 6px 0 #7cc3d8}
+.isle{cursor:pointer;outline:none}
+.isle .lift{transition:transform .15s}
+.isle:hover .lift,.isle:focus-visible .lift{transform:translateY(-5px)}
+.isle:focus-visible .ring{stroke:#16324a;stroke-width:5;stroke-dasharray:8 6}
+.isle.soonisle .land{filter:saturate(.55)}
+.boat{animation:bob 2.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-5px) rotate(-2deg)}}
+.seedglow{animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{50%{opacity:.35}}
+.garden{width:100%;background:var(--panel);border:3px solid var(--panel-line);border-radius:22px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 0 var(--panel-line)}
+.garden h3{margin:0;font-family:var(--display);font-size:20px;line-height:1}
+.garden p{margin:0;font-size:13px;font-weight:700;color:var(--ink-soft)}
+.garden .pots{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;align-items:end}
+.garden .pots svg{width:100%;height:auto;max-height:84px}
+.daily .cal.bottle{background:#e9f8fb;position:relative;width:56px;height:64px}
+.daily .cal.bottle svg{position:absolute;inset:4px 8px;width:40px;height:56px}
+.daily .cal.bottle b{position:relative;font-size:17px;margin-top:16px;color:var(--ink)}
+.daily .cal.bottle small{position:relative;font-size:9px}
+.dhead .num svg{width:46px;height:46px}
+.dhead .seed{display:inline-block;margin:6px 0 0 6px;font-size:12px;font-weight:800;background:#fff;color:var(--ink);border-radius:999px;padding:2px 10px}
+.stamps{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.stamps span{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;border:3px dashed #c9d3de;background:#f6f8fa}
+.stamps span.on{border-style:solid;background:#fff}
+.stamps span svg{width:30px;height:30px}
+.stamps span:not(.on) svg{filter:grayscale(1);opacity:.35}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -284,16 +313,17 @@ h1,h2,h3{text-wrap:balance}
   </div>
   <div class="beta" role="note"><span class="pill">Açık beta</span><span><b>Şu an bütün içerik ücretsiz.</b> Bidik gelişiyor; gördüğünüz hataları bize bildirin.</span></div>
   <div class="mapwrap">
-    <h2>Bidik Haritası</h2>
-    <p>Yedi durak, yedi düşünme becerisi. Bir durağa dokun, oyunları gör.</p>
+    <h2>Bidik'in 7 Ada Yolculuğu</h2>
+    <p>Büyük Çiçek'in yaprakları döküldü! Yedi adadan yedi sihirli tohumu topla, çiçek yeniden açsın. Bir adaya dokun.</p>
     <div class="map" id="map"></div>
+    <div class="garden" id="garden"></div>
   </div>
   <button class="daily" id="dailyBtn">
-    <span class="cal"><small id="dMon"></small><b id="dDay"></b></span>
-    <div><strong>Günün Bulmacası</strong><span id="dTxt">Her gün yeni bir usta bulmacası. Büyükler de dene!</span></div>
+    <span class="cal bottle"><svg viewBox="0 0 40 56" aria-hidden="true"><rect x="15" y="2" width="10" height="7" rx="2" fill="#b07a45"/><path d="M14 9h12v8c7 3 10 8 10 15v16a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V32c0-7 3-12 10-15z" fill="#bfe9f3" stroke="#5aa9c0" stroke-width="2.5"/><rect x="9" y="27" width="22" height="18" rx="2" fill="#fff6dc" stroke="#d9b56a" stroke-width="1.5" transform="rotate(-6 20 36)"/></svg><b id="dDay"></b><small id="dMon"></small></span>
+    <div><strong>Mesaj Şişesi</strong><span id="dTxt">Her gün yeni bir usta bulmacası. Büyükler de dene!</span></div>
   </button>
   <div class="home-tools">
-    <button class="chip" id="reportBtn">Öğretmen / veli paneli</button>
+    <button class="chip" id="reportBtn">Seyir Defteri (öğretmen / veli)</button>
     <button class="chip" id="teacherBtn" aria-pressed="false">Öğretmen modu</button>
     <a class="chip" id="fbBtn" style="text-decoration:none;color:inherit" href="mailto:topcubasitolga@gmail.com?subject=Bidik%20beta%20geri%20bildirim&amp;body=Cihaz%20(tahta%2Ftablet%2Fbilgisayar)%3A%0AOyun%20ve%20b%C3%B6l%C3%BCm%3A%0ANe%20oldu%3A%0A">Görüş / hata bildir</a>
   </div>
@@ -313,8 +343,8 @@ h1,h2,h3{text-wrap:balance}
 <!-- DURAK -->
 <section id="durak" class="screen" hidden>
   <div class="topbar">
-    <button class="iconbtn" data-home aria-label="Bidik Haritası"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="title"><strong>Bidik Haritası</strong><small id="dSub"></small></div>
+    <button class="iconbtn" data-home aria-label="Ada haritası"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="title"><strong>Ada Haritası</strong><small id="dSub"></small></div>
     <span style="width:46px"></span>
   </div>
   <div class="dhead" id="dHead"></div>
@@ -383,7 +413,7 @@ h1,h2,h3{text-wrap:balance}
 <section id="report" class="screen" hidden>
   <div class="topbar">
     <button class="iconbtn" data-home aria-label="Ana ekran"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-    <div class="title"><strong>Öğretmen / veli paneli</strong><small>Beceri bazında ilerleme</small></div>
+    <div class="title"><strong>Seyir Defteri</strong><small>Öğretmen / veli paneli · beceri bazında ilerleme</small></div>
     <span style="width:46px"></span>
   </div>
   <div class="list" id="rList"></div>
@@ -1430,69 +1460,155 @@ function goHome(){
   const now=new Date(), mon=["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][now.getMonth()];
   $("dMon").textContent=mon; $("dDay").textContent=now.getDate();
   const ds=d.daily[todayKey()];
-  $("dTxt").textContent=ds?`Bugün çözüldü: ${starsTxt(ds)} · Yarın yenisi gelecek`:`Bugün: ${todayKey()%2?"Kodla Sür":"Yol Kur"} · Her gün yeni bir usta bulmacası. Büyükler de dene!`;
+  $("dTxt").textContent=ds?`Bugünkü şişe açıldı: ${starsTxt(ds)} · Yarın kıyıya yenisi vuracak`:`Kıyıya bir şişe vurdu! İçinde bugünün ${todayKey()%2?"Kodla Sür":"Yol Kur"} bulmacası var. Büyükler de dene!`;
   $("teacherBtn").setAttribute("aria-pressed",db.teacher);
 }
 // ---- Bidik Haritası: kitaptaki yedi durak (B1–B7) ----
 const BUG_LEVELS=[5,10,15,20,25,30,35,40,45,50,55,60];
 const DURAKS=[
- {no:1,name:"Büyük İşi Böl",kid:"Büyük işi küçük parçalara böl.",code:"B1 · Ayrıştırma",color:"#f08a24",acts:[
-   {t:"Yol Kur",d:"Parçaları seç, yolu kur. Altın, anahtar ve kapı gibi küçük hedeflere bölerek çiçeğe ulaş.",lvl:"● ●●",age:"4-8 yaş",open:()=>openLevels("yol"),prog:()=>[sumStars(P().yol,1,40),120]},
+ {no:1,name:"Yapboz Adası",kid:"Büyük işi küçük parçalara böl.",code:"B1 · Ayrıştırma",color:"#f08a24",acts:[
+   {t:"Yol Kur",d:"Parçaları seç, yolu kur. Altın, anahtar ve kapı gibi küçük hedeflere bölerek çiçeğe ulaş.",lvl:"● ●●",age:"4-8 yaş",open:()=>openLevels("yol"),prog:(d=P())=>[sumStars(d.yol,1,40),120]},
    {soon:1,t:"Piknik Ağacı",d:"Pikniğe gereken eşyaları doğru dala yerleştir.",lvl:"●",page:11},
    {soon:1,t:"Eksik Parça Hangisi?",d:"Bir işin adımlarından biri eksik. Hangisi?",lvl:"●●",page:14}]},
- {no:2,name:"Tekrar Edeni Fark Et",kid:"Ne tekrar ediyor? Sırada ne var?",code:"B2 · Örüntü tanıma",color:"#14a89a",acts:[
+ {no:2,name:"Boncuk Adası",kid:"Ne tekrar ediyor? Sırada ne var?",code:"B2 · Örüntü tanıma",color:"#14a89a",acts:[
    {soon:1,t:"Boncuk Dizisi",d:"Örüntünün birimini bul, bileziği tamamla.",lvl:"●",page:16},
    {soon:1,t:"Bum, Tık, Tık",d:"Ritmi dinle, sıradaki sesi bul.",lvl:"●●",page:18},
    {soon:1,t:"Uzun Yerine Kısa",d:"Uzun diziyi “birim × sayı” ile kısalt.",lvl:"●●",page:22}]},
- {no:3,name:"Önemli Olanı Seç",kid:"İşe yarayanı seç, gerisini bırak.",code:"B3 · Soyutlama",color:"#8a5cd6",acts:[
+ {no:3,name:"Büyüteç Adası",kid:"İşe yarayanı seç, gerisini bırak.",code:"B3 · Soyutlama",color:"#8a5cd6",acts:[
    {soon:1,t:"Kayıp Kedi",d:"Kediyi ötekilerden ayıran bilgiyi seç, kayıp kediyi bul.",lvl:"●",page:26},
    {soon:1,t:"Gölgesinden Tanı",d:"Renk ve desen yok; şekilden tanı.",lvl:"●●",page:31},
    {soon:1,t:"Kalabalık Izgara",d:"Yolu etkileyenleri seç, fazlalıkları at.",lvl:"●●",page:32}]},
- {no:4,name:"Sırayla Anlat",kid:"Önce ne, sonra ne?",code:"B4 · Algoritma",color:"#e0a100",acts:[
-   {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik yukarı bakarak başlar.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:()=>[sumStars(P().kod,1,10),30]},
-   {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:()=>[sumStars(P().kod,11,20),30]},
+ {no:4,name:"Pusula Adası",kid:"Önce ne, sonra ne?",code:"B4 · Algoritma",color:"#e0a100",acts:[
+   {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik yukarı bakarak başlar.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>[sumStars(d.kod,1,10),30]},
+   {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:(d=P())=>[sumStars(d.kod,11,20),30]},
    {soon:1,t:"Önce Ne, Sonra Ne?",d:"Resimli adımları doğru sıraya diz.",lvl:"●",page:35},
    {soon:1,t:"Aynı Hedefe İki Yol",d:"İki yol bul; hangisi daha kısa?",lvl:"●●",page:41}]},
- {no:5,name:"Tekrar Et, Eğer… İse",kid:"Kaç kez? Ne olursa ne yapayım?",code:"B5 · Döngü ve koşul",color:"#22a165",acts:[
-   {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:()=>[sumStars(P().kod,21,30),30]},
-   {t:"Kodla Sür: Fonksiyonlar",d:"Tekrar eden hareket grubunu kendi bloğuna koy.",lvl:"●●",age:"7-10 yaş",open:()=>openLevels("kod",{ch:[3]}),prog:()=>[sumStars(P().kod,31,40),30]},
-   {t:"Kodla Sür: Koşullar",d:"“Eğer pembe kare”, “eğer önü kapalı”: tek bir akıllı kural yaz.",lvl:"●●",age:"8-12 yaş",open:()=>openLevels("kod",{ch:[4]}),prog:()=>[sumStars(P().kod,41,50),30]},
-   {t:"Kodla Sür: Usta",d:"Döngü ve fonksiyon birlikte. En kısa programı bul. Büyükler de dene!",lvl:"●●●",age:"9 yaş ve üstü",open:()=>openLevels("kod",{ch:[5]}),prog:()=>[sumStars(P().kod,51,60),30]},
+ {no:5,name:"Değirmen Adası",kid:"Kaç kez? Ne olursa ne yapayım?",code:"B5 · Döngü ve koşul",color:"#22a165",acts:[
+   {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>[sumStars(d.kod,21,30),30]},
+   {t:"Kodla Sür: Fonksiyonlar",d:"Tekrar eden hareket grubunu kendi bloğuna koy.",lvl:"●●",age:"7-10 yaş",open:()=>openLevels("kod",{ch:[3]}),prog:(d=P())=>[sumStars(d.kod,31,40),30]},
+   {t:"Kodla Sür: Koşullar",d:"“Eğer pembe kare”, “eğer önü kapalı”: tek bir akıllı kural yaz.",lvl:"●●",age:"8-12 yaş",open:()=>openLevels("kod",{ch:[4]}),prog:(d=P())=>[sumStars(d.kod,41,50),30]},
+   {t:"Kodla Sür: Usta",d:"Döngü ve fonksiyon birlikte. En kısa programı bul. Büyükler de dene!",lvl:"●●●",age:"9 yaş ve üstü",open:()=>openLevels("kod",{ch:[5]}),prog:(d=P())=>[sumStars(d.kod,51,60),30]},
    {soon:1,t:"Kural Makinesi",d:"Hava, ışık ve kapı kuralları: kuralı kur, Bidik karar versin.",lvl:"● ●●",page:"50-52"}]},
- {no:6,name:"Yanlışı Bul, Düzelt",kid:"Nerede takıldı? Nasıl düzelir?",code:"B6 · Hata ayıklama",color:"#e0457b",acts:[
-   {t:"Hata Avcısı",d:"Hazır programda bir hata var. Adım adım çalıştır, hatalı bloğu bul ve düzelt.",lvl:"● ●●",age:"5-12 yaş",open:()=>openLevels("kod",{list:BUG_LEVELS,title:"Hata Avcısı"}),prog:()=>[BUG_LEVELS.reduce((a,n)=>a+(P().kod[n]||0),0),36]},
+ {no:6,name:"Tamir Adası",kid:"Nerede takıldı? Nasıl düzelir?",code:"B6 · Hata ayıklama",color:"#e0457b",acts:[
+   {t:"Hata Avcısı",d:"Hazır programda bir hata var. Adım adım çalıştır, hatalı bloğu bul ve düzelt.",lvl:"● ●●",age:"5-12 yaş",open:()=>openLevels("kod",{list:BUG_LEVELS,title:"Hata Avcısı"}),prog:(d=P())=>[BUG_LEVELS.reduce((a,n)=>a+(d.kod[n]||0),0),36]},
    {soon:1,t:"İki Kod Yarışıyor",d:"İki Bidik aynı hedefe gidiyor; hangisi takılacak?",lvl:"●●",page:61},
    {soon:1,t:"Tarifte Hata",d:"Tarifteki yanlış adımı bul, doğru yere taşı.",lvl:"●",page:60}]},
- {no:7,name:"Sembolle Anlat",kid:"Bu işaret ne demek? Nasıl gösteririm?",code:"B7 · Temsil ve sembol",color:"#1d3b6a",acts:[
+ {no:7,name:"Şifre Adası",kid:"Bu işaret ne demek? Nasıl gösteririm?",code:"B7 · Temsil ve sembol",color:"#1d3b6a",acts:[
    {soon:1,t:"Karenin Adı Ne?",d:"Harf ve rakamla kareyi bul: B3.",lvl:"●",page:65},
    {soon:1,t:"Gizli Resim",d:"Kare adlarını boya, gizli resim ortaya çıksın.",lvl:"●●",page:66},
    {soon:1,t:"Kalem Bidik",d:"Bidik yürürken iz bıraksın: kodla şekil çiz.",lvl:"●●",page:72},
    {soon:1,t:"İki Renkli Dil",d:"İki renkli boncuklarla gizli mesaj yaz ve çöz.",lvl:"●●",page:74}]}
 ];
-const FINAL={name:"Bidik'in Bir Günü",kid:"Bütün durakları tek hikâyede kullan, Kodlama Ustası sertifikasını kazan.",page:"78-82"};
+const FINAL={name:"Çiçek Adası",kid:"Yedi tohumu getir, Büyük Çiçek'i yeniden aç. Bidik'in Bir Günü burada seni bekliyor.",page:"78-82"};
 const FLOWER=`<g transform="translate(50 46)">${[0,60,120,180,240,300].map(a=>`<ellipse cx="0" cy="-18" rx="11" ry="15" fill="#f49ac1" stroke="#fff" stroke-width="2.5" transform="rotate(${a})"/>`).join("")}<circle r="13" fill="#ffc93c" stroke="#d99a00" stroke-width="2.5"/><circle cx="-4.5" cy="-2" r="2" fill="#16324a"/><circle cx="4.5" cy="-2" r="2" fill="#16324a"/><path d="M-4.5 3.5 Q0 7 4.5 3.5" stroke="#16324a" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>`;
-let curDurak=null, lastLevels=null;
+// ada simgeleri (48×48)
+function emblem(no,c){
+  c=c||(DURAKS.find(x=>x.no===no)||{}).color||"#16324a";
+  switch(no){
+  case 1: return `<path d="M9 14h10a5 5 0 1 1 10 0h10v10a5 5 0 1 0 0 10v10H29a5 5 0 1 0-10 0H9z" fill="${c}" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>`;
+  case 2: return `<path d="M5 17 Q24 42 43 17" stroke="#16324a" stroke-width="2" fill="none"/>${[[9,23,c],[16.5,30,"#ffc93c"],[24,32.5,c],[31.5,30,"#ffc93c"],[39,23,c]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="5.5" fill="${p[2]}" stroke="#fff" stroke-width="2"/>`).join("")}`;
+  case 3: return `<circle cx="20" cy="20" r="12" fill="#e6f7ff" stroke="${c}" stroke-width="5"/><path d="M15 15a7 7 0 0 1 7-3" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M29 29l11 11" stroke="${c}" stroke-width="7" stroke-linecap="round"/>`;
+  case 4: return `<circle cx="24" cy="24" r="18" fill="#fff" stroke="${c}" stroke-width="4"/><path d="M24 9l5 15h-10z" fill="#e8443a"/><path d="M24 39l5-15h-10z" fill="#16324a"/><circle cx="24" cy="24" r="2.6" fill="#fff"/>`;
+  case 5: return `<path d="M20.5 25h7l3.5 19h-14z" fill="${c}"/><g transform="translate(24 22)">${[20,110,200,290].map(a=>`<path d="M0 0 L5 -3 L5 -19 L0 -19Z" fill="#ffc93c" stroke="${c}" stroke-width="1.6" transform="rotate(${a})"/>`).join("")}<circle r="3.2" fill="#16324a"/></g>`;
+  case 6: return `<path d="M34 6a9 9 0 0 0-10 12L8 34a4.5 4.5 0 0 0 6.4 6.4l16-16a9 9 0 0 0 12-10l-6 6-5.5-1-1-5.5z" fill="${c}" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>`;
+  case 7: return `<rect x="11" y="9" width="26" height="30" rx="3" fill="#fff6dc" stroke="${c}" stroke-width="3"/><rect x="8" y="5" width="32" height="7" rx="3.5" fill="${c}"/><rect x="8" y="36" width="32" height="7" rx="3.5" fill="${c}"/><circle cx="17" cy="19" r="2.8" fill="#d6409f"/><circle cx="24" cy="19" r="2.8" fill="#2f7fd8"/><circle cx="31" cy="19" r="2.8" fill="#d6409f"/><path d="M15 26.5h18M15 31.5h11" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/>`;
+  default: return `<g transform="translate(-1 -3) scale(.5)">${FLOWER}</g>`;
+  }
+}
+// ada yıldızları ve tohum
+function isleStars(dk,d){ d=d||P(); let got=0,max=0; dk.acts.forEach(a=>{ if(a.prog){const r=a.prog(d); got+=r[0]; max+=r[1]} }); return [got,max] }
+function seedNeed(max){ return Math.min(12,Math.ceil(max/4)) }
+function hasSeed(dk,d){ const [g,m]=isleStars(dk,d); return m>0&&g>=seedNeed(m) }
+function seedCount(d){ return DURAKS.filter(dk=>hasSeed(dk,d)).length }
+const SEED_ART=(x,y,on)=>`<g transform="translate(${x} ${y})">${on?`<circle r="19" fill="#ffe27a" class="seedglow"/>`:""}<circle r="15" fill="${on?"#fff":"rgba(255,255,255,.75)"}" stroke="${on?"#d99a00":"#7aa7b8"}" stroke-width="3" ${on?"":`stroke-dasharray="4 4"`}/><path d="M0 -9 C7 -3 7 6 0 9 C-7 6 -7 -3 0 -9Z" fill="${on?"#a0682c":"#c9d3de"}"/><path d="M0 -4 v9" stroke="${on?"#f3c98b":"#eef2f6"}" stroke-width="2" stroke-linecap="round"/></g>`;
+function blobPath(cx,cy,r,seed){
+  const n=11, pts=[];
+  for(let i=0;i<n;i++){ const a=i/n*Math.PI*2, w=0.86+0.2*Math.abs(Math.sin(seed*7.3+i*2.1)); pts.push([cx+Math.cos(a)*r*w*1.12, cy+Math.sin(a)*r*w*0.9]) }
+  let d=""; for(let i=0;i<n;i++){ const p=pts[i], q=pts[(i+1)%n], m=[(p[0]+q[0])/2,(p[1]+q[1])/2]; if(i===0){const z=pts[n-1];d+=`M${((z[0]+p[0])/2).toFixed(1)} ${((z[1]+p[1])/2).toFixed(1)}`} d+=` Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}` }
+  return d+"Z";
+}
+const BOAT=`<g class="boat"><path d="M-36 4 h72 l-13 17 h-46z" fill="#b5743c" stroke="#7a4a20" stroke-width="3" stroke-linejoin="round"/><path d="M-30 10 h60" stroke="#e7a866" stroke-width="3"/><path d="M2 2 V-46" stroke="#7a4a20" stroke-width="3.5"/><path d="M5 -44 L30 -6 H5z" fill="#fff" stroke="#c9d3de" stroke-width="2"/><path d="M5 -20 L19 -20 L23 -14 H5z" fill="#f49ac1"/><g transform="translate(-14 -6) rotate(-90) scale(.42)">${ROBOT}</g></g>`;
+const MAPL={
+  wide:{w:1000,h:600,r:62,pos:[[130,150],[360,115],[600,160],[850,130],[860,400],[610,440],[370,410],[135,430]]},
+  tall:{w:420,h:1110,r:58,pos:[[120,95],[300,215],[120,340],[300,465],[120,590],[300,715],[120,840],[290,970]]}
+};
+function smoothPath(P){ let d=`M${P[0][0]} ${P[0][1]}`; for(let i=0;i<P.length-1;i++){ const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||p2; d+=` C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)} ${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)} ${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0]} ${p2[1]}` } return d }
+let curDurak=null, lastLevels=null, mapLayout=null;
 function renderMap(){
-  const m=$("map"); m.innerHTML="";
-  DURAKS.forEach(dk=>{
-    const live=dk.acts.filter(a=>!a.soon).length, soon=dk.acts.length-live;
-    const b=document.createElement("button"); b.className="stop";
-    b.innerHTML=`<span class="num" style="background:${dk.color}">${dk.no}</span><h3>${dk.name}</h3><small>${dk.code}</small>${live?`<span class="cnt">${live} oyun</span>`:`<span class="cnt soon">Yakında</span>`}`;
-    b.setAttribute("aria-label",`Durak ${dk.no}: ${dk.name}`);
-    b.onclick=()=>openDurak(dk.no);
-    m.appendChild(b);
-  });
-  const f=document.createElement("button"); f.className="stop final"; f.disabled=true; f.style.cursor="default";
-  f.innerHTML=`<svg viewBox="0 0 100 100" aria-hidden="true">${FLOWER}</svg><span><h3>${FINAL.name}</h3><small>${FINAL.kid}</small><br><span class="cnt soon">Yakında</span></span>`;
-  m.appendChild(f);
+  const m=$("map"), wide=window.matchMedia("(min-width:700px)").matches, Lp=wide?MAPL.wide:MAPL.tall; mapLayout=wide;
+  const d=P(), seeds=DURAKS.map(dk=>hasSeed(dk,d)), nSeed=seeds.filter(Boolean).length;
+  const last=Math.min(8,Math.max(1,d.lastIsle||1)), R=Lp.r;
+  let o=`<svg class="sea" viewBox="0 0 ${Lp.w} ${Lp.h}" role="group" aria-label="Ada haritası"><defs><linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9e3f2"/><stop offset="1" stop-color="#7fcfe6"/></linearGradient></defs>
+  <rect width="${Lp.w}" height="${Lp.h}" rx="28" fill="url(#seaG)"/>`;
+  // dalgalar
+  for(let i=0;i<14;i++){ const x=(i*173+60)%(Lp.w-80)+20, y=(i*97+40)%(Lp.h-40)+20; o+=`<path d="M${x} ${y} q8 -7 16 0 t16 0" stroke="#e6f8fd" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".8"/>` }
+  // rota
+  for(let i=0;i<7;i++){ const seg=smoothPath(Lp.pos).split(" C")[i+1]; const st=Lp.pos[i]; o+=`<path d="M${st[0]} ${st[1]} C${seg}" stroke="${seeds[i]?"#ffc93c":"#ffffff"}" stroke-width="7" stroke-dasharray="1 17" stroke-linecap="round" fill="none"/>` }
+  // adalar
+  const isle=(no,x,y,name,sub,color,soon,seedOn,isFinal)=>{
+    const lab=y+R+30;
+    return `<g class="isle${soon?" soonisle":""}" data-no="${no}" role="button" tabindex="0" aria-label="${name}${isFinal?`, ${nSeed} / 7 tohum`:`, ${sub}`}"><g class="lift">
+      <ellipse cx="${x}" cy="${y+8}" rx="${R*1.32}" ry="${R*1.05}" fill="#d4f3fb" opacity=".8"/>
+      <path class="land" d="${blobPath(x,y,R*1.12,no)}" fill="#f6e2a6" stroke="#e2c47a" stroke-width="3"/>
+      <path class="land" d="${blobPath(x,y-4,R*0.9,no+3)}" fill="${isFinal?"#a7dd8c":"#9fd884"}"/>
+      ${isFinal?"":`<g fill="#5fae55"><circle cx="${x-R*.72}" cy="${y-R*.15}" r="9"/><circle cx="${x-R*.6}" cy="${y-R*.3}" r="7"/><circle cx="${x+R*.7}" cy="${y+R*.25}" r="8"/></g>`}
+      <circle class="ring" cx="${x}" cy="${y-6}" r="${R*.56}" fill="#fff" stroke="${color}" stroke-width="5"/>
+      <svg x="${x-R*.42}" y="${y-6-R*.42}" width="${R*.84}" height="${R*.84}" viewBox="0 0 48 48">${isFinal?`<g transform="translate(-1 -3) scale(.5)">${FLOWER}</g>`:emblem(no,color)}</svg>
+      ${isFinal?"":`<circle cx="${x-R*.62}" cy="${y-R*.62}" r="15" fill="${color}" stroke="#fff" stroke-width="3"/><text x="${x-R*.62}" y="${y-R*.62+6}" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="18" fill="#fff">${no}</text>`}
+      ${isFinal?"":SEED_ART(x+R*.72,y-R*.6,seedOn)}
+      <rect x="${x-98}" y="${lab-22}" width="196" height="${soon?56:48}" rx="16" fill="#fff" stroke="${color}" stroke-width="3"/>
+      <text x="${x}" y="${lab}" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="22" fill="#16324a">${name}</text>
+      <text x="${x}" y="${lab+18}" text-anchor="middle" font-family="Nunito,Segoe UI,sans-serif" font-weight="800" font-size="13" fill="#466179">${sub}</text>
+      ${soon?`<text x="${x}" y="${lab+31}" text-anchor="middle" font-family="Nunito,Segoe UI,sans-serif" font-weight="800" font-size="11" fill="#8a9bab">oyunlar yakında</text>`:""}
+    </g></g>`;
+  };
+  DURAKS.forEach((dk,i)=>{ const [x,y]=Lp.pos[i]; o+=isle(dk.no,x,y,dk.name,dk.code,dk.color,!dk.acts.some(a=>!a.soon),seeds[i],false) });
+  const fp=Lp.pos[7]; o+=isle(8,fp[0],fp[1],FINAL.name,`${nSeed} / 7 tohum`,"#e0457b",false,false,true);
+  // tekne: son ziyaret edilen adanın kıyısında
+  const bp=Lp.pos[last-1], np=Lp.pos[last], t=.47; o+=`<g transform="translate(${(bp[0]+(np[0]-bp[0])*t).toFixed(0)} ${(bp[1]+(np[1]-bp[1])*t-8).toFixed(0)})">${BOAT}</g>`;
+  o+=`</svg>`;
+  m.innerHTML=o;
+  m.querySelectorAll(".isle").forEach(g=>{ const no=+g.dataset.no; const go=()=>{ sfx.click&&sfx.click(); no===8?openFinal():openDurak(no) }; g.addEventListener("click",go); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();go()} }) });
+  renderGarden(seeds,nSeed);
+  checkNewSeeds(seeds);
+}
+window.addEventListener("resize",()=>{ if(!$("home").hidden && window.matchMedia("(min-width:700px)").matches!==mapLayout) renderMap() });
+function potSVG(on,color,no){
+  return `<svg viewBox="0 0 60 84" aria-hidden="true">${on?`<path d="M30 58 V30" stroke="#22a165" stroke-width="4" stroke-linecap="round"/><path d="M30 48 Q20 42 16 46 Q22 53 30 50Z" fill="#22a165"/><path d="M30 42 Q40 36 44 40 Q38 47 30 44Z" fill="#22a165"/><g transform="translate(30 24)">${[0,60,120,180,240,300].map(a=>`<ellipse cx="0" cy="-9" rx="6" ry="8" fill="${color}" stroke="#fff" stroke-width="1.6" transform="rotate(${a})"/>`).join("")}<circle r="6.5" fill="#ffc93c" stroke="#d99a00" stroke-width="1.5"/></g>`:`<path d="M30 58 C28 54 26 52 24 51" stroke="#b9c7b0" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>`}
+  <path d="M12 58 h36 l-5 24 h-26z" fill="#d9774a" stroke="#a8532d" stroke-width="2.5" stroke-linejoin="round"/><rect x="9" y="54" width="42" height="8" rx="3" fill="#e88d5f" stroke="#a8532d" stroke-width="2.5"/><text x="30" y="77" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="13" fill="#fff">${no}</text></svg>`;
+}
+function renderGarden(seeds,n){
+  const g=$("garden"); if(!g) return;
+  g.innerHTML=`<h3>Bidik'in Bahçesi</h3><p>${n===7?"Yedi tohumun hepsi toprakta! Çiçek Adası'na yelken aç.":`${n} / 7 tohum toplandı. Her adanın tohumu bir saksıda çiçek açar.`}</p>
+    <div class="pots">${DURAKS.map((dk,i)=>potSVG(seeds[i],dk.color,dk.no)).join("")}</div>`;
+}
+function checkNewSeeds(seeds){
+  const d=P(); d.seeds=d.seeds||{};
+  const fresh=DURAKS.filter((dk,i)=>seeds[i]&&!d.seeds[dk.no]);
+  if(!fresh.length) return;
+  fresh.forEach(dk=>d.seeds[dk.no]=1); save();
+  const dk=fresh[0];
+  setTimeout(()=>{ if($("home").hidden||!$("overlay").hidden) return;
+    overlay(`<span class="kicker">Sihirli tohum!</span><svg class="art" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#ffe27a" class="seedglow"/><circle cx="50" cy="50" r="30" fill="#fff" stroke="${dk.color}" stroke-width="5"/><svg x="26" y="26" width="48" height="48" viewBox="0 0 48 48">${emblem(dk.no)}</svg></svg>
+      <h2>${dk.name} tohumu senin!</h2><p>Bidik tohumu çantasına koydu ve bahçesine dikti. ${seedCount()===7?"Yedi tohumun hepsi tamam!":`Toplam ${seedCount()} / 7 tohum.`}</p><div class="btns"><button class="btn-main" id="ovSeed">Yaşasın!</button></div>`);
+    sfx.win&&sfx.win(); $("ovSeed").onclick=()=>{closeOverlay(); renderMap()};
+  },350);
+}
+function openFinal(){
+  const n=seedCount();
+  overlay(`<span class="kicker">Son durak</span><svg class="art" viewBox="0 0 100 100">${FLOWER}</svg><h2>${FINAL.name}</h2><p>${FINAL.kid}</p><p><b>${n} / 7 tohum</b> toplandı.${n<7?" Her adada biraz daha yıldız topla, tohumlar gelsin.":""}</p><p style="font-size:13px">Bu ada yakında açılıyor. Kitapta s. ${FINAL.page}.</p><div class="btns"><button class="btn-main" id="ovFin">Tamam</button></div>`);
+  $("ovFin").onclick=closeOverlay;
 }
 function openDurak(no){
   curDurak=no; lastLevels=null;
+  const d=P(); if(d.lastIsle!==no){ d.lastIsle=no; save() }
   const dk=DURAKS.find(x=>x.no===no);
   show("durak");
-  $("dSub").textContent=`Durak ${dk.no} / 7`;
+  $("dSub").textContent=`Ada ${dk.no} / 7`;
   const h=$("dHead"); h.style.background=dk.color;
-  h.innerHTML=`<span class="num">${dk.no}</span><div><h2>${dk.name}</h2><p>${dk.kid}</p><span class="code">${dk.code}</span></div>`;
+  const [g,mx]=isleStars(dk), need=seedNeed(mx), ok=mx>0&&g>=need;
+  const seedTxt= mx===0? "Tohum: oyunlar gelince" : ok? "Tohum kazanıldı ✓" : `Tohuma ${need-g} yıldız kaldı`;
+  h.innerHTML=`<span class="num" style="background:#fff"><svg viewBox="0 0 48 48" aria-hidden="true">${emblem(dk.no)}</svg></span><div><h2>${dk.name}</h2><p>${dk.kid}</p><span class="code">${dk.code}</span><span class="seed">${seedTxt}</span></div>`;
   const box=$("dActs"); box.innerHTML="";
   dk.acts.forEach(a=>{
     const b=document.createElement("button"); b.className="act";
@@ -1597,7 +1713,8 @@ function openReport(){
     ];
     const daily=Object.keys(d.daily).length;
     const c=document.createElement("div"); c.className="rcard";
-    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)}</header>
+    const stamps=`<div class="stamps" aria-label="Ada mühürleri">${DURAKS.map(dk=>`<span class="${hasSeed(dk,d)?"on":""}" title="${dk.name}" style="${hasSeed(dk,d)?`border-color:${dk.color}`:""}"><svg viewBox="0 0 48 48">${emblem(dk.no)}</svg></span>`).join("")}</div>`;
+    c.innerHTML=`<header><span class="avatar" style="background:${COLORS[p.color]}">${esc((p.name[0]||"?").toUpperCase())}</span>${esc(p.name)} · ${seedCount(d)} / 7 tohum</header>${stamps}
       <div class="bars">${rows.map(([l,v,m,col])=>`<span>${l}</span><div class="meter"><i style="width:${v/m*100}%;background:${col}"></i></div><span class="v">${v}/${m}</span>`).join("")}</div>
       <p class="note" style="text-align:left">Çözülen günlük bulmaca: ${daily}</p>`;
     list.appendChild(c);
