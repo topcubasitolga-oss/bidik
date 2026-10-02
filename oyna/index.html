@@ -2428,25 +2428,25 @@ const skaNums=no=>(WORLD[no].ska.match(/\d+/g)||[]).map(Number);
 // her bölge: görev cümlesi, katkı cümlesi, görevi anlatan bloklar, sorunu canlandıran nesneler
 const FILM={
   1:{gorev:"Görevin: Yol parçalarıyla Bidik'in evinden okula ve parka güvenli bir yol kur.",
-     katki:"Güvenli yollar ve bisiklet yolları, herkesin rahatça yaşadığı bir şehir demek. Böylece Amaç 11'e, Sürdürülebilir Şehirler ve Topluluklar'a katkı sağlarsın.",
+     katki:"Yaptığın güvenli yollarla çocuklar okula ve parka bisikletle gidebilecek. Böylece herkesin mutlu yaşadığı bir şehir kurmuş olacaksın!",
      blocks:["yol-duz","yol-viraj","yol-duz"],props:["koni","koni","koni"]},
   2:{gorev:"Görevin: Bloklarla Bidik'e yol göster, göletteki bütün çöpleri topla.",
-     katki:"Temiz su bütün canlılar için hayat demek. Göleti temizleyerek Amaç 6, Temiz Su ve Amaç 14, Sudaki Yaşam için çalışırsın.",
+     katki:"Göleti temizlersen balıklar, kurbağalar ve bütün canlılar temiz suya kavuşacak. Böylece dünyamızın sularını korumuş olacaksın!",
      blocks:["F","F","R"],props:["sise","teneke","poset"]},
   3:{gorev:"Görevin: Bidik'i bütün solgun çiçeklere götür, arılar için polen taşısın.",
-     katki:"Arılar çiçekleri tozlaştırınca meyve ve sebze yetişir. Böylece Amaç 15, Karasal Yaşam ve Amaç 2, Açlığa Son için çalışırsın.",
+     katki:"Çiçeklere polen taşırsan arılar mutlu olacak, bahçelerde meyve ve sebze yetişecek. Böylece herkesin sofrasına yiyecek gelmesine yardım etmiş olacaksın!",
      blocks:["F","3","F"],props:["solcicek","solcicek","solcicek"]},
   4:{gorev:"Görevin: Bidik'i çukurlara götür ve Fidan dik bloğuyla ağaç dik.",
-     katki:"Ağaçlar havayı temizler, iklimi korur, hayvanlara yuva olur. Böylece Amaç 13, İklim Eylemi ve Amaç 15, Karasal Yaşam için çalışırsın.",
+     katki:"Diktiğin her fidan büyüyüp ağaç olacak, havamızı temizleyecek, hayvanlara yuva olacak. Böylece dünyamızı korumuş olacaksın!",
      blocks:["F","D","R"],props:["kutuk","kutuk","kutuk"]},
   5:{gorev:"Görevin: Her atığı aynı renkli kutuya taşı. Plastik sarıya, kâğıt maviye, cam yeşile.",
-     katki:"Ayrı toplanan atık yeniden kullanılır, dünya daha az kirlenir. Böylece Amaç 12, Sorumlu Üretim ve Tüketim için çalışırsın.",
+     katki:"Atıkları doğru kutuya koyarsan onlar yeniden kullanılacak, dünyamız daha az kirlenecek. Böylece dünyamıza iyilik yapmış olacaksın!",
      blocks:["F","R","F"],props:["w:sari","w:mavi","w:yesil"]},
   6:{gorev:"Görevin: En kısa yoldan git, boşuna yanan lambaları söndür, enerjiyi koru.",
-     katki:"Enerjiyi boşa harcamamak havamızı ve iklimimizi korur. Böylece Amaç 7, Temiz Enerji ve Amaç 13, İklim Eylemi için çalışırsın.",
+     katki:"Boşuna yanan lambaları söndürürsen enerji boşa gitmeyecek. Böylece dünyamızın havasını korumuş olacaksın!",
      blocks:["F","L","2"],props:["lamba","lamba","lamba"]},
   7:{gorev:"Görevin: Sulama programındaki hatayı bul, düzelt ve tarlayı sula.",
-     katki:"Suyu boşa harcamadan doğru yere vermek, herkese yetecek yiyecek demek. Böylece Amaç 6, Temiz Su ve Amaç 2, Açlığa Son için çalışırsın.",
+     katki:"Tarlayı doğru sularsan su boşa gitmeyecek, sebzeler büyüyecek. Böylece hem suyu korumuş hem de herkese yiyecek yetiştirmiş olacaksın!",
      blocks:["F","R","F"],props:["kuru","kuru","kuru"]}
 };
 // ses: önce kayıt (ElevenLabs), yoksa cihaz sesi; bitince ya da süre dolunca devam
@@ -2481,7 +2481,8 @@ function filmBlock(t){
   if(t==="D") return window.__gorev&&window.__gorev.bH?window.__gorev.bH("D"):blkHTML("F");
   return blkHTML(t);
 }
-function skaBadge(n){ const s=SKA[n]; return `<div class="skab" style="--c:${s[1]}"><b>${n}</b><span>${s[0]}</span></div>` }
+const SKA_COCUK={2:"Herkese yiyecek",6:"Temiz su",7:"Temiz enerji",9:"Güvenli yollar",11:"Güzel şehirler",12:"Atıkları azalt",13:"İklimi koru",14:"Sudaki canlılar",15:"Karadaki canlılar",17:"Hep birlikte"};
+function skaBadge(n){ const s=SKA[n]; return `<div class="skab" style="--c:${s[1]}" title="Sürdürülebilir Kalkınma Amacı ${n}: ${s[0]}"><span>🌍</span><span>${SKA_COCUK[n]||s[0]}</span></div>` }
 function filmSeen(no){ return !!(P().seen||{})["film"+no] }
 function playFilm(no,then){
   const w=WORLD[no], F=FILM[no]; if(!w||!F){ then&&then(); return }
@@ -2490,7 +2491,7 @@ function playFilm(no,then){
   let el=$("film"); if(!el){ el=document.createElement("div"); el.id="film"; document.body.appendChild(el) }
   const nums=skaNums(no);
   el.innerHTML=`<div class="fcard" role="dialog" aria-modal="true" aria-label="${w.kita} filmi">
-    <div class="fsteps"><span data-s="1">1 · Sorun</span><span data-s="2">2 · Görev</span><span data-s="3">3 · Dünyaya katkı</span></div>
+    <div class="fsteps"><span data-s="1">1 · Sorun</span><span data-s="2">2 · Görev</span><span data-s="3">3 · Dünyaya iyiliğin</span></div>
     <div class="fstage" style="background:${w.sky[1]}">
       <svg class="fbg b0" viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${regionArt(no,false)}</svg>
       <svg class="fbg b1" viewBox="${vb}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${regionArt(no,true)}</svg>
@@ -2514,7 +2515,7 @@ function playFilm(no,then){
     await sayLine(`film-${no}-sorun`,w.sorun); if(!alive) return;
     step(2); cap.innerHTML=`<b>Bidik:</b> ${F.gorev}`; sfx.place&&sfx.place();
     await sayLine(`film-${no}-gorev`,F.gorev); if(!alive) return;
-    step(3); cap.innerHTML=`<b>Dünyaya katkın:</b> ${F.katki}`; sfx.win&&sfx.win();
+    step(3); cap.innerHTML=`<b>Bidik:</b> ${F.katki}`; sfx.win&&sfx.win();
     await sayLine(`film-${no}-katki`,F.katki); if(!alive) return;
     $("fSkip").textContent="Tekrar izle"; $("fSkip").onclick=()=>{ alive=false; stopFilmAudio(); playFilm(no,then) };
     $("fGo").hidden=false; $("fGo").focus();
@@ -3198,7 +3199,7 @@ function openMenu(){
       <button class="mi" id="miLv"><b>Seviye</b><small>Şu an: ${L}${teacherOn()?"":" · değiştirmek için önce öğretmen modunu açın"}</small></button>
       <button class="mi" id="miT"><b>Öğretmen modu: ${teacherOn()?"açık":"kapalı"}</b><small>Akıllı tahtada “Çözümü göster” düğmesi ve seviye değiştirme</small></button>
       <button class="mi" id="miR"><b>Hedef Defteri</b><small>Her çocuğun beceri ve hedef ilerlemesi</small></button>
-      ${/^https?:/.test(location.protocol)?`<a class="mi" href="../kartlar.html" target="_blank" rel="noopener"><b>Masa başı kartlar</b><small>Ekransız etkinlikler: yazdırıp sınıfta oynayın</small></a>`:""}
+      ${/^https?:/.test(location.protocol)?`<a class="mi" href="../ogretmen.html" target="_blank" rel="noopener"><b>Öğretmen Odası</b><small>Ders planı, çalışma yaprağı, değerlendirme</small></a><a class="mi" href="../kartlar.html" target="_blank" rel="noopener"><b>Masa başı kartlar</b><small>Ekransız etkinlikler: yazdırıp sınıfta oynayın</small></a>`:""}
       <button class="mi" id="miP"><b>Oyuncular</b><small>Öğrenci ekle, değiştir</small></button>
       <a class="mi" href="${$("fbBtn").getAttribute("href")}"><b>Görüş / hata bildir</b><small>E-posta ile bize yazın</small></a>
     </div><div class="btns"><button class="btn-main" id="miX">Kapat</button></div>`);
