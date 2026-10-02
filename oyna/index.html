@@ -251,6 +251,41 @@ h1,h2,h3{text-wrap:balance}
 .ptree .ptitle{font-family:var(--display);font-weight:800;font-size:26px;fill:#fff;letter-spacing:2px}
 .ptree .pbl{font-family:var(--display);font-weight:800;font-size:19px;fill:#fff}
 @media (max-width:420px){.sq{width:76px;min-height:104px}.sq svg{width:54px;height:54px}.tcard{width:84px}}
+
+.rules{width:min(100%,620px);display:flex;flex-direction:column;gap:10px}
+.rrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:3px solid #5aae95;border-radius:18px;padding:8px 12px;box-shadow:0 4px 0 #2f7a66}
+.rrow.bad{border-color:var(--red);box-shadow:0 4px 0 #a8261e}
+.rrow b{font-family:var(--display);font-size:20px;color:#2f7a66}
+.rrow .rn{font-weight:800;font-size:14px;min-width:84px}
+.rch{display:flex;gap:6px;margin-left:auto}
+.ract{display:flex;flex-direction:column;align-items:center;background:var(--sky);border:3px solid var(--panel-line);border-radius:14px;padding:4px 6px;min-width:64px}
+.ract small{font-weight:800;font-size:11px}
+.ract[aria-pressed="true"]{background:#fff7dc;border-color:var(--ink)}
+.ract.sm{min-width:0;padding:3px}
+.belt{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;background:#5b6f82;border-radius:16px;padding:10px;box-shadow:inset 0 -5px 0 rgba(0,0,0,.25)}
+.bslot{width:64px;height:92px;background:#fff;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:4px;border:3px solid transparent;transition:transform .2s}
+.bslot.on{transform:translateY(-6px);border-color:#ffc93c}
+.bslot.ok{border-color:#22a165}.bslot.no{border-color:var(--red)}
+.bslot .bout{height:36px}
+.rulecard{background:#fff;border:3px solid #5aae95;border-radius:18px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 0 #2f7a66}
+.rulecard div{display:flex;align-items:center;gap:6px;font-weight:800;flex-wrap:wrap}
+.rulecard b{font-family:var(--display);font-size:20px;color:#2f7a66}
+.rulecard .to{font-family:var(--display);font-size:24px}
+.preds{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.pcol{display:flex;flex-direction:column;align-items:center;gap:4px;background:#fff;border:3px solid var(--panel-line);border-radius:16px;padding:6px}
+.pcol.bad{border-color:var(--red)}.pcol.on{border-color:#ffc93c}
+.pch{display:flex;gap:4px}
+.progs{display:flex;flex-direction:column;gap:8px;width:min(100%,560px)}
+.prow{display:flex;align-items:center;gap:8px;background:#fff;border:3px solid var(--c);border-radius:16px;padding:6px 8px}
+.ptag{font-family:var(--display);font-weight:800;color:var(--c);font-size:17px;white-space:nowrap}
+.pblocks{display:flex;gap:5px;flex-wrap:wrap}
+.pb2{width:44px;height:44px;border-radius:12px;padding:0;border:3px solid transparent}
+.pb2.on{border-color:#ffc93c;transform:translateY(-3px)}
+.pb2.sel{border-color:var(--ink);box-shadow:0 0 0 3px #ffc93c}
+.pb2.err{border-color:var(--red)}
+.blkopt{display:flex;flex-direction:column;align-items:center;gap:2px;height:auto;padding:6px 10px}
+.blkopt .blk{width:44px;height:44px}
+.blkopt small{font-family:var(--body);font-size:12px}
 /* durak sayfası */
 .dhead{width:100%;border-radius:24px;padding:16px 18px;color:#fff;display:flex;gap:14px;align-items:center}
 .dhead .num{width:62px;height:62px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:34px}
@@ -1667,7 +1702,7 @@ $("aReset").onclick=()=>{ if(A&&!A.busy){ A.st=A.m.setup(A.n); A.won=false; A.de
 $("aCheck").onclick=()=>{
   if(!A||A.busy||A.won) return;
   const r=A.m.check(A.st);
-  if(r===true) aWin(); else aBad(typeof r==="string"?r:null);
+  if(r===true) aWin(); else if(r!=null) aBad(typeof r==="string"?r:null);
 };
 $("aSolve").onclick=aSolveRun;
 
@@ -2635,6 +2670,260 @@ regAct("piknik",{
   async solve(st){ for(const it of st.items){ st.sel=it; aRefresh(); aGoal(`${IT[it][0]} → ${BR[home(st,it)][0]}`); await aWait(700); st.place[it]=home(st,it); st.sel=null; sfx.place(); aRefresh(); await aWait(450) } }
 });
 })();
+// ===== Kural Makinesi (Kuzey Amerika · Kunduz Kunku) =====
+Object.assign(ICONS,{
+  isik_k:`<rect x="32" y="8" width="36" height="84" rx="12" fill="#16324a"/><circle cx="50" cy="26" r="11" fill="#e8443a"/><circle cx="50" cy="50" r="11" fill="#3c4f63"/><circle cx="50" cy="74" r="11" fill="#3c4f63"/><circle cx="46" cy="22" r="3" fill="#fff" opacity=".6"/>`,
+  isik_s:`<rect x="32" y="8" width="36" height="84" rx="12" fill="#16324a"/><circle cx="50" cy="26" r="11" fill="#3c4f63"/><circle cx="50" cy="50" r="11" fill="#ffc93c"/><circle cx="50" cy="74" r="11" fill="#3c4f63"/><circle cx="46" cy="46" r="3" fill="#fff" opacity=".6"/>`,
+  isik_y:`<rect x="32" y="8" width="36" height="84" rx="12" fill="#16324a"/><circle cx="50" cy="26" r="11" fill="#3c4f63"/><circle cx="50" cy="50" r="11" fill="#3c4f63"/><circle cx="50" cy="74" r="11" fill="#22a165"/><circle cx="46" cy="70" r="3" fill="#fff" opacity=".6"/>`,
+  dur:`<path d="M34 8 H66 L92 34 V66 L66 92 H34 L8 66 V34Z" fill="#e8443a" stroke="#fff" stroke-width="5"/><text x="50" y="60" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="26" fill="#fff">DUR</text>`,
+  gec:`<circle cx="56" cy="16" r="9" fill="#22a165"/><path d="M52 28 L44 54 L30 60 M48 40 L62 48 L72 44 M44 54 L56 70 L52 90 M44 56 L34 74 L22 80" stroke="#22a165" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+  bekle:`<path d="M28 10 H72 M28 90 H72" stroke="#b5743c" stroke-width="7" stroke-linecap="round"/><path d="M32 12 C32 36 50 42 50 50 C50 58 32 64 32 88 H68 C68 64 50 58 50 50 C50 42 68 36 68 12Z" fill="#e3f7fd" stroke="#4a9cc4" stroke-width="4"/><path d="M38 84 C40 72 50 68 50 64 C50 68 60 72 62 84Z" fill="#ffc93c"/><path d="M42 26 H58 C56 34 50 38 50 40 C50 38 44 34 42 26Z" fill="#ffc93c"/>`,
+  yagmur:`<path d="M24 54 a16 16 0 0 1 4 -31 a22 22 0 0 1 42 4 a14 14 0 0 1 6 27Z" fill="#9fb4c9"/><path d="M34 64 l-5 12 M52 64 l-5 12 M70 64 l-5 12 M43 80 l-4 10 M61 80 l-4 10" stroke="#2f7fd8" stroke-width="5" stroke-linecap="round"/>`,
+  kar:`<path d="M24 50 a16 16 0 0 1 4 -31 a22 22 0 0 1 42 4 a14 14 0 0 1 6 27Z" fill="#c9d3de"/>${[[32,68],[52,74],[70,66],[42,88],[62,88]].map(([x,y])=>`<g transform="translate(${x} ${y})"><path d="M0 -7 V7 M-6 -3.5 L6 3.5 M-6 3.5 L6 -3.5" stroke="#7fb6e0" stroke-width="3" stroke-linecap="round"/></g>`).join("")}`,
+  bulut:`<path d="M20 70 a18 18 0 0 1 4 -35 a24 24 0 0 1 46 4 a16 16 0 0 1 8 31Z" fill="#c9d3de" stroke="#9fb4c9" stroke-width="3"/>`,
+  semsiye:`<path d="M10 50 C10 20 90 20 90 50 C84 44 76 44 70 50 C64 44 56 44 50 50 C44 44 36 44 30 50 C24 44 16 44 10 50Z" fill="#e0457b" stroke="#a82a5c" stroke-width="3" stroke-linejoin="round"/><path d="M50 50 V80 a8 8 0 0 1 -16 0" stroke="#16324a" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M50 22 V14" stroke="#16324a" stroke-width="4"/>`,
+  atki:`<path d="M20 30 C40 40 60 40 80 30 L82 44 C60 54 40 54 18 44Z" fill="#e8443a" stroke="#a8261e" stroke-width="3"/><path d="M58 46 L64 88 L50 88 L46 48Z" fill="#e8443a" stroke="#a8261e" stroke-width="3"/><path d="M28 36 V46 M40 40 V50 M52 40 V50 M52 64 H62 M54 76 H63" stroke="#fff" stroke-width="3"/>`,
+  kilitli:`<rect x="24" y="12" width="52" height="78" rx="4" fill="#b5743c" stroke="#7a4a20" stroke-width="4"/><rect x="38" y="46" width="24" height="20" rx="4" fill="#ffc93c" stroke="#d99a00" stroke-width="3"/><path d="M42 46 V40 a8 8 0 0 1 16 0 V46" stroke="#d99a00" stroke-width="4" fill="none"/><circle cx="50" cy="56" r="3" fill="#16324a"/>`,
+  acik:`<rect x="24" y="12" width="52" height="78" rx="4" fill="#3c4f63"/><path d="M24 12 L56 20 V96 L24 90Z" fill="#b5743c" stroke="#7a4a20" stroke-width="4" stroke-linejoin="round"/><circle cx="50" cy="58" r="3.5" fill="#ffd23f"/><path d="M60 50 h12" stroke="#ffc93c" stroke-width="4" stroke-linecap="round" opacity=".7"/>`,
+  anahtar:`<circle cx="30" cy="50" r="16" fill="#ffd23f" stroke="#a87700" stroke-width="5"/><circle cx="30" cy="50" r="6" fill="#fff"/><path d="M46 50 H88 M74 50 V64 M84 50 V60" stroke="#a87700" stroke-width="7" stroke-linecap="round"/>`,
+  icerigir:`<rect x="18" y="12" width="44" height="78" rx="4" fill="#3c4f63"/><path d="M92 50 H44 M58 36 L44 50 L58 64" stroke="#22a165" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+  kuru:`<path d="M26 56 H74 L68 90 H32Z" fill="#d9774a" stroke="#a8532d" stroke-width="3"/><path d="M50 56 V36 C46 28 38 26 32 30 M50 40 C56 30 64 32 68 36" stroke="#b08a5a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M30 34 C26 40 30 46 34 42 Z M68 38 C72 44 68 50 64 46Z" fill="#c9a66b"/><path d="M34 62 l6 6 l6 -6 l6 6 l6 -6 l6 6" stroke="#a8532d" stroke-width="2" fill="none"/>`,
+  islak:`<path d="M26 56 H74 L68 90 H32Z" fill="#d9774a" stroke="#a8532d" stroke-width="3"/><path d="M50 56 V28" stroke="#22a165" stroke-width="5"/><path d="M50 42 C40 30 28 34 26 40 C36 46 44 46 50 42Z M50 36 C58 24 72 26 74 32 C64 40 56 40 50 36Z" fill="#7cc35a" stroke="#22a165" stroke-width="2"/><path d="M80 20 C86 30 86 36 80 36 C74 36 74 30 80 20Z M14 30 C18 38 18 42 14 42 C10 42 10 38 14 30Z" fill="#7fd0ea"/>`,
+  sola:`<path d="M84 50 H22 M42 28 L18 50 L42 72" stroke="#2f7fd8" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+  saga:`<path d="M16 50 H78 M58 28 L82 50 L58 72" stroke="#d6409f" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+  orta:`<path d="M50 16 V80 M28 58 L50 82 L72 58" stroke="#22a165" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`,
+  topk:`<circle cx="50" cy="50" r="30" fill="#e8443a" stroke="#a8261e" stroke-width="4"/><circle cx="40" cy="40" r="8" fill="#fff" opacity=".45"/>`,
+  topm:`<circle cx="50" cy="50" r="30" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="4"/><circle cx="40" cy="40" r="8" fill="#fff" opacity=".45"/>`,
+  topy:`<circle cx="50" cy="50" r="30" fill="#22a165" stroke="#167a4a" stroke-width="4"/><circle cx="40" cy="40" r="8" fill="#fff" opacity=".45"/>`,
+  dalu:`<path d="M10 56 L90 44" stroke="#8a5a2b" stroke-width="12" stroke-linecap="round"/><path d="M60 48 L72 30" stroke="#8a5a2b" stroke-width="6" stroke-linecap="round"/><ellipse cx="74" cy="28" rx="7" ry="4" fill="#7cc35a"/>`,
+  dalk:`<path d="M32 54 L68 46" stroke="#8a5a2b" stroke-width="12" stroke-linecap="round"/>`,
+  baraj:`<path d="M6 70 C30 62 70 62 94 70 V90 H6Z" fill="#7fd0ea"/><g stroke="#8a5a2b" stroke-width="7" stroke-linecap="round"><path d="M14 64 L86 56"/><path d="M12 54 L80 46"/><path d="M20 44 L88 38"/></g><path d="M30 40 L44 30 L58 38" stroke="#6b4226" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+  yuva:`<path d="M10 80 C10 44 36 26 50 26 C64 26 90 44 90 80Z" fill="#a8693d" stroke="#6b4226" stroke-width="4"/><path d="M38 80 V64 a12 12 0 0 1 24 0 V80Z" fill="#3b2418"/><path d="M20 60 L40 52 M60 50 L80 58 M30 42 L50 40" stroke="#6b4226" stroke-width="4" stroke-linecap="round"/>`
+});
+(function(){
+// kural kur: koşullar → eylemler; sonra makine test durumlarında çalışır
+const RULES={
+  1:{say:"Kunku nehrin karşısına geçecek. Trafik ışığına göre ne yapmalı?",rows:[["isik_k","dur"],["isik_y","gec"]],acts:["dur","gec"],tests:["isik_y","isik_k","isik_k","isik_y"]},
+  2:{say:"Şimdi ışığın üç rengi var.",rows:[["isik_k","dur"],["isik_s","bekle"],["isik_y","gec"]],acts:["dur","bekle","gec"],tests:["isik_s","isik_y","isik_k","isik_s","isik_y"]},
+  3:{say:"Kunku dışarı çıkacak. Havaya göre ne alsın?",rows:[["yagmur","semsiye"],["gunes","sapka"]],acts:["semsiye","sapka"],tests:["gunes","yagmur","yagmur","gunes"]},
+  4:{say:"Bugün hava çok değişken!",rows:[["yagmur","semsiye"],["gunes","sapka"],["kar","atki"]],acts:["semsiye","sapka","atki"],tests:["kar","gunes","yagmur","kar","gunes"]},
+  5:{say:"Kunku eve girecek. Kapıya göre ne yapmalı?",rows:[["kilitli","anahtar"],["acik","icerigir"]],acts:["anahtar","icerigir"],tests:["acik","kilitli","kilitli","acik"]},
+  6:{say:"Kunku'nun saksıları. Toprağa göre ne yapmalı?",rows:[["kuru","sulama"],["islak","bekle"]],acts:["sulama","bekle"],tests:["islak","kuru","kuru","islak","kuru"]}
+};
+const NAME={isik_k:"Kırmızı ışık",isik_s:"Sarı ışık",isik_y:"Yeşil ışık",dur:"Dur",gec:"Geç",bekle:"Bekle",yagmur:"Yağmur",gunes:"Güneş",kar:"Kar",bulut:"Bulut",semsiye:"Şemsiye al",sapka:"Şapka tak",atki:"Atkı tak",
+  kilitli:"Kapı kilitli",acik:"Kapı açık",anahtar:"Anahtarı kullan",icerigir:"İçeri gir",kuru:"Toprak kuru",islak:"Toprak ıslak",sulama:"Sula",
+  sola:"Sola",saga:"Sağa",orta:"Ortaya",topk:"Kırmızı top",topm:"Mavi top",topy:"Yeşil top",dalu:"Uzun dal",dalk:"Kısa dal",baraj:"Baraja",yuva:"Yuvaya"};
+// tahmin: kural kartı + girdiler → her girdi için çıktı seç
+const PRED={
+  7:{rule:[["Eğer","yagmur","ise","semsiye"],["Değilse","","","sapka"]],say:"Kural: yağmur yağıyorsa şemsiye, değilse şapka. Kunku her gün ne alır?",items:["gunes","yagmur","kar","bulut","yagmur"],outs:["semsiye","sapka"],f:x=>x==="yagmur"?"semsiye":"sapka"},
+  8:{rule:[["Eğer","topk","ise","sola"],["Değilse","","","saga"]],say:"Ayırma makinesi! Kırmızı toplar sola, ötekiler sağa.",items:["topm","topk","topy","topk","topm","topk"],outs:["sola","saga"],f:x=>x==="topk"?"sola":"saga"},
+  9:{rule:[["Eğer","topk","ise","sola"],["Eğer","topm","ise","saga"],["Değilse","","","orta"]],say:"Üç yollu makine: kırmızı sola, mavi sağa, kalanlar ortaya.",items:["topy","topk","topm","topy","topm","topk","topm"],outs:["sola","orta","saga"],f:x=>x==="topk"?"sola":x==="topm"?"saga":"orta"},
+  10:{rule:[["Eğer","dalu","ise","baraj"],["Değilse","","","yuva"]],say:"Kunku dalları ayırıyor. Uzun dallar baraja, kısalar yuvaya. Baraja kaç dal gider?",items:["dalu","dalk","dalu","dalu","dalk","dalu","dalk"],outs:["baraj","yuva"],f:x=>x==="dalu"?"baraj":"yuva",count:"baraj"}
+};
+regAct("kural",{
+  title:"Kural Makinesi", durak:5, N:10, speed:true,
+  parts:[{name:"Kuralı Kur",sub:"Eğer… ise…: her duruma bir eylem",from:1,to:6},{name:"Makine Ne Yapar?",sub:"Kuralı oku, sonucu tahmin et",from:7,to:10}],
+  doneText:"Makine doğru çalıştı",
+  talk:n=> n<=6?"Günlük hayatta hangi “eğer… ise…” kurallarını kullanıyoruz? Bir tane de sen uydur!":"“Değilse” ne demek? Kar yağınca Kunku neden şapka taktı? Kuralı nasıl düzeltirdin?",
+  intro:n=> n===1?{key:"p1",kicker:"Kuzey Amerika",title:"Kunku'nun kural makinesi",art:ICONS.isik_k,text:"Her duruma bir eylem seç: <b>Eğer</b> kırmızı ışıksa <b>dur</b>. Sonra <b>Çalıştır</b>'a bas: makine kuralını farklı durumlarda dener."}
+        : n===7?{key:"p2",kicker:"Yeni görev",title:"Makine ne yapar?",art:ICONS.semsiye,text:"Kural kartını oku. Her durum için makinenin ne yapacağını seç. <b>Değilse</b>: kuraldaki durum yoksa ne olacağını söyler."}:null,
+  setup(n){
+    if(n<=6){ const R=RULES[n]; return {n,type:"rule",R,pick:R.rows.map(()=>null),run:-1,res:[]} }
+    const L=PRED[n]; return {n,type:"pred",L,pick:L.items.map(()=>null),count:null,run:-1,res:[]};
+  },
+  goal(st){ return st.type==="rule"?st.R.say:st.L.say },
+  checkLabel(st){ return st.type==="rule"?"Çalıştır":"Kontrol et" },
+  render(st){
+    const body=$("aBody"); let h="";
+    if(st.type==="rule"){
+      h+=`<div class="rules">${st.R.rows.map((r,i)=>`<div class="rrow ${st.res.length&&st.res.some(x=>x.cond===r[0]&&!x.ok)?"bad":""}"><b>Eğer</b>${cardIcon(r[0],56)}<span class="rn">${NAME[r[0]]}</span><b>ise</b>
+        <div class="rch">${st.R.acts.map(a=>`<button class="ract" data-r="${i}" data-a="${a}" aria-pressed="${st.pick[i]===a}" aria-label="${NAME[a]}">${cardIcon(a,44)}<small>${NAME[a]}</small></button>`).join("")}</div></div>`).join("")}</div>`;
+      h+=`<div class="belt">${st.R.tests.map((t,i)=>{ const r=st.res[i]; return `<div class="bslot ${st.run===i?"on":""} ${r?(r.ok?"ok":"no"):""}">${cardIcon(t,44)}<span class="bout">${r?cardIcon(r.out||"",36):""}</span></div>` }).join("")}</div>`;
+      body.innerHTML=h;
+      body.querySelectorAll(".ract").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.pick[+b.dataset.r]=b.dataset.a; st.res=[]; sfx.click(); aRefresh() });
+      return;
+    }
+    const L=st.L;
+    h+=`<div class="rulecard">${L.rule.map(r=>`<div>${r[1]?`<b>${r[0]}</b>${cardIcon(r[1],40)}<span>${NAME[r[1]]}</span><b>${r[2]}</b>`:`<b>${r[0]}</b>`}<span class="to">→</span>${cardIcon(r[3],40)}<span>${NAME[r[3]]}</span></div>`).join("")}</div>`;
+    if(L.count){
+      h+=`<div class="belt">${L.items.map((t,i)=>`<div class="bslot ${st.run===i?"on":""} ${st.res[i]?"ok":""}">${cardIcon(t,48)}<span class="bout">${st.res[i]?cardIcon(L.f(t),32):""}</span></div>`).join("")}</div>`;
+      const right=L.items.filter(x=>L.f(x)===L.count).length, opts=[right-1,right,right+1,right+2].filter(x=>x>=0).slice(0,4);
+      h+=`<p class="ahelp">${NAME[L.count]} kaç dal gider?</p><div class="aopts">${opts.map(o=>`<button class="aopt" data-c="${o}" aria-pressed="${st.count===o}">${o}</button>`).join("")}</div>`;
+      body.innerHTML=h;
+      body.querySelectorAll(".aopt").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.count=+b.dataset.c; sfx.click(); aRefresh() });
+      return;
+    }
+    h+=`<div class="preds">${L.items.map((t,i)=>`<div class="pcol ${st.res[i]===false?"bad":""} ${st.run===i?"on":""}">${cardIcon(t,52)}<div class="pch">${L.outs.map(o=>`<button class="ract sm" data-i="${i}" data-o="${o}" aria-pressed="${st.pick[i]===o}" aria-label="${NAME[o]}">${cardIcon(o,34)}</button>`).join("")}</div></div>`).join("")}</div>`;
+    body.innerHTML=h;
+    body.querySelectorAll(".ract").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.pick[+b.dataset.i]=b.dataset.o; st.res=[]; sfx.click(); aRefresh() });
+  },
+  async run(st){
+    A.busy=true; st.res=[];
+    const map={}; st.R.rows.forEach((r,i)=>map[r[0]]=st.pick[i]);
+    for(let i=0;i<st.R.tests.length;i++){ const t=st.R.tests[i], out=map[t], want=st.R.rows.find(r=>r[0]===t)[1];
+      st.run=i; st.res.push({cond:t,out,ok:out===want}); out===want?sfx.place():sfx.no(); aRefresh(); await aWait(700) }
+    st.run=-1; A.busy=false; aRefresh();
+    return st.res.every(r=>r.ok);
+  },
+  check(st){
+    if(st.type==="rule"){
+      if(st.pick.includes(null)) return "Her duruma bir eylem seç.";
+      // çalıştır animasyonu; sonucu kendisi bildirir
+      this.run(st).then(ok=>{ if(ok) aWin(); else aBad("Makine bazı durumlarda yanlış yaptı. Kırmızı işaretli kuralı düzelt.") });
+      return null;
+    }
+    const L=st.L;
+    if(L.count){ if(st.count==null) return "Bir sayı seç."; return st.count===L.items.filter(x=>L.f(x)===L.count).length?true:"Bir daha say. Her dal için kuralı uygula." }
+    if(st.pick.includes(null)) return "Her durum için bir sonuç seç.";
+    st.res=L.items.map((t,i)=>st.pick[i]===L.f(t));
+    return st.res.every(Boolean)?true:"İşaretli tahminler kurala uymuyor. Kural kartını bir daha oku.";
+  },
+  solved(st){ if(st.type==="rule") return st.pick.every((p,i)=>p===st.R.rows[i][1]); const L=st.L; return L.count?st.count===L.items.filter(x=>L.f(x)===L.count).length:L.items.every((t,i)=>st.pick[i]===L.f(t)) },
+  auto(st){ if(st.type==="rule") st.pick=st.R.rows.map(r=>r[1]); else if(st.L.count) st.count=st.L.items.filter(x=>st.L.f(x)===st.L.count).length; else st.pick=st.L.items.map(t=>st.L.f(t)); return true },
+  async solve(st){
+    if(st.type==="rule"){ for(let i=0;i<st.R.rows.length;i++){ const r=st.R.rows[i]; aGoal(`Eğer ${NAME[r[0]].toLowerCase()} ise: ${NAME[r[1]].toLowerCase()}`); st.pick[i]=r[1]; sfx.click(); aRefresh(); await aWait(1000) } await this.run(st); A.busy=true; return }
+    const L=st.L;
+    for(let i=0;i<L.items.length;i++){ st.run=i; const o=L.f(L.items[i]); aGoal(`${NAME[L.items[i]]} → ${NAME[o]}`); if(L.count) st.res[i]=true; else st.pick[i]=o; sfx.click(); aRefresh(); await aWait(750) }
+    st.run=-1; if(L.count){ st.count=L.items.filter(x=>L.f(x)===L.count).length; aGoal(`${NAME[L.count]} ${st.count} dal gider.`) } aRefresh(); await aWait(900);
+  }
+});
+})();
+// ===== İki Kod Yarışıyor (Antarktika · Penguen Pengo) =====
+(function(){
+const DX=[0,1,0,-1], DY=[-1,0,1,0];
+const B={F:["İleri","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],G:["Geri","gd",'<path d="M12 4v16M6 14l6 6 6-6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>']};
+const bHTML=(t,extra)=>`<span class="blk ${B[t][1]}" aria-label="${B[t][0]}" ${extra||""}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${B[t][2]}</svg></span>`;
+const LV={1:[4,3,1],2:[4,4,1],3:[4,5,2],4:[4,5,2],5:[5,6,3],6:[5,6,3],7:[5,7,3],8:[5,8,3]}; // N, uzunluk, delik sayısı
+function sim(L,prog,upto){
+  let x=L.sx,y=L.sy,d=L.sd; const path=[[x,y,d]];
+  const n=upto==null?prog.length:upto;
+  for(let i=0;i<n;i++){ const c=prog[i];
+    if(c==="L") d=(d+3)%4; else if(c==="R") d=(d+1)%4;
+    else { const s=c==="F"?1:-1; x+=DX[d]*s; y+=DY[d]*s;
+      if(x<0||y<0||x>=L.N||y>=L.N){ path.push([x,y,d]); return {path,fail:"out",at:i} }
+      if(L.holes.some(h=>h[0]===x&&h[1]===y)){ path.push([x,y,d]); return {path,fail:"hole",at:i} } }
+    path.push([x,y,d]);
+  }
+  const end=path[path.length-1];
+  return {path,fail:(end[0]===L.gx&&end[1]===L.gy)?null:"miss",at:n-1};
+}
+function gen(n){
+  const [N,len,nh]=LV[n];
+  for(let seed=0;seed<6000;seed++){
+    const r=mkRng(n*7919+seed*13), pick=a=>a[Math.floor(r()*a.length)];
+    const L={N,sx:Math.floor(r()*N),sy:Math.floor(r()*N),sd:Math.floor(r()*4),holes:[]};
+    const set=n>=7?["F","F","F","L","R","G"]:["F","F","L","R"];
+    const prog=[]; for(let i=0;i<len;i++) prog.push(pick(set));
+    if(prog[0]!=="F"&&n<=2) prog[0]="F";
+    const s=prog.join(""); if(/LR|RL|LLL|RRR|FG|GF|(L|R)$/.test(s)) continue;
+    if(!prog.includes("L")&&!prog.includes("R")&&n>2) continue;
+    L.gx=-1; const p=sim({...L,gx:-1,gy:-1},prog);
+    if(p.fail==="out"||p.fail==="hole") continue;
+    const end=p.path[p.path.length-1]; if(end[0]===L.sx&&end[1]===L.sy) continue;
+    const cells=new Set(p.path.map(q=>q[0]+","+q[1])); if(cells.size<Math.min(len,3)) continue;
+    L.gx=end[0]; L.gy=end[1];
+    // delikler: yolun dışına
+    const free=[]; for(let yy=0;yy<N;yy++) for(let xx=0;xx<N;xx++) if(!cells.has(xx+","+yy)) free.push([xx,yy]);
+    L.holes=shuffle(free,r).slice(0,nh);
+    // bozuk program: tek blok değişsin ve başarısız olsun; delik ya da dışarı tercih
+    const opts=[];
+    prog.forEach((c,i)=>["F","L","R",...(n>=7?["G"]:[])].forEach(t=>{ if(t===c) return; const bad=prog.slice(); bad[i]=t; const q=sim(L,bad); if(q.fail) opts.push({i,t,q}) }));
+    const good=opts.filter(o=>o.q.fail!=="miss"||n<=2); if(!good.length) continue;
+    const bad=pick(good);
+    const badProg=prog.slice(); badProg[bad.i]=bad.t;
+    const aGood=r()<.5;
+    return {...L,prog,badProg,badAt:bad.i,good:aGood?"A":"B",fail:bad.q.fail};
+  }
+  throw new Error("yarış üretilemedi "+n);
+}
+const CACHE={};
+function pengo(scarf){ return `<g><ellipse cx="0" cy="4" rx="27" ry="31" fill="#22344d"/><path d="M-27 2 C-34 10 -32 22 -24 24 M27 2 C34 10 32 22 24 24" stroke="#22344d" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="0" cy="-8" rx="17" ry="15" fill="#fff"/><circle cx="-6" cy="-12" r="3.6" fill="#16324a"/><circle cx="6" cy="-12" r="3.6" fill="#16324a"/><circle cx="-5" cy="-13.5" r="1.3" fill="#fff"/><circle cx="7" cy="-13.5" r="1.3" fill="#fff"/>
+  <path d="M-6 -24 L0 -38 L6 -24Z" fill="#ff9b2f" stroke="#d96e10" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M-22 10 C-10 16 10 16 22 10 L21 18 C10 24 -10 24 -21 18Z" fill="${scarf}"/></g>` }
+const COL={A:"#e8443a",B:"#2f7fd8"};
+const GEN={A:"A'nın",B:"B'nin"};
+regAct("yaris",{
+  title:"İki Kod Yarışıyor", durak:6, N:8, speed:true,
+  parts:[{name:"Tahmin Et, Bul, Düzelt",sub:"İki Pengo aynı balığa gidiyor; biri takılacak",from:1,to:4},{name:"Uzun Kodlar",sub:"Daha büyük buz, daha uzun program",from:5,to:8}],
+  doneText:"Hata bulundu ve düzeltildi",
+  talk:n=>"Takılan Pengo'nun kodu hangi adımda ayrıldı? İki kodu karşılaştırmak hatayı bulmayı neden kolaylaştırdı?",
+  intro:n=> n===1?{key:"p1",kicker:"Antarktika",title:"İki Pengo yarışıyor!",art:`<g transform="translate(50 54)">${pengo("#e8443a")}</g>`,text:"İki Pengo aynı balığa gidiyor. Kodlar neredeyse aynı ama birinde tek bir hata var. 1) Hangisi balığa ulaşır, <b>tahmin et</b>. 2) Yarışı izle. 3) Hatalı bloğu <b>bul</b> ve <b>düzelt</b>. Komutlar Pengo'ya göre: Sola dön, Pengo'nun soluna."}:null,
+  setup(n){ const L=CACHE[n]||(CACHE[n]=gen(n)); return {n,L,phase:"guess",guess:null,pos:{A:null,B:null},runAt:-1,sel:null,fixed:null,fail:{}} },
+  goal(st){ const bad=st.L.good==="A"?"B":"A";
+    return {guess:"Hangi Pengo balığa ulaşır? Kodlara bak, tahmin et.",race:"Yarış başladı!",find:`Pengo ${bad} takıldı! Kodunda hatalı blok hangisi? Ona dokun.`,fix:"Bu bloğun yerine hangisi gelmeli?",done:"İki Pengo da balığa ulaştı!"}[st.phase] },
+  render(st){
+    const L=st.L, N=L.N, cs=100, W=N*cs+16, bad=L.good==="A"?"B":"A";
+    let s=`<svg class="board agrid" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#bfe3f7"/><g transform="translate(8 8)">`;
+    for(let y=0;y<N;y++) for(let x=0;x<N;x++){
+      const hole=L.holes.some(h=>h[0]===x&&h[1]===y);
+      s+=`<rect x="${x*cs+4}" y="${y*cs+4}" width="${cs-8}" height="${cs-8}" rx="14" fill="${(x+y)%2?"#f2f8ff":"#e4f1fc"}"/>`;
+      if(hole) s+=`<ellipse cx="${x*cs+50}" cy="${y*cs+52}" rx="36" ry="30" fill="#1d5b9a"/><ellipse cx="${x*cs+50}" cy="${y*cs+52}" rx="24" ry="18" fill="none" stroke="#7fd0ea" stroke-width="3"/>`;
+    }
+    s+=`<g transform="translate(${L.gx*cs+50} ${L.gy*cs+52})"><path d="M-26 0 C-14 -16 12 -16 22 0 C12 16 -14 16 -26 0Z" fill="#ff9b2f" stroke="#d96e10" stroke-width="3"/><path d="M20 0 L36 -12 V12Z" fill="#ff9b2f" stroke="#d96e10" stroke-width="3" stroke-linejoin="round"/><circle cx="-14" cy="-3" r="3.5" fill="#16324a"/></g>`;
+    ["A","B"].forEach((k,ki)=>{ const p=st.pos[k]||[L.sx,L.sy,L.sd], off=ki?14:-14, fell=st.fail[k]==="hole";
+      s+=`<g transform="translate(${p[0]*cs+50+off} ${p[1]*cs+50}) rotate(${p[2]*90}) scale(${fell?.5:.78})" opacity="${fell?.5:1}">${pengo(COL[k])}</g>` });
+    s+=`</g></svg>`;
+    const row=k=>{ const prog=k===L.good?L.prog:(st.fixed?L.prog:L.badProg);
+      return `<div class="prow" style="--c:${COL[k]}"><span class="ptag">Pengo ${k}</span><div class="pblocks">${prog.map((t,i)=>`<button class="pb2 ${st.runAt===i?"on":""} ${st.phase==="fix"&&k===bad&&i===st.sel?"sel":""} ${st.fail[k]&&st.fail[k+"at"]===i?"err":""}" data-k="${k}" data-i="${i}">${bHTML(t)}</button>`).join("")}</div></div>` };
+    let h=s+`<div class="progs">${row("A")}${row("B")}</div>`;
+    if(st.phase==="guess") h+=`<div class="aopts"><button class="aopt" data-g="A" style="color:${COL.A}">Pengo A</button><button class="aopt" data-g="B" style="color:${COL.B}">Pengo B</button></div>`;
+    if(st.phase==="fix") h+=`<div class="aopts">${Object.keys(B).filter(t=>t!=="G"||st.n>=7).map(t=>`<button class="aopt blkopt" data-t="${t}">${bHTML(t)}<small>${B[t][0]}</small></button>`).join("")}</div>`;
+    const body=$("aBody"); body.innerHTML=h;
+    body.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>this.guess(st,b.dataset.g));
+    body.querySelectorAll(".pb2").forEach(b=>b.onclick=()=>this.pickBlock(st,b.dataset.k,+b.dataset.i));
+    body.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>this.fix(st,b.dataset.t));
+  },
+  async guess(st,g){
+    if(A.busy||st.phase!=="guess") return;
+    st.guess=g; if(g!==st.L.good) A.tries++;
+    sfx.click(); await this.race(st,false);
+    const bad=st.L.good==="A"?"B":"A";
+    aGoal(g===st.L.good?`Tahminin doğru! Pengo ${bad} takıldı. Şimdi hatayı bul.`:`Pengo ${bad} takıldı. Tahmin tutmadı ama sorun yok: hatayı bul!`, g===st.L.good?"good":"bad");
+    st.phase="find"; aRefresh(); setTimeout(()=>{ if(A&&A.st===st&&st.phase==="find") aGoal() },2200);
+  },
+  async race(st,fixedOnly){
+    A.busy=true; st.phase=st.phase==="guess"?"race":st.phase; aRefresh();
+    const L=st.L, bad=L.good==="A"?"B":"A";
+    const progs={A:L.good==="A"?L.prog:L.badProg,B:L.good==="B"?L.prog:L.badProg};
+    if(fixedOnly){ progs[bad]=L.prog; st.fail={} }
+    const res={A:sim(L,progs.A),B:sim(L,progs.B)};
+    st.pos={A:[L.sx,L.sy,L.sd],B:[L.sx,L.sy,L.sd]}; aRefresh(); await aWait(500);
+    const max=Math.max(progs.A.length,progs.B.length);
+    for(let i=0;i<max;i++){
+      st.runAt=i;
+      ["A","B"].forEach(k=>{ const r=res[k]; if(st.fail[k]) return; if(i<r.path.length-1){ const out=r.fail==="out"&&i===r.at; if(!out) st.pos[k]=r.path[i+1]; if(r.fail&&r.fail!=="miss"&&i===r.at){ st.fail[k]=r.fail; st.fail[k+"at"]=i } } });
+      sfx.step(); aRefresh(); await aWait(650);
+    }
+    ["A","B"].forEach(k=>{ if(res[k].fail==="miss"&&!st.fail[k]){ st.fail[k]="miss"; st.fail[k+"at"]=-1 } });
+    st.runAt=-1; A.busy=false; aRefresh();
+    if(Object.keys(st.fail).length) sfx.fail(); else sfx.win();
+  },
+  pickBlock(st,k,i){
+    if(A.busy||A.won||st.phase!=="find") return;
+    const bad=st.L.good==="A"?"B":"A";
+    if(k!==bad){ aBad(`Pengo ${k} balığa ulaştı; onun kodu doğru. Takılanın koduna bak.`); return }
+    if(i!==st.L.badAt){ aBad("Bu blok doğru görünüyor. İki kodu blok blok karşılaştır: nerede farklılar?"); return }
+    st.sel=i; st.phase="fix"; sfx.place(); aRefresh(); aGoal();
+  },
+  async fix(st,t){
+    if(A.busy||A.won||st.phase!=="fix") return;
+    if(t!==st.L.prog[st.L.badAt]){ aBad(`${B[t][0]} olmaz. Pengo ${GEN[st.L.good]} kodunda bu adımda ne var?`); return }
+    st.fixed=true; st.sel=null; st.phase="done"; sfx.place(); aRefresh();
+    await this.race(st,true); aWin();
+  },
+  solved(st){ return st.fixed===true },
+  auto(st){ const L=st.L, r=sim(L,L.prog), b=sim(L,L.badProg); if(r.fail||!b.fail) return false; st.fixed=true; return true },
+  async solve(st){
+    const L=st.L, bad=L.good==="A"?"B":"A";
+    aGoal(`Kodları karşılaştıralım… ${L.badAt+1}. blok farklı!`); await aWait(1300);
+    st.guess=L.good; await this.race(st,false);
+    st.phase="find"; aRefresh(); aGoal(`Pengo ${GEN[bad]} ${L.badAt+1}. bloğu hatalı.`); await aWait(1200);
+    st.sel=L.badAt; st.phase="fix"; aRefresh(); await aWait(900);
+    st.fixed=true; st.phase="done"; st.sel=null; aRefresh(); await this.race(st,true); A.busy=true;
+  }
+});
+})();
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
@@ -2674,10 +2963,10 @@ const DURAKS=[
    {t:"Kodla Sür: Fonksiyonlar",d:"Tekrar eden hareket grubunu kendi bloğuna koy.",lvl:"●●",age:"7-10 yaş",open:()=>openLevels("kod",{ch:[3]}),prog:(d=P())=>[sumStars(d.kod,31,40),30]},
    {t:"Kodla Sür: Koşullar",d:"“Eğer pembe kare”, “eğer önü kapalı”: tek bir akıllı kural yaz.",lvl:"●●",age:"8-12 yaş",open:()=>openLevels("kod",{ch:[4]}),prog:(d=P())=>[sumStars(d.kod,41,50),30]},
    {t:"Kodla Sür: Usta",d:"Döngü ve fonksiyon birlikte. En kısa programı bul. Büyükler de dene!",lvl:"●●●",age:"9 yaş ve üstü",open:()=>openLevels("kod",{ch:[5]}),prog:(d=P())=>[sumStars(d.kod,51,60),30]},
-   {soon:1,t:"Kural Makinesi",d:"Hava, ışık ve kapı kuralları: kuralı kur, Bidik karar versin.",lvl:"● ●●",page:"50-52"}]},
+   {t:"Kural Makinesi",d:"Kunduz Kunku'nun makinesi: ışık, hava, kapı kuralları. “Eğer… ise…, değilse…” kur ve tahmin et.",lvl:"● ●●",age:"5-8 yaş",page:"50-52",open:()=>openActLevels("kural"),prog:(d=P())=>actProg("kural",d)}]},
  {no:6,name:"Tamir Adası",kid:"Nerede takıldı? Nasıl düzelir?",code:"B6 · Hata ayıklama",color:"#e0457b",acts:[
    {t:"Hata Avcısı",d:"Hazır programda bir hata var. Adım adım çalıştır, hatalı bloğu bul ve düzelt.",lvl:"● ●●",age:"5-12 yaş",open:()=>openLevels("kod",{list:BUG_LEVELS,title:"Hata Avcısı"}),prog:(d=P())=>[BUG_LEVELS.reduce((a,n)=>a+(d.kod[n]||0),0),36]},
-   {soon:1,t:"İki Kod Yarışıyor",d:"İki Bidik aynı hedefe gidiyor; hangisi takılacak?",lvl:"●●",page:61},
+   {t:"İki Kod Yarışıyor",d:"İki Pengo aynı balığa gidiyor; biri takılacak. Tahmin et, hatalı bloğu bul, düzelt.",lvl:"●●",age:"6-9 yaş",page:61,open:()=>openActLevels("yaris"),prog:(d=P())=>actProg("yaris",d)},
    {soon:1,t:"Tarifte Hata",d:"Tarifteki yanlış adımı bul, doğru yere taşı.",lvl:"●",page:60}]},
  {no:7,name:"Şifre Adası",kid:"Bu işaret ne demek? Nasıl gösteririm?",code:"B7 · Temsil ve sembol",color:"#1d3b6a",acts:[
    {t:"Koordinat Avı",d:"Önce harf, sonra rakam: B3. Kareleri bul, gizli resmi ortaya çıkar, resmi sayılarla boya.",lvl:"● ●●",age:"5-8 yaş",page:"65-73",open:()=>openActLevels("koord"),prog:(d=P())=>actProg("koord",d)},
