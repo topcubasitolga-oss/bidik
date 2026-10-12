@@ -4511,7 +4511,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 // Altyapı: Firebase Auth (öğrenci: anonim; öğretmen: sınıfa özel e-posta + anahtar) ve Firestore, REST ile. SDK yüklenmez.
 // Yapılandırma derlemede bidik-src/firebase.json'dan gelir; boşsa sınıf sistemi gizli kalır.
 const SINIF_CFG={"apiKey": "AIzaSyBgfIjNEWnD0ymyy07_453DilXXs_cImj4", "projectId": "bidik-sinif"};
-const SINIF_URL="https://topcubasitolga-oss.github.io/bidik/oyna/";
+const SINIF_URL="https://bidik.tr/oyna/";
 const KOD_ABC="BCDFGHJKLMNPQRSTVWXZ23456789"; // sesli harf yok (kod bir sözcük okunmasın), karışan I/O/0/1 yok
 function kodUret(n){ const a=new Uint32Array(n); if(window.crypto&&crypto.getRandomValues) crypto.getRandomValues(a); else for(let i=0;i<n;i++) a[i]=Math.floor(Math.random()*4294967296); let s=""; for(let i=0;i<n;i++) s+=KOD_ABC[a[i]%KOD_ABC.length]; return s }
 function kodTemiz(s){ return String(s||"").replace(/ı/g,"I").replace(/i/g,"I").toUpperCase().replace(/[^A-Z0-9]/g,"") }
