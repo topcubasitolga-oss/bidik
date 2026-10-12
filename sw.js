@@ -1,12 +1,14 @@
 // Bidik çevrimdışı önbellek. Sürüm değişince eski önbellek silinir.
-const CACHE="bidik-2026-10-12-61";
+const CACHE="bidik-2026-10-12-62";
 const FILES=["./", "index.html", "rehber.html", "gizlilik.html", "kartlar.html", "ogretmen-cicek.html", "ogretmen-donusum.html", "ogretmen-gece.html", "ogretmen-golet.html", "ogretmen-mahalle.html", "ogretmen-orman.html", "ogretmen-tarla.html", "ogretmen.html", "oyna/index.html", "manifest.webmanifest", "simgeler/simge-192.png", "simgeler/simge-512.png", "simgeler/apple-touch-icon.png"];
-self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(u=>new Request(u,{cache:"reload"})))).then(()=>self.skipWaiting()))});
-self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
+// Eski adres (github.io): bu service worker kendini kaldırır, önbelleği siler; sayfalar bidik.tr'ye geçer
+const ESKI=/github[.]io$/.test(self.location.hostname);
+self.addEventListener("install",e=>{ if(ESKI){ e.waitUntil(self.skipWaiting()); return } e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(u=>new Request(u,{cache:"reload"})))).then(()=>self.skipWaiting()))});
+self.addEventListener("activate",e=>{ if(ESKI){ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))).then(()=>self.registration.unregister()).then(()=>self.clients.matchAll({type:"window"})).then(cs=>cs.forEach(c=>c.navigate(c.url).catch(()=>{})))); return } e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 // Sayfalar: önce ağ (her zaman en yeni sürüm), internet yoksa önbellek.
 // Diğer dosyalar: önbellekten hızlı aç, arkada ağdan tazele.
 self.addEventListener("fetch",e=>{
-  const req=e.request; if(req.method!=="GET") return;
+  const req=e.request; if(req.method!=="GET"||ESKI) return;
   if(req.mode==="navigate"){
     e.respondWith(fetch(req.url,{cache:"no-cache",credentials:"same-origin"}).then(r=>{ const cp=r.clone(); caches.open(CACHE).then(c=>c.put(req,cp)); return r })
       .catch(()=>caches.match(req,{ignoreSearch:true}).then(h=>h||caches.match("./"))));
