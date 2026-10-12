@@ -37,3 +37,9 @@ Yeni sürümü yüklediğinizde `sw.js` içindeki `CACHE` adı değiştiği içi
 
 - Okul ağında bazı siteler filtrelenebilir. Derste kullanmadan önce siteyi okul ağından, akıllı tahtanın tarayıcısından bir kez açıp deneyin.
 - Bir kez açıldıktan sonra site internet kesilse de çalışır.
+
+## Yayın adresi ve depolar (Ekim 2026)
+
+- **https://bidik.tr** — canlı site. GitHub Pages, depo: `topcubasitolga-oss/bidik-tr` (derlenmiş site + `CNAME`). DNS: Turkticaret panelinde A kayıtları 185.199.108/109/110/111.153, `www` CNAME → topcubasitolga-oss.github.io. HTTPS zorunlu.
+- `topcubasitolga-oss/bidik` — eski adres (topcubasitolga-oss.github.io/bidik). Sayfalar ziyaretçiyi otomatik bidik.tr'ye taşır ve eski çevrimdışı önbelleği temizler; eski bağlantılar çalışmaya devam eder.
+- Yayın: `bidik-src/yayinla.sh "mesaj"` — derler, iki depoya da gönderir (CNAME yalnızca bidik-tr'de).
