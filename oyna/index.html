@@ -575,6 +575,13 @@ h1,h2,h3{text-wrap:balance}
 #kCar.blink-L .bl-L,#kCar.blink-R .bl-R{animation:wave .3s ease-in-out 3}
 .petals{transform-box:view-box;transform-origin:0 0}
 .bloom .petals{animation:bloom 1.2s ease-in-out 2}
+.finish .fring{animation:finpulse 1.6s ease-in-out infinite}
+@keyframes finpulse{50%{stroke-opacity:.25;stroke-width:11}}
+.finish .cloth{transform-box:fill-box;transform-origin:left center}
+.finish.bloom .cloth{animation:flagwave .5s ease-in-out 4}
+@keyframes flagwave{50%{transform:scaleX(.82) skewY(-6deg)}}
+.finish text,.startpad text{font-family:var(--display)}
+@media (prefers-reduced-motion:reduce){.finish .fring{animation:none}}
 @keyframes bloom{50%{transform:rotate(60deg) scale(1.3)}}
 @keyframes wave{50%{transform:scale(1.7)}}
 .blk svg text{font-family:var(--display)}
@@ -894,7 +901,12 @@ function destArt(k){
   return `<rect x="10" y="40" width="80" height="50" fill="#fff6e6" stroke="#d9b56a" stroke-width="3"/><path d="M6 40 L16 20 H84 L94 40Z" fill="#f08a24"/>${[12,32,52,72].map((x,j)=>`<path d="M${x} 40 a8 8 0 0 0 16 0" fill="${j%2?"#fff":"#ffc93c"}"/>`).join("")}<circle cx="30" cy="70" r="8" fill="#e8443a"/><circle cx="50" cy="70" r="8" fill="#ffc93c"/><circle cx="70" cy="70" r="8" fill="#22a165"/>`;
 }
 const homeArt=`<ellipse cx="50" cy="90" rx="40" ry="6" fill="#16324a" opacity=".14"/><rect x="18" y="46" width="64" height="42" fill="#fff6e6" stroke="#d9b56a" stroke-width="3"/><path d="M8 48 L50 12 L92 48Z" fill="#e8443a" stroke="#a8261e" stroke-width="3" stroke-linejoin="round"/><circle cx="36" cy="34" r="4.5" fill="#16324a"/><circle cx="60" cy="30" r="4.5" fill="#16324a"/><circle cx="52" cy="42" r="4" fill="#16324a"/><rect x="42" y="62" width="16" height="26" fill="#b5743c"/><circle cx="74" cy="76" r="11" fill="#22a165" stroke="#fff" stroke-width="3"/><path d="M71 70 L80 76 L71 82Z" fill="#fff"/>`;
-function finishArt(i){return `<g class="finish"><circle cx="50" cy="52" r="46" fill="#fff7c2" opacity=".85"/><circle cx="50" cy="52" r="45" fill="none" stroke="#ffc93c" stroke-width="4" stroke-dasharray="8 6"/><g transform="translate(8 8) scale(.84)">${destArt(DEST)}</g><g transform="translate(70 4)"><path d="M4 30 V2" stroke="#16324a" stroke-width="3"/><path d="M4 2 L24 8 L4 14Z" fill="#e8443a"/></g></g>`}
+// Bitiş hücresi: damalı bayrak + "BİTİŞ" rozeti + yanıp sönen altın çerçeve (hedef bina küçük, sağ üstte). stub: Yol Kur'da hücreye giren yol parçası (giriş yönü görünsün diye zeminin üstüne çizilir)
+function checkerArt(x0,y0,cols,rows,s){ let o=""; for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) o+=`<rect x="${x0+c*s}" y="${y0+r*s}" width="${s}" height="${s}" fill="${(r+c)%2?"#fff":"#16324a"}"/>`; return o }
+const flagArt=`<g class="flag"><path d="M13 88 V8" stroke="#16324a" stroke-width="5" stroke-linecap="round"/><circle cx="13" cy="7" r="4.5" fill="#e8443a"/><g class="cloth">${checkerArt(16,11,4,3,8)}<rect x="16" y="11" width="32" height="24" fill="none" stroke="#16324a" stroke-width="2.5"/></g></g>`;
+function finishArt(i,stub){return `<g class="finish"><rect class="fpad" x="5" y="5" width="90" height="90" rx="14" fill="#fff1a8"/>${stub||""}<rect class="fring" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#f5b400" stroke-width="5"/><g transform="translate(51 9) scale(.44)">${destArt(DEST)}</g><g transform="translate(2 0)">${flagArt}</g><g class="flabel"><rect x="14" y="70" width="72" height="24" rx="12" fill="#16324a"/><text x="50" y="87.5" text-anchor="middle" font-size="16" font-weight="800" fill="#fff" letter-spacing=".5">BİTİŞ</text></g></g>`}
+// Başlangıç hücresi (Kodla Sür ve bölge etkinlikleri): yeşil zemin + "BAŞLA" rozeti
+const startArt=`<g class="startpad"><rect x="8" y="8" width="84" height="84" rx="12" fill="#c5ecd0"/><rect x="8" y="8" width="84" height="84" rx="12" fill="none" stroke="#22a165" stroke-width="4" stroke-dasharray="7 6"/><rect x="16" y="70" width="68" height="24" rx="12" fill="#22a165"/><text x="50" y="87.5" text-anchor="middle" font-size="15" font-weight="800" fill="#fff" letter-spacing=".5">BAŞLA</text></g>`;
 const coinArt=`<g class="coin"><ellipse cx="50" cy="84" rx="16" ry="4" fill="#16324a" opacity=".15"/><rect x="47" y="52" width="6" height="32" fill="#5f7489"/><path d="M30 34 a20 20 0 0 1 40 0 V56 H30Z" fill="#2f7fd8" stroke="#1d5b9a" stroke-width="3"/><rect x="38" y="38" width="24" height="5" rx="2" fill="#16324a"/><path d="M70 30 V16 H82 V24 H70" fill="#e8443a"/></g>`;
 const keyArt=`<g class="key" transform="translate(50 50) rotate(-35)"><circle cx="-10" cy="0" r="11" fill="#ffd23f" stroke="#a87700" stroke-width="4"/><circle cx="-10" cy="0" r="4" fill="var(--tile)"/><rect x="0" y="-4" width="24" height="8" rx="3" fill="#ffd23f" stroke="#a87700" stroke-width="3"/><rect x="14" y="2" width="5" height="9" fill="#ffd23f" stroke="#a87700" stroke-width="2"/></g>`;
 const LOCK=`<g transform="translate(76 6)"><rect width="18" height="15" y="7" rx="3" fill="var(--ink)"/><path d="M3.5 8V5a5.5 5.5 0 0 1 11 0v3" stroke="var(--ink)" stroke-width="2.6" fill="none"/></g>`;
@@ -1217,11 +1229,8 @@ function cellSVG(c,i){
   g+= water? waterArt() : tileBg(i,N);
   if(c.kind==="obstacle") g+=blockArt(c.v,i);
   if(c.kind==="piece"){ g+=pieceArt(c); if(c.oneway!=null) g+=onewayArt(c.oneway); if(c.gate) g+=`<g class="gate" transform="rotate(${pairs(c)[0][0]%2?0:90} 50 50)">${gateArt}</g>`; if(c.fixed&&!c.gate&&c.oneway==null) g+=LOCK; }
-  if(c.kind==="start"||c.kind==="finish"){
-    g+=railPath(`M50 50 L${EDGE[c.dir]}`);
-    if(c.kind==="start") g+=homeArt;
-    else g+=finishArt(i);
-  }
+  if(c.kind==="start"){ g+=railPath(`M50 50 L${EDGE[c.dir]}`)+homeArt }
+  if(c.kind==="finish") g+=finishArt(i,railPath(`M50 50 L${EDGE[c.dir]}`));
   if(c.kind==="tunnel") g+=railPath(`M50 50 L${EDGE[c.dir]}`)+tunnelArt(c.dir);
   if(L.coins.includes(i)) g+=coinArt;
   if(L.key===i) g+=keyArt;
@@ -1244,8 +1253,8 @@ function start(n,keep,daily){
   setFriend("yFriend","yol",n,daily); setGoal(); renderTray(); render(); stats(); renderSpeedBars();
   if(!keep&&!daily&&INTRO[n]) seenOnce("y"+n,INTRO[n]);
 }
-function setGoal(msg,cls){
-  const g=$("yGoal"); g.className="goal"+(cls?" "+cls:"");
+function setGoal(msg,cls,say){
+  const g=$("yGoal"); g.className="goal"+(cls?" "+cls:""); if(say) g.dataset.say=say; else delete g.dataset.say;
   if(msg){g.textContent=msg;return}
   const parts=[`Bidik'in evinden ${DESTS[DEST].yon} yol yap.`];
   if(L.coins.length) parts.push("Bütün posta kutularına uğra.");
@@ -1397,7 +1406,7 @@ $("yHint").onclick=()=>{
   grid[i]={kind:"piece",fixed:true,...L.solution[i]}; if(keepGate) grid[i].gate=true; if(keepOne!=null) grid[i].oneway=keepOne;
   hints++; failCell=-1;
   tone(880,.1,"sine");tone(1175,.15,"sine",.08);
-  setGoal(`İpucu: bir ${TYPES[L.solution[i].type].name.toLowerCase()} kilitlendi.`);
+  setGoal(`İpucu: bir ${TYPES[L.solution[i].type].name.toLowerCase()} kilitlendi.`,null,"İpucu: bir parça kilitlendi.");
   render();stats();
 };
 $("yReset").onclick=()=>{ if(!running){ const g=grid; grid=L.cells.map(c=>({...c})); failCell=-1; setGoal(); render(); stats(); } };
@@ -1677,8 +1686,8 @@ function start(n,daily){
     if(n===L.ch.from) seenOnce("k"+L.ch.from,L.ch.intro,sensor); else sensor();
   }
 }
-function goal(msg,cls){
-  const g=$("kGoal"); g.className="goal"+(cls?" "+cls:"");
+function goal(msg,cls,say){
+  const g=$("kGoal"); g.className="goal"+(cls?" "+cls:""); if(say) g.dataset.say=say; else delete g.dataset.say;
   if(msg){g.textContent=msg;return}
   if(L.bug){g.textContent="Bu programda bir hata var. Bul ve düzelt!";return}
   if(L.paint){
@@ -1702,7 +1711,7 @@ function renderBoard(){
     const pt=L.paint&&L.paint[i];
     if(pt) g+=`<rect x="8" y="8" width="84" height="84" rx="12" fill="${pt==="A"?TILE_A:TILE_Y}"/><rect x="8" y="8" width="84" height="84" rx="12" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="6 7" opacity=".8"/>`;
     if(c.kind==="block") g+=blockArt(c.v,i);
-    if(i===L.start) g+=`<g opacity=".9">${star8("var(--green)").replace("#a8261e","#16794a")}</g>`;
+    if(i===L.start) g+=startArt;
     if(i===L.fin) g+=finishArt(i);
     if(L.coins.includes(i)) g+=`<g data-coin="${i}">${coinArt}</g>`;
     g+=`</g>`;
@@ -1838,7 +1847,7 @@ $("kStep").onclick=()=>{
   if(sess.res.crash&&i===end){highlight(sess.steps[i].src);finish();return}
   sess.idx++;
   const s=sess.steps[i];
-  if(!s.check) goal(`Adım ${i+1}: ${BLK[s.op].name}`);
+  if(!s.check) goal(`Adım ${i+1}: ${BLK[s.op].name}`,"quiet");
   animateTo(i,()=>{anim=null; if(sess.idx>end) finish()});
 };
 $("kStop").onclick=()=>{stop();goal()};
@@ -1852,7 +1861,7 @@ $("kHint").onclick=()=>{
   for(const row of ["main","fn"]){
     const want=L.seed[row], have=prog[row];
     for(let i=0;i<want.length;i++) if(have[i]!==want[i]){
-      goal(`İpucu: ${row==="fn"?"Fonksiyonun":"Ana programın"} ${i+1}. bloğu “${BLK[want[i]].name}” olabilir.`);
+      goal(`İpucu: ${row==="fn"?"Fonksiyonun":"Ana programın"} ${i+1}. bloğu “${BLK[want[i]].name}” olabilir.`,null,"İpucu: işaretli blok başka bir blok olabilir.");
       return;
     }
   }
@@ -1931,7 +1940,7 @@ function aRefresh(){
   fitBoard(document.querySelector("#aBody>svg.board"),$("aCheck"));
   $("aInfo").textContent=(m.info?m.info(st):"")+(A.tries?` · Deneme: ${A.tries}`:"");
 }
-function aGoal(txt,cls){ const g=$("aGoal"); g.className="goal"+(cls?" "+cls:""); g.textContent=txt||(A&&A.m.goal?A.m.goal(A.st):""); fitBoard(document.querySelector("#aBody>svg.board"),$("aCheck")) }
+function aGoal(txt,cls,say){ const g=$("aGoal"); g.className="goal"+(cls?" "+cls:""); if(say) g.dataset.say=say; else delete g.dataset.say; g.textContent=txt||(A&&A.m.goal?A.m.goal(A.st):""); fitBoard(document.querySelector("#aBody>svg.board"),$("aCheck")) }
 function aBad(msg){ A.tries++; sfx.no(); aGoal(msg||"Olmadı, bir daha dene.","bad"); aRefresh() }
 function aGood(msg){ sfx.place(); aGoal(msg,"good") }
 function aWin(extra){
@@ -2039,67 +2048,68 @@ function optsHTML(opts,attr){ return `<div class="aopts">${opts.map((o,i)=>`<but
 // ===== Kayıtlı sesler (ElevenLabs): metin -> ses/<dosya>.mp3 =====
 // Üretim: bidik-src/gen_ses.py (kaynak: ses-listesi.csv). Dosya listesi derlemede build.py tarafından doldurulur.
 const SES_METIN={
-"merhaba! ben bidik. kasabamızda yedi sorun var. hadi, kodla birlikte çözelim!": "genel-hosgeldin",
-"hadi başlayalım!": "genel-oyna",
-"mahallede okula ve parka giden yol yok. çocuklar bisikletle güvenle gidemiyor!": "film-1-sorun",
+"merhaba. ben bidik. kasabamızda yedi sorun var. hadi, kodla birlikte çözelim.": "genel-hosgeldin",
+"hadi başlayalım.": "genel-oyna",
+"mahallede okula ve parka giden yol yok. çocuklar bisikletle güvenle gidemiyor.": "film-1-sorun",
 "sürdürülebilir şehirler: güvenli yollar ve bisiklet yolları herkesin hakkı. yürüyen ve bisiklete binen bir kasabanın havası temiz olur.": "bolge-1-bilgi",
 "gölete çöp atılmış. balıklar da ben de zor durumdayız, gölü temizler misin?": "film-2-sorun",
 "temiz su ve sudaki yaşam: suya atılan bir plastik şişe yüzlerce yıl kaybolmaz. temiz su bütün canlıların ihtiyacı.": "bolge-2-bilgi",
-"çiçekler azaldı, arılar polen bulamıyor. tarladaki bütün çiçeklere birlikte uğrayalım!": "film-3-sorun",
+"çiçekler azaldı, arılar polen bulamıyor. tarladaki bütün çiçeklere birlikte uğrayalım.": "film-3-sorun",
 "karadaki yaşam ve açlığa son: yediğimiz meyve ve sebzelerin çoğu arıların çiçekten çiçeğe taşıdığı polen sayesinde büyür.": "bolge-3-bilgi",
-"ağaçlar kesildi, yuvam kayboldu. yeniden fidan dikelim, orman büyüsün!": "film-4-sorun",
+"ağaçlar kesildi, yuvam kayboldu. yeniden fidan dikelim, orman büyüsün.": "film-4-sorun",
 "iklim eylemi: ağaçlar havayı temizler, gölge yapar, toprağı tutar ve hayvanlara yuva olur.": "bolge-4-bilgi",
-"çöpler karışmış! kâğıt mavi kutuya, plastik sarı kutuya. doğru yere ulaştıralım.": "film-5-sorun",
+"çöpler karışmış. kâğıt mavi kutuya, plastik sarı kutuya. doğru yere ulaştıralım.": "film-5-sorun",
 "sorumlu üretim ve tüketim: ayrı toplanan kâğıt, plastik ve cam yeniden kullanılır; daha az ağaç kesilir, daha az çöp birikir.": "bolge-5-bilgi",
-"boş sokaklarda lambalar boşuna yanıyor. en kısa yoldan gidip enerjiyi boşa harcamayalım!": "film-6-sorun",
+"boş sokaklarda lambalar boşuna yanıyor. en kısa yoldan gidip enerjiyi boşa harcamayalım.": "film-6-sorun",
 "temiz enerji: gereksiz yanan bir lamba bile enerji harcar. en kısa yol, en az enerji demek. güneş enerjisi ise hiç tükenmez.": "bolge-6-bilgi",
 "sulama makinesinin programı bozuldu, tarla susuz kaldı. hatayı bulur musun?": "film-7-sorun",
 "temiz su ve açlığa son: tarlalar dünyadaki suyun en çoğunu kullanır. suyu damla damla, doğru yere vermek gerekir.": "bolge-7-bilgi",
-"teşekkürler! artık okula ve parka güvenle yürüyüp bisiklet sürebiliyoruz. ben kirpi kiko, şenlikte görüşürüz!": "tesekkur-1",
-"vırak vırak, teşekkürler! gölet tertemiz oldu, balıklar yeniden yüzüyor. ben kurbağa kuki, şenliğe geliyorum!": "tesekkur-2",
-"vızz vızz, teşekkürler! bütün çiçekler açtı, arılar polen buldu. ben arı bal, şenlikte bal ikram edeceğim!": "tesekkur-3",
-"teşekkürler! orman yeniden yeşerdi, yuvama kavuştum. ben sincap fındık, şenliğe fındık getiriyorum!": "tesekkur-4",
-"gak gak, teşekkürler! atıklar doğru kutularda, yeniden kullanılacak. ben karga kara, şenlikte buluşalım!": "tesekkur-5",
-"teşekkürler! enerjiyi boşa harcamıyoruz, gece sokaklar huzurlu. ben ateşböceği ışıl, şenliği ben aydınlatacağım!": "tesekkur-6",
-"teşekkürler! tarla suyuna kavuştu, fideler büyüyor. ben tavşan pıtır, şenliğe taze havuç getiriyorum!": "tesekkur-7",
+"teşekkürler. artık okula ve parka güvenle yürüyüp bisiklet sürebiliyoruz. ben kirpi kiko, şenlikte görüşürüz.": "tesekkur-1",
+"vırak vırak, teşekkürler. gölet tertemiz oldu, balıklar yeniden yüzüyor. ben kurbağa kuki, şenliğe geliyorum.": "tesekkur-2",
+"vızz vızz, teşekkürler. bütün çiçekler açtı, arılar polen buldu. ben arı bal, şenlikte bal ikram edeceğim.": "tesekkur-3",
+"teşekkürler. orman yeniden yeşerdi, yuvama kavuştum. ben sincap fındık, şenliğe fındık getiriyorum.": "tesekkur-4",
+"gak gak, teşekkürler. atıklar doğru kutularda, yeniden kullanılacak. ben karga kara, şenlikte buluşalım.": "tesekkur-5",
+"teşekkürler. enerjiyi boşa harcamıyoruz, gece sokaklar huzurlu. ben ateşböceği ışıl, şenliği ben aydınlatacağım.": "tesekkur-6",
+"teşekkürler. tarla suyuna kavuştu, fideler büyüyor. ben tavşan pıtır, şenliğe taze havuç getiriyorum.": "tesekkur-7",
 "gölete atılan bütün çöpleri topla.": "gorev-golet",
-"göleti temizleyelim! kurbağa kuki'nin göleti çöple dolmuş. bidik yaprak sandalıyla yüzüyor. bloklarla yol yaz, çalıştır'a bas: bidik geçtiği yerdeki çöpü toplar.": "giris-golet-1",
-"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Kurbağa Kuki": "giris-golet-6",
-"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Arı Bal": "giris-cicek-6",
-"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Sincap Fındık": "giris-orman-6",
-"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Karga Kara": "giris-donusum-6",
-"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Ateşböceği Işıl": "giris-gece-6",
-"arı bal ile bütün solgun çiçeklere uğra. uğradığın çiçek açar!": "gorev-cicek",
-"çiçekler susadı. arılar azalınca çiçekler tozlaşamıyor. bidik'i bütün solgun çiçeklere götür, polen taşısın. aynı hareket tekrar ediyorsa iki kere, üç kere, dört kere bloklarını dene!": "giris-cicek-1",
+"göleti temizleyelim. kurbağa kuki'nin göleti çöple dolmuş. bidik yaprak sandalıyla yüzüyor. bloklarla yol yaz, çalıştır'a bas: bidik geçtiği yerdeki çöpü toplar.": "giris-golet-1",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri.|Kurbağa Kuki": "giris-golet-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri.|Arı Bal": "giris-cicek-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri.|Sincap Fındık": "giris-orman-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri.|Karga Kara": "giris-donusum-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri.|Ateşböceği Işıl": "giris-gece-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri.": "giris-golet-6",
+"arı bal ile bütün solgun çiçeklere uğra. uğradığın çiçek açar.": "gorev-cicek",
+"çiçekler susadı. arılar azalınca çiçekler tozlaşamıyor. bidik'i bütün solgun çiçeklere götür, polen taşısın. aynı hareket tekrar ediyorsa iki kere, üç kere, dört kere bloklarını dene.": "giris-cicek-1",
 "her çukura git ve fidan dik bloğunu kullan.": "gorev-orman",
-"orman yeniden büyüsün. sincap fındık'ın ormanı kesilmiş. bidik'i çukurlara götür, çukurun üstündeyken yeşil fidan dik bloğunu koy. yanlış yerde dikersen olmaz!": "giris-orman-1",
-"atığı al, doğru renkli kutuya götür. plastik sarıya, kâğıt maviye, cam yeşile!": "gorev-donusum",
+"orman yeniden büyüsün. sincap fındık'ın ormanı kesilmiş. bidik'i çukurlara götür, çukurun üstündeyken yeşil fidan dik bloğunu koy. yanlış yerde dikersen olmaz.": "giris-orman-1",
+"atığı al, doğru renkli kutuya götür. plastik sarıya, kâğıt maviye, cam yeşile.": "gorev-donusum",
 "doğru kutu hangisi? karga kara'nın sokağında atıklar karışmış. bidik bir atığın üstünden geçince onu alır, aynı renkli kutuya gelince bırakır. bidik bir seferde tek atık taşır.": "giris-donusum-1",
-"boş sokaktaki bütün lambaları söndür. her blok enerji harcar: enerjin bitmeden bitir!": "gorev-gece",
-"enerjiyi koru. ateşböceği ışıl üzgün: boş sokakta lambalar boşuna yanıyor. bidik'i lambalara götür, söndürsün. ama dikkat: her blok enerji harcar. en kısa yolu bul!": "giris-gece-1",
-"sulama programı bozuk! programı çalıştır, nerede saptığını gör, hatalı bloğa dokun ve doğrusunu seç.": "gorev-tarla",
-"kuru fidelere git, hepsini sula!": "gorev-tarla-sula",
+"boş sokaktaki bütün lambaları söndür. her blok enerji harcar: enerjin bitmeden bitir.": "gorev-gece",
+"enerjiyi koru. ateşböceği ışıl üzgün: boş sokakta lambalar boşuna yanıyor. bidik'i lambalara götür, söndürsün. ama dikkat: her blok enerji harcar. en kısa yolu bul.": "giris-gece-1",
+"sulama programı bozuk. programı çalıştır, nerede saptığını gör, hatalı bloğa dokun ve doğrusunu seç.": "gorev-tarla",
+"kuru fidelere git, hepsini sula.": "gorev-tarla-sula",
 "tarla susuz kaldı. tavşan pıtır'ın fideleri kurumuş. bidik'i kuru fidelere götür; geçtiği yer sulanır, fide yeşerir.": "giris-tarla-1",
 "sulama robotu bozuldu. tavşan pıtır'ın sulama robotunun programı bozulmuş. önce çalıştır'a bas ve izle. robot nerede yanlış yaptı? hatalı bloğa dokun, aşağıdan doğrusunu seç.": "giris-tarla-4",
-"şenlik bayrakları rüzgârla meydana dağılmış. hepsini topla!": "gorev-senlik-1",
+"şenlik bayrakları rüzgârla meydana dağılmış. hepsini topla.": "gorev-senlik-1",
 "şenlikten önce meydanı temizle: her atığı aynı renkli kutuya taşı.": "gorev-senlik-2",
 "boş saksılara git, fidan dik bloğuyla çiçek dik.": "gorev-senlik-3",
-"akşam oldu! güneş enerjisiyle dolan şenlik ışıklarını yak. enerjin sınırlı: en kısa yolu bul.": "gorev-senlik-4",
-"balonları dağıtma programı bozuldu! çalıştır, nerede saptığını gör, hatalı bloğu düzelt.": "gorev-senlik-5",
-"şenlik günü! bütün sorunlar çözüldü, kasaba şenlik yapıyor! kirpi kiko bayrakları asacak ama rüzgâr hepsini dağıtmış. bidik'le bayrakları topla.": "giris-senlik-1",
-"meydan tertemiz olsun. karga kara yardıma geldi: meydandaki atıkları doğru kutulara taşıyalım. plastik sarıya, kâğıt maviye, cam yeşile!": "giris-senlik-2",
+"akşam oldu. güneş enerjisiyle dolan şenlik ışıklarını yak. enerjin sınırlı: en kısa yolu bul.": "gorev-senlik-4",
+"balonları dağıtma programı bozuldu. çalıştır, nerede saptığını gör, hatalı bloğu düzelt.": "gorev-senlik-5",
+"şenlik günü. bütün sorunlar çözüldü, kasaba şenlik yapıyor. kirpi kiko bayrakları asacak ama rüzgâr hepsini dağıtmış. bidik'le bayrakları topla.": "giris-senlik-1",
+"meydan tertemiz olsun. karga kara yardıma geldi: meydandaki atıkları doğru kutulara taşıyalım. plastik sarıya, kâğıt maviye, cam yeşile.": "giris-senlik-2",
 "meydan çiçek açsın. arı bal ve sincap fındık boş saksılar getirdi. her saksının üstünde yeşil fidan dik bloğunu kullan, meydan çiçeklensin.": "giris-senlik-3",
 "ışıklar yansın. ateşböceği ışıl gündüz güneşten enerji topladı. şimdi şenlik ışıklarını yakalım ama enerjiyi boşa harcamadan: her blok enerji harcar.": "giris-senlik-4",
-"son bir hata. tavşan pıtır balonları dostlara dağıtacak ama programında hata var. hata dedektifi, sıra sende: bul, düzelt, şenlik başlasın!": "giris-senlik-5",
-"fidanlarla desen. sincap fındık bidik'e fidan dolu bir çanta verdi! bidik ileri gidince geçtiği yere sıra sıra fidan diker. kesikli çizgideki orman desenini kuracak kodu yaz, sonra çiz'e bas. bidik başta yukarı bakıyor.": "giris-kalem-1",
-"tekrar. kısa bir kod yaz, kaç kez tekrar edeceğini seç. ileri ve sağa dön bloklarını dört kere tekrarla: kare olur!": "giris-kalem-5",
+"son bir hata. tavşan pıtır balonları dostlara dağıtacak ama programında hata var. hata dedektifi, sıra sende: bul, düzelt, şenlik başlasın.": "giris-senlik-5",
+"fidanlarla desen. sincap fındık bidik'e fidan dolu bir çanta verdi. bidik ileri gidince geçtiği yere sıra sıra fidan diker. kesikli çizgideki orman desenini kuracak kodu yaz, sonra çiz'e bas. bidik başta yukarı bakıyor.": "giris-kalem-1",
+"tekrar. kısa bir kod yaz, kaç kez tekrar edeceğini seç. ileri ve sağa dön bloklarını dört kere tekrarla: kare olur.": "giris-kalem-5",
 "iki sulama robotu. iki robot aynı kuru fideye gidiyor. kodlar neredeyse aynı ama birinde tek bir hata var. 1) hangisi kuru fideye ulaşır, tahmin et. 2) yarışı izle. 3) hatalı bloğu bul ve düzelt. komutlar robota göre: sola dön, robotun soluna.": "giris-yaris-1",
 "yolu sen kur. aşağıdan bir parça seç, boş kareye dokun. parçaya tekrar dokunursan döner. hazır olunca çalıştır'a bas.": "yol-giris-1",
-"posta kutuları. bidik bugün postacı! yol bütün posta kutularının önünden geçmeli; bidik hedefe varmadan hepsine mektup bırakır.": "yol-giris-4",
+"posta kutuları. bidik bugün postacı. yol bütün posta kutularının önünden geçmeli; bidik hedefe varmadan hepsine mektup bırakır.": "yol-giris-4",
 "köprü. tahtada nehir var. suyun üstüne sadece köprü konur, bidik ancak köprüden karşıya geçer.": "yol-giris-6",
 "kavşak. kavşakta bidik hep dümdüz gider. yolun kendi üstünden çapraz geçmesini sağlar.": "yol-giris-8",
 "çift viraj. tek karede iki ayrı viraj. bidik bu kareden bir kez bir yana, sonra bir kez öbür yana dönerek geçebilir.": "yol-giris-14",
-"anahtar ve kapı. kapı kilitli. bidik önce anahtarın olduğu kareden geçmeli, sonra kapıdan geçebilir. sıra önemli!": "yol-giris-18",
+"anahtar ve kapı. kapı kilitli. bidik önce anahtarın olduğu kareden geçmeli, sonra kapıdan geçebilir. sıra önemli.": "yol-giris-18",
 "tünel. bidik bir tünelin ağzından girer, öbür tünelden çıkar. tünele sadece ağız tarafından girilir.": "yol-giris-23",
 "tek yön. oklu yollar tek yöndür. bidik bu yoldan sadece okun gösterdiği yöne gidebilir.": "yol-giris-28",
 "bidik'in evinden okula yol yap.": "yol-hedef-okul",
@@ -2114,12 +2124,12 @@ const SES_METIN={
 "tek yön oklarına uy.": "yol-ek-tekyon",
 "bidik, bee-bot gibi çalışır. ileri bloğu bidik'i yüzünün baktığı yöne bir kare götürür. geri bloğu bir kare geri götürür. sola dön ve sağa dön, bidik'i yerinde çeyrek tur döndürür. antenlerine bak: mavi anten sol, pembe anten sağ. bloğa dokun, programa eklenir; programdaki bloğa dokun, silinir.": "kod-giris-0",
 "bidik'in yerine geç. artık bidik her yöne bakabilir. sağ ve sol, ekrana göre değil bidik'e göredir; bee-bot'u yere koyup arkasına geçtiğin gibi düşün. antenlerine bak: mavi anten bidik'in solu, pembe anten sağı.": "kod-giris-1",
-"döngü: tekrar et. aynı bloğu üst üste koymak yerine önüne bir sayı bloğu koy. üç kere ileri bidik'i üç kare ileri götürür. programda yer az, döngü kullanmak zorundasın!": "kod-giris-2",
+"döngü: tekrar et. aynı bloğu üst üste koymak yerine önüne bir sayı bloğu koy. üç kere ileri bidik'i üç kare ileri götürür. programda yer az, döngü kullanmak zorundasın.": "kod-giris-2",
 "fonksiyon: kendi bloğun. tekrar eden bir hareket grubunu mor fonksiyon satırına bir kez yaz. ana programdaki f bloğu o satırın tamamını çalıştırır. üç kere f onu üç kez çalıştırır.": "kod-giris-3",
-"eğer: duruma göre karar. eğer pembe kare bloğu, yanındaki bloğu sadece bidik pembe karedeyken çalıştırır. ∞ bitene kadar bloğu ise bidik'i bitişe varana kadar tekrar tekrar çalıştırır. tek bir akıllı kural bütün yolu çözer!": "kod-giris-4",
-"hepsi bir arada. döngüleri ve fonksiyonları birlikte kullan. yer çok az: en kısa programı bulan kazanır. büyükler için de zor!": "kod-giris-5",
+"eğer: duruma göre karar. eğer pembe kare bloğu, yanındaki bloğu sadece bidik pembe karedeyken çalıştırır. ∞ bitene kadar bloğu ise bidik'i bitişe varana kadar tekrar tekrar çalıştırır. tek bir akıllı kural bütün yolu çözer.": "kod-giris-4",
+"hepsi bir arada. döngüleri ve fonksiyonları birlikte kullan. yer çok az: en kısa programı bulan kazanır. büyükler için de zor.": "kod-giris-5",
 "hata avcısı. bu program neredeyse doğru ama bir hata var. önce adım düğmesiyle tek tek çalıştır, bidik'in nerede yanlış gittiğini gör. sonra hatalı bloğu düzelt.": "kod-giris-hata",
-"eğer önü kapalı. artık renkli kare yok. bidik önüne bakar: önünde engel ya da duvar varsa bu blok yanındakini çalıştırır. gerçek robot süpürgeler de böyle düşünür!": "kod-giris-sensor",
+"eğer önü kapalı. artık renkli kare yok. bidik önüne bakar: önünde engel ya da duvar varsa bu blok yanındakini çalıştırır. gerçek robot süpürgeler de böyle düşünür.": "kod-giris-sensor",
 "okula ulaş.": "kod-hedef-okul",
 "parka ulaş.": "kod-hedef-park",
 "hastaneye ulaş.": "kod-hedef-hastane",
@@ -2127,19 +2137,46 @@ const SES_METIN={
 "pazara ulaş.": "kod-hedef-pazar",
 "posta kutularına uğra.": "kod-ek-posta",
 "sağ ve sol bidik'e göredir.": "kod-ek-goreli",
-"yer az, akıllı kullan!": "kod-ek-yer",
-"harika!": "geri-basari-1",
-"süper, başardın!": "geri-basari-2",
-"kusursuz! üç yıldız!": "geri-basari-3",
-"olmadı, bir daha dene.": "geri-tekrar-1",
-"neredeyse oldu! bir daha bak.": "geri-tekrar-2",
-"eyvah, bidik dışarı çıktı!": "geri-hata-disari",
-"bidik bir engele çarptı!": "geri-hata-carpti",
-"yanlış kutu! atığın rengine bak.": "geri-hata-yanlis-kutu",
+"yer az, akıllı kullan.": "kod-ek-yer",
+"harika.": "geri-basari-1",
+"süper, başardın.": "geri-basari-2",
+"kusursuz. üç yıldız.": "geri-basari-3",
+"olmadı, bir daha dene.|Bidik": "fb-bidik-olmadi-bir-daha-dene",
+"olmadı, bir daha dene.|Kurbağa Kuki": "fb-kuki-olmadi-bir-daha-dene",
+"olmadı, bir daha dene.|Arı Bal": "fb-bal-olmadi-bir-daha-dene",
+"olmadı, bir daha dene.|Sincap Fındık": "fb-findik-olmadi-bir-daha-dene",
+"olmadı, bir daha dene.|Karga Kara": "fb-kara-olmadi-bir-daha-dene",
+"olmadı, bir daha dene.|Ateşböceği Işıl": "fb-isil-olmadi-bir-daha-dene",
+"olmadı, bir daha dene.|Tavşan Pıtır": "fb-pitir-olmadi-bir-daha-dene",
+"olmadı, bir daha dene.": "fb-bidik-olmadi-bir-daha-dene",
+"neredeyse oldu. bir daha bak.": "geri-tekrar-2",
+"eyvah, bidik dışarı çıktı.": "geri-hata-disari",
+"bidik bir engele çarptı.": "geri-hata-carpti",
+"yanlış kutu. atığın rengine bak.|Bidik": "fb-bidik-yanlis-kutu-atigin-rengine-b",
+"yanlış kutu. atığın rengine bak.|Karga Kara": "fb-kara-yanlis-kutu-atigin-rengine-b",
+"yanlış kutu. atığın rengine bak.": "fb-bidik-yanlis-kutu-atigin-rengine-b",
+"burada çukur yok, fidan dikilemez.|Bidik": "geri-hata-cukur",
+"burada çukur yok, fidan dikilemez.|Sincap Fındık": "fb-findik-burada-cukur-yok-fidan-dikil",
 "burada çukur yok, fidan dikilemez.": "geri-hata-cukur",
-"enerji bitti! daha kısa bir yol bul.": "geri-hata-enerji",
-"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.": "geri-hata-eksik",
-"tekrar bloğundan sonra bir hareket bloğu koy.": "geri-hata-tekrar",
+"enerji bitti. daha kısa bir yol bul.|Bidik": "fb-bidik-enerji-bitti-daha-kisa-bir-y",
+"enerji bitti. daha kısa bir yol bul.|Ateşböceği Işıl": "fb-isil-enerji-bitti-daha-kisa-bir-y",
+"enerji bitti. daha kısa bir yol bul.": "fb-bidik-enerji-bitti-daha-kisa-bir-y",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.|Bidik": "fb-bidik-program-bitti-ama-gorev-bitm",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.|Kurbağa Kuki": "fb-kuki-program-bitti-ama-gorev-bitm",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.|Arı Bal": "fb-bal-program-bitti-ama-gorev-bitm",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.|Sincap Fındık": "fb-findik-program-bitti-ama-gorev-bitm",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.|Karga Kara": "fb-kara-program-bitti-ama-gorev-bitm",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.|Ateşböceği Işıl": "fb-isil-program-bitti-ama-gorev-bitm",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.|Tavşan Pıtır": "fb-pitir-program-bitti-ama-gorev-bitm",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.": "fb-bidik-program-bitti-ama-gorev-bitm",
+"tekrar bloğundan sonra bir hareket bloğu koy.|Bidik": "fb-bidik-tekrar-blogundan-sonra-bir-h",
+"tekrar bloğundan sonra bir hareket bloğu koy.|Kurbağa Kuki": "fb-kuki-tekrar-blogundan-sonra-bir-h",
+"tekrar bloğundan sonra bir hareket bloğu koy.|Arı Bal": "fb-bal-tekrar-blogundan-sonra-bir-h",
+"tekrar bloğundan sonra bir hareket bloğu koy.|Sincap Fındık": "fb-findik-tekrar-blogundan-sonra-bir-h",
+"tekrar bloğundan sonra bir hareket bloğu koy.|Karga Kara": "fb-kara-tekrar-blogundan-sonra-bir-h",
+"tekrar bloğundan sonra bir hareket bloğu koy.|Ateşböceği Işıl": "fb-isil-tekrar-blogundan-sonra-bir-h",
+"tekrar bloğundan sonra bir hareket bloğu koy.|Tavşan Pıtır": "fb-pitir-tekrar-blogundan-sonra-bir-h",
+"tekrar bloğundan sonra bir hareket bloğu koy.": "fb-bidik-tekrar-blogundan-sonra-bir-h",
 "bu çöpler göle nasıl gelmiş olabilir? göletin temiz kalması için biz ne yapabiliriz?": "konus-golet",
 "arılar olmasaydı meyve ve sebzelerimize ne olurdu? aynı hareketi tekrarladığın yerleri kısaltabildin mi?": "konus-cicek",
 "ağaçlar bize ve hayvanlara neler verir? bir ağacın büyümesi kaç yıl sürer, düşündün mü?": "konus-orman",
@@ -2158,35 +2195,241 @@ const SES_METIN={
 "köprü olmasa bidik nehri nasıl geçerdi? kavşak ne işe yarıyor?": "konus-yol-2",
 "anahtarı almadan kapıya gitseydin ne olurdu? sıra neden önemli?": "konus-yol-3",
 "bu uzun yolu hangi küçük parçalara böldün? önce neyi çözdün?": "konus-yol-4",
-"programını yüksek sesle oku: ileri, ileri, sağa dön... ayağa kalk, bidik ol ve programı sen yap!": "konus-kod-1",
+"programını yüksek sesle oku: ileri, ileri, sağa dön... ayağa kalk, bidik ol ve programı sen yap.": "konus-kod-1",
 "bidik aşağı bakarken sağa dön dersen hangi yöne döner? bidik'in yerine geçip dene.": "konus-kod-2",
 "hangi blok tekrar ediyordu? tekrar sayısı 100 olsa ne yapardın?": "konus-kod-3",
 "fonksiyonuna bir ad verseydin ne derdin? neden işimizi kolaylaştırdı?": "konus-kod-4",
 "kural sayesinde bidik'e her adımı tek tek söylemek gerekti mi? kural neden güçlü?": "konus-kod-5",
 "daha kısa bir program bulabilir misin? kısa program neden iyidir?": "konus-kod-6",
 "hatayı nasıl buldun? bidik ilk hangi adımda yanlış yöne gitti? hangi blok sorumluydu?": "konus-hata",
-"şenlik başladı! yedi dost meydanda, büyük çiçek açtı. kasabanın sorunlarını kodla birlikte çözdünüz; tek başına değil, hep birlikte!": "final-senlik",
-"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.": "tahmin-sor",
-"tahminin doğru, bidik tam o karede durdu!": "tahmin-dogru",
-"bidik tahmin ettiğin karede durmadı.": "tahmin-yanlis",
+"şenlik başladı. yedi dost meydanda, büyük çiçek açtı. kasabanın sorunlarını kodla birlikte çözdünüz; tek başına değil, hep birlikte.": "final-senlik",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.|Bidik": "fb-bidik-once-tahmin-et-bidik-en-son",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.|Kurbağa Kuki": "fb-kuki-once-tahmin-et-bidik-en-son",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.|Arı Bal": "fb-bal-once-tahmin-et-bidik-en-son",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.|Sincap Fındık": "fb-findik-once-tahmin-et-bidik-en-son",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.|Karga Kara": "fb-kara-once-tahmin-et-bidik-en-son",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.|Ateşböceği Işıl": "fb-isil-once-tahmin-et-bidik-en-son",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.|Tavşan Pıtır": "fb-pitir-once-tahmin-et-bidik-en-son",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.": "fb-bidik-once-tahmin-et-bidik-en-son",
+"tahminin doğru, bidik tam o karede durdu.|Bidik": "fb-bidik-tahminin-dogru-bidik-tam-o-k",
+"tahminin doğru, bidik tam o karede durdu.|Kurbağa Kuki": "fb-kuki-tahminin-dogru-bidik-tam-o-k",
+"tahminin doğru, bidik tam o karede durdu.|Arı Bal": "fb-bal-tahminin-dogru-bidik-tam-o-k",
+"tahminin doğru, bidik tam o karede durdu.|Sincap Fındık": "fb-findik-tahminin-dogru-bidik-tam-o-k",
+"tahminin doğru, bidik tam o karede durdu.|Karga Kara": "fb-kara-tahminin-dogru-bidik-tam-o-k",
+"tahminin doğru, bidik tam o karede durdu.|Ateşböceği Işıl": "fb-isil-tahminin-dogru-bidik-tam-o-k",
+"tahminin doğru, bidik tam o karede durdu.|Tavşan Pıtır": "fb-pitir-tahminin-dogru-bidik-tam-o-k",
+"tahminin doğru, bidik tam o karede durdu.": "fb-bidik-tahminin-dogru-bidik-tam-o-k",
+"bidik tahmin ettiğin karede durmadı.|Bidik": "fb-bidik-bidik-tahmin-ettigin-karede",
+"bidik tahmin ettiğin karede durmadı.|Kurbağa Kuki": "fb-kuki-bidik-tahmin-ettigin-karede",
+"bidik tahmin ettiğin karede durmadı.|Arı Bal": "fb-bal-bidik-tahmin-ettigin-karede",
+"bidik tahmin ettiğin karede durmadı.|Sincap Fındık": "fb-findik-bidik-tahmin-ettigin-karede",
+"bidik tahmin ettiğin karede durmadı.|Karga Kara": "fb-kara-bidik-tahmin-ettigin-karede",
+"bidik tahmin ettiğin karede durmadı.|Ateşböceği Işıl": "fb-isil-bidik-tahmin-ettigin-karede",
+"bidik tahmin ettiğin karede durmadı.|Tavşan Pıtır": "fb-pitir-bidik-tahmin-ettigin-karede",
+"bidik tahmin ettiğin karede durmadı.": "fb-bidik-bidik-tahmin-ettigin-karede",
 "görevin: yol parçalarıyla bidik'in evinden okula ve parka güvenli bir yol kur.": "film-1-gorev",
-"yaptığın güvenli yollarla çocuklar okula ve parka bisikletle gidebilecek. böylece herkesin mutlu yaşadığı bir şehir kurmuş olacaksın!": "film-1-katki",
+"yaptığın güvenli yollarla çocuklar okula ve parka bisikletle gidebilecek. böylece herkesin mutlu yaşadığı bir şehir kurmuş olacaksın.": "film-1-katki",
 "görevin: bloklarla bidik'e yol göster, göletteki bütün çöpleri topla.": "film-2-gorev",
-"göleti temizlersen balıklar, kurbağalar ve bütün canlılar temiz suya kavuşacak. böylece dünyamızın sularını korumuş olacaksın!": "film-2-katki",
+"göleti temizlersen balıklar, kurbağalar ve bütün canlılar temiz suya kavuşacak. böylece dünyamızın sularını korumuş olacaksın.": "film-2-katki",
 "görevin: bidik'i bütün solgun çiçeklere götür, arılar için polen taşısın.": "film-3-gorev",
-"çiçeklere polen taşırsan arılar mutlu olacak, bahçelerde meyve ve sebze yetişecek. böylece herkesin sofrasına yiyecek gelmesine yardım etmiş olacaksın!": "film-3-katki",
+"çiçeklere polen taşırsan arılar mutlu olacak, bahçelerde meyve ve sebze yetişecek. böylece herkesin sofrasına yiyecek gelmesine yardım etmiş olacaksın.": "film-3-katki",
 "görevin: bidik'i çukurlara götür ve fidan dik bloğuyla ağaç dik.": "film-4-gorev",
-"diktiğin her fidan büyüyüp ağaç olacak, havamızı temizleyecek, hayvanlara yuva olacak. böylece dünyamızı korumuş olacaksın!": "film-4-katki",
+"diktiğin her fidan büyüyüp ağaç olacak, havamızı temizleyecek, hayvanlara yuva olacak. böylece dünyamızı korumuş olacaksın.": "film-4-katki",
 "görevin: her atığı aynı renkli kutuya taşı. plastik sarıya, kâğıt maviye, cam yeşile.": "film-5-gorev",
-"atıkları doğru kutuya koyarsan onlar yeniden kullanılacak, dünyamız daha az kirlenecek. böylece dünyamıza iyilik yapmış olacaksın!": "film-5-katki",
+"atıkları doğru kutuya koyarsan onlar yeniden kullanılacak, dünyamız daha az kirlenecek. böylece dünyamıza iyilik yapmış olacaksın.": "film-5-katki",
 "görevin: en kısa yoldan git, boşuna yanan lambaları söndür, enerjiyi koru.": "film-6-gorev",
-"boşuna yanan lambaları söndürürsen enerji boşa gitmeyecek. böylece dünyamızın havasını korumuş olacaksın!": "film-6-katki",
+"boşuna yanan lambaları söndürürsen enerji boşa gitmeyecek. böylece dünyamızın havasını korumuş olacaksın.": "film-6-katki",
 "görevin: sulama programındaki hatayı bul, düzelt ve tarlayı sula.": "film-7-gorev",
-"tarlayı doğru sularsan su boşa gitmeyecek, sebzeler büyüyecek. böylece hem suyu korumuş hem de herkese yiyecek yetiştirmiş olacaksın!": "film-7-katki"
+"tarlayı doğru sularsan su boşa gitmeyecek, sebzeler büyüyecek. böylece hem suyu korumuş hem de herkese yiyecek yetiştirmiş olacaksın.": "film-7-katki",
+"kırmızı blok hatanın olduğu yer.|Bidik": "fb-bidik-kirmizi-blok-hatanin-oldugu",
+"kırmızı blok hatanın olduğu yer.|Kurbağa Kuki": "fb-kuki-kirmizi-blok-hatanin-oldugu",
+"kırmızı blok hatanın olduğu yer.|Arı Bal": "fb-bal-kirmizi-blok-hatanin-oldugu",
+"kırmızı blok hatanın olduğu yer.|Sincap Fındık": "fb-findik-kirmizi-blok-hatanin-oldugu",
+"kırmızı blok hatanın olduğu yer.|Karga Kara": "fb-kara-kirmizi-blok-hatanin-oldugu",
+"kırmızı blok hatanın olduğu yer.|Ateşböceği Işıl": "fb-isil-kirmizi-blok-hatanin-oldugu",
+"kırmızı blok hatanın olduğu yer.|Tavşan Pıtır": "fb-pitir-kirmizi-blok-hatanin-oldugu",
+"kırmızı blok hatanın olduğu yer.": "fb-bidik-kirmizi-blok-hatanin-oldugu",
+"bidik tahtanın dışına çıktı.": "fb-bidik-bidik-tahtanin-disina-cikti",
+"bitişe yanlış taraftan gelindi.": "fb-bidik-bitise-yanlis-taraftan-gelin",
+"tünele yandan girilmez. ağzına doğru yol kur.": "fb-bidik-tunele-yandan-girilmez-agzin",
+"bidik suya düştü. nehirden köprüyle geçilir.": "fb-bidik-bidik-suya-dustu-nehirden-ko",
+"yol burada bitiyor. bir parça eksik.": "fb-bidik-yol-burada-bitiyor-bir-parca",
+"kapı kilitli. önce anahtarın olduğu kareden geç.": "fb-bidik-kapi-kilitli-once-anahtarin",
+"bu parça doğru yöne bakmıyor. döndür ya da başka parça seç.": "fb-bidik-bu-parca-dogru-yone-bakmiyor",
+"tek yön. bu yoldan okun tersine gidilmez.": "fb-bidik-tek-yon-bu-yoldan-okun-tersi",
+"yol çok karışık.": "fb-bidik-yol-cok-karisik",
+"döngü hiç bitmiyor, bidik bitişe ulaşamadı. kuralını kontrol et.": "fb-bidik-dongu-hic-bitmiyor-bidik-bit",
+"döngünün içi boş, bidik hiç hareket etmiyor.": "fb-bidik-dongunun-ici-bos-bidik-hic-h",
+"program boş. önce aşağıdan blok ekle.": "fb-bidik-program-bos-once-asagidan-bl",
+"fonksiyonun içine f konmaz. ana programa ekle.": "fb-bidik-fonksiyonun-icine-f-konmaz-a",
+"programın örnek çözümle aynı. çalıştır'a bas.": "fb-bidik-programin-ornek-cozumle-ayni",
+"çözüm gösterildi.": "fb-bidik-cozum-gosterildi",
+"çözüm adım adım gösteriliyor...|Bidik": "fb-bidik-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım gösteriliyor...|Kurbağa Kuki": "fb-kuki-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım gösteriliyor...|Arı Bal": "fb-bal-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım gösteriliyor...|Sincap Fındık": "fb-findik-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım gösteriliyor...|Karga Kara": "fb-kara-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım gösteriliyor...|Ateşböceği Işıl": "fb-isil-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım gösteriliyor...|Tavşan Pıtır": "fb-pitir-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım gösteriliyor...": "fb-bidik-cozum-adim-adim-gosteriliyor",
+"çözüm adım adım kuruluyor...": "fb-bidik-cozum-adim-adim-kuruluyor",
+"kurduğun yol çözümle aynı. çalıştır'a bas.": "fb-bidik-kurdugun-yol-cozumle-ayni-ca",
+"suyun üstüne sadece köprü konur.": "fb-bidik-suyun-ustune-sadece-kopru-ko",
+"köprü sadece suyun üstüne konur.": "fb-bidik-kopru-sadece-suyun-ustune-ko",
+"kavşak her yöne açık, döndürmeye gerek yok.": "fb-bidik-kavsak-her-yone-acik-dondurm",
+"kapı ve tabelalar sabittir.": "fb-bidik-kapi-ve-tabelalar-sabittir",
+"kilitli parçalar ipucudur, değiştirilemez.": "fb-bidik-kilitli-parcalar-ipucudur-de",
+"bidik duvara gelince dönmeli. eğer önü kapalı bloğuyla kural yaz.": "fb-bidik-bidik-duvara-gelince-donmeli",
+"ipucu: bir parça kilitlendi.": "fb-bidik-ipucu-bir-parca-kilitlendi",
+"ipucu: işaretli blok başka bir blok olabilir.": "fb-bidik-ipucu-isaretli-blok-baska-bi",
+"önce program yaz.|Bidik": "fb-bidik-once-program-yaz",
+"önce program yaz.|Kurbağa Kuki": "fb-kuki-once-program-yaz",
+"önce program yaz.|Arı Bal": "fb-bal-once-program-yaz",
+"önce program yaz.|Sincap Fındık": "fb-findik-once-program-yaz",
+"önce program yaz.|Karga Kara": "fb-kara-once-program-yaz",
+"önce program yaz.|Ateşböceği Işıl": "fb-isil-once-program-yaz",
+"önce program yaz.|Tavşan Pıtır": "fb-pitir-once-program-yaz",
+"önce program yaz.": "fb-bidik-once-program-yaz",
+"harika. bidik okula ulaştı.": "fb-bidik-harika-bidik-okula-ulasti",
+"harika. program çalıştı, bidik okula ulaştı.": "fb-bidik-harika-program-calisti-bidik",
+"harika. bidik parka ulaştı.": "fb-bidik-harika-bidik-parka-ulasti",
+"harika. program çalıştı, bidik parka ulaştı.": "fb-bidik-harika-program-calisti-bidik-2",
+"harika. bidik hastaneye ulaştı.": "fb-bidik-harika-bidik-hastaneye-ulast",
+"harika. program çalıştı, bidik hastaneye ulaştı.": "fb-bidik-harika-program-calisti-bidik-3",
+"harika. bidik kütüphaneye ulaştı.": "fb-bidik-harika-bidik-kutuphaneye-ula",
+"harika. program çalıştı, bidik kütüphaneye ulaştı.": "fb-bidik-harika-program-calisti-bidik-4",
+"harika. bidik pazara ulaştı.": "fb-bidik-harika-bidik-pazara-ulasti",
+"harika. program çalıştı, bidik pazara ulaştı.": "fb-bidik-harika-program-calisti-bidik-5",
+"ipucu: ana programdaki 1. bloğa bak.": "fb-bidik-ipucu-ana-1",
+"ipucu: fonksiyondaki 1. bloğa bak.": "fb-bidik-ipucu-fn-1",
+"ipucu: ana programdaki 2. bloğa bak.": "fb-bidik-ipucu-ana-2",
+"ipucu: fonksiyondaki 2. bloğa bak.": "fb-bidik-ipucu-fn-2",
+"ipucu: ana programdaki 3. bloğa bak.": "fb-bidik-ipucu-ana-3",
+"ipucu: fonksiyondaki 3. bloğa bak.": "fb-bidik-ipucu-fn-3",
+"ipucu: ana programdaki 4. bloğa bak.": "fb-bidik-ipucu-ana-4",
+"ipucu: fonksiyondaki 4. bloğa bak.": "fb-bidik-ipucu-fn-4",
+"ipucu: ana programdaki 5. bloğa bak.": "fb-bidik-ipucu-ana-5",
+"ipucu: fonksiyondaki 5. bloğa bak.": "fb-bidik-ipucu-fn-5",
+"ipucu: ana programdaki 6. bloğa bak.": "fb-bidik-ipucu-ana-6",
+"ipucu: fonksiyondaki 6. bloğa bak.": "fb-bidik-ipucu-fn-6",
+"ipucu: ana programdaki 7. bloğa bak.": "fb-bidik-ipucu-ana-7",
+"ipucu: fonksiyondaki 7. bloğa bak.": "fb-bidik-ipucu-fn-7",
+"ipucu: ana programdaki 8. bloğa bak.": "fb-bidik-ipucu-ana-8",
+"ipucu: fonksiyondaki 8. bloğa bak.": "fb-bidik-ipucu-fn-8",
+"ipucu: ana programdaki 9. bloğa bak.": "fb-bidik-ipucu-ana-9",
+"ipucu: fonksiyondaki 9. bloğa bak.": "fb-bidik-ipucu-fn-9",
+"ipucu: ana programdaki 10. bloğa bak.": "fb-bidik-ipucu-ana-10",
+"ipucu: fonksiyondaki 10. bloğa bak.": "fb-bidik-ipucu-fn-10",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?|Kurbağa Kuki": "fb-kuki-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?|Arı Bal": "fb-bal-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?|Sincap Fındık": "fb-findik-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?|Karga Kara": "fb-kara-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?|Ateşböceği Işıl": "fb-isil-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?|Tavşan Pıtır": "fb-pitir-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?|Bidik": "fb-bidik-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. tekrar bloklarıyla kısaltabilir misin?": "fb-bidik-programda-yer-kalmadi-tekrar",
+"programda yer kalmadı. daha kısa bir yol dene.|Kurbağa Kuki": "fb-kuki-programda-yer-kalmadi-daha-k",
+"programda yer kalmadı. daha kısa bir yol dene.|Arı Bal": "fb-bal-programda-yer-kalmadi-daha-k",
+"programda yer kalmadı. daha kısa bir yol dene.|Sincap Fındık": "fb-findik-programda-yer-kalmadi-daha-k",
+"programda yer kalmadı. daha kısa bir yol dene.|Karga Kara": "fb-kara-programda-yer-kalmadi-daha-k",
+"programda yer kalmadı. daha kısa bir yol dene.|Ateşböceği Işıl": "fb-isil-programda-yer-kalmadi-daha-k",
+"programda yer kalmadı. daha kısa bir yol dene.|Tavşan Pıtır": "fb-pitir-programda-yer-kalmadi-daha-k",
+"programda yer kalmadı. daha kısa bir yol dene.|Bidik": "fb-bidik-programda-yer-kalmadi-daha-k",
+"programda yer kalmadı. daha kısa bir yol dene.": "fb-bidik-programda-yer-kalmadi-daha-k",
+"bidik gölün dışına çıktı.": "fb-kuki-bidik-golun-disina-cikti",
+"taşa çarptı.|Kurbağa Kuki": "fb-kuki-tasa-carpti",
+"taşa çarptı.|Tavşan Pıtır": "fb-pitir-tasa-carpti",
+"taşa çarptı.": "fb-kuki-tasa-carpti",
+"bidik tarlanın dışına çıktı.": "fb-bal-bidik-tarlanin-disina-cikti",
+"çalıya takıldı.": "fb-bal-caliya-takildi",
+"bidik ormanın dışına çıktı.": "fb-findik-bidik-ormanin-disina-cikti",
+"kütüğe çarptı.": "fb-findik-kutuge-carpti",
+"bidik kâğıttan çıktı. kodu kontrol et.": "fb-findik-bidik-kagittan-cikti-kodu-ko",
+"fidanlar desene uymadı. kesikli çizgiyi parmağınla izle, bidik'in yönünü düşün.": "fb-findik-fidanlar-desene-uymadi-kesik",
+"programda yer kalmadı. tekrar kullanmayı dene.": "fb-findik-programda-yer-kalmadi-tekrar-2",
+"bidik alanın dışına çıktı.": "fb-kara-bidik-alanin-disina-cikti",
+"kolilere çarptı.": "fb-kara-kolilere-carpti",
+"program bitti ama atıklar hâlâ kutusunda değil.|Karga Kara": "fb-kara-program-bitti-ama-atiklar-ha",
+"program bitti ama atıklar hâlâ kutusunda değil.|Bidik": "fb-bidik-program-bitti-ama-atiklar-ha",
+"program bitti ama atıklar hâlâ kutusunda değil.": "fb-bidik-program-bitti-ama-atiklar-ha",
+"bidik sokaktan çıktı.": "fb-isil-bidik-sokaktan-cikti",
+"banka çarptı.|Ateşböceği Işıl": "fb-isil-banka-carpti",
+"banka çarptı.|Bidik": "fb-bidik-banka-carpti",
+"banka çarptı.": "fb-bidik-banka-carpti",
+"robot tarlanın dışına çıktı.": "fb-pitir-robot-tarlanin-disina-cikti",
+"önce değiştirmek istediğin bloğa dokun.": "fb-pitir-once-degistirmek-istedigin-b",
+"bidik meydanın dışına çıktı.": "fb-bidik-bidik-meydanin-disina-cikti",
+"burada saksı yok.": "fb-bidik-burada-saksi-yok",
+"1. blok hatalı.": "fb-pitir-blok-hatali-1",
+"2. blok hatalı.": "fb-pitir-blok-hatali-2",
+"3. blok hatalı.": "fb-pitir-blok-hatali-3",
+"4. blok hatalı.": "fb-pitir-blok-hatali-4",
+"5. blok hatalı.": "fb-pitir-blok-hatali-5",
+"6. blok hatalı.": "fb-pitir-blok-hatali-6",
+"7. blok hatalı.": "fb-pitir-blok-hatali-7",
+"8. blok hatalı.": "fb-pitir-blok-hatali-8",
+"9. blok hatalı.": "fb-pitir-blok-hatali-9",
+"10. blok hatalı.": "fb-pitir-blok-hatali-10",
+"çizgi biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.": "fb-findik-cizgi-biciminde-fidan-dik-ke",
+"l harfi biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.": "fb-findik-l-harfi-biciminde-fidan-dik",
+"köprü biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.": "fb-findik-kopru-biciminde-fidan-dik-ke",
+"kare biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.": "fb-findik-kare-biciminde-fidan-dik-kes",
+"küçük kare biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.": "fb-findik-kucuk-kare-biciminde-orman-k",
+"büyük kare biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.": "fb-findik-buyuk-kare-biciminde-orman-k",
+"merdiven biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.": "fb-findik-merdiven-biciminde-orman-kis",
+"kapı biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.": "fb-findik-kapi-biciminde-orman-kisa-bi",
+"bu kodu 2 kez tekrarla": "fb-findik-tekrarla-2",
+"bu kodu 3 kez tekrarla": "fb-findik-tekrarla-3",
+"bu kodu 4 kez tekrarla": "fb-findik-tekrarla-4",
+"hangi robot kuru fideye ulaşır? kodlara bak, tahmin et.": "fb-pitir-hangi-robot-kuru-fideye-ulas",
+"yarış başladı.": "fb-pitir-yaris-basladi",
+"bu bloğun yerine hangisi gelmeli?": "fb-pitir-bu-blogun-yerine-hangisi-gel",
+"iki robot da kuru fideye ulaştı.": "fb-pitir-iki-robot-da-kuru-fideye-ula",
+"bu blok doğru görünüyor. iki kodu blok blok karşılaştır: nerede farklılar?": "fb-pitir-bu-blok-dogru-gorunuyor-iki",
+"robot a takıldı. kodunda hatalı blok hangisi? ona dokun.": "fb-pitir-robot-a-takildi-kodunda-hata",
+"tahminin doğru. robot a takıldı. şimdi hatayı bul.": "fb-pitir-tahminin-dogru-robot-a-takil",
+"robot a takıldı. tahmin tutmadı ama sorun yok: hatayı bul.": "fb-pitir-robot-a-takildi-tahmin-tutma",
+"robot a kuru fideye ulaştı; onun kodu doğru. takılanın koduna bak.": "fb-pitir-robot-a-kuru-fideye-ulasti-o",
+"ileri olmaz. robot a'nın kodunda bu adımda ne var?": "fb-pitir-ileri-olmaz-robot-a-nin-kodu",
+"geri olmaz. robot a'nın kodunda bu adımda ne var?": "fb-pitir-geri-olmaz-robot-a-nin-kodun",
+"sola dön olmaz. robot a'nın kodunda bu adımda ne var?": "fb-pitir-sola-don-olmaz-robot-a-nin-k",
+"sağa dön olmaz. robot a'nın kodunda bu adımda ne var?": "fb-pitir-saga-don-olmaz-robot-a-nin-k",
+"robot a'nın 1. bloğu hatalı.": "fb-pitir-robot-a-blok-1",
+"robot a'nın 2. bloğu hatalı.": "fb-pitir-robot-a-blok-2",
+"robot a'nın 3. bloğu hatalı.": "fb-pitir-robot-a-blok-3",
+"robot a'nın 4. bloğu hatalı.": "fb-pitir-robot-a-blok-4",
+"robot a'nın 5. bloğu hatalı.": "fb-pitir-robot-a-blok-5",
+"robot a'nın 6. bloğu hatalı.": "fb-pitir-robot-a-blok-6",
+"robot a'nın 7. bloğu hatalı.": "fb-pitir-robot-a-blok-7",
+"robot a'nın 8. bloğu hatalı.": "fb-pitir-robot-a-blok-8",
+"robot b takıldı. kodunda hatalı blok hangisi? ona dokun.": "fb-pitir-robot-b-takildi-kodunda-hata",
+"tahminin doğru. robot b takıldı. şimdi hatayı bul.": "fb-pitir-tahminin-dogru-robot-b-takil",
+"robot b takıldı. tahmin tutmadı ama sorun yok: hatayı bul.": "fb-pitir-robot-b-takildi-tahmin-tutma",
+"robot b kuru fideye ulaştı; onun kodu doğru. takılanın koduna bak.": "fb-pitir-robot-b-kuru-fideye-ulasti-o",
+"ileri olmaz. robot b'nin kodunda bu adımda ne var?": "fb-pitir-ileri-olmaz-robot-b-nin-kodu",
+"geri olmaz. robot b'nin kodunda bu adımda ne var?": "fb-pitir-geri-olmaz-robot-b-nin-kodun",
+"sola dön olmaz. robot b'nin kodunda bu adımda ne var?": "fb-pitir-sola-don-olmaz-robot-b-nin-k",
+"sağa dön olmaz. robot b'nin kodunda bu adımda ne var?": "fb-pitir-saga-don-olmaz-robot-b-nin-k",
+"robot b'nin 1. bloğu hatalı.": "fb-pitir-robot-b-blok-1",
+"robot b'nin 2. bloğu hatalı.": "fb-pitir-robot-b-blok-2",
+"robot b'nin 3. bloğu hatalı.": "fb-pitir-robot-b-blok-3",
+"robot b'nin 4. bloğu hatalı.": "fb-pitir-robot-b-blok-4",
+"robot b'nin 5. bloğu hatalı.": "fb-pitir-robot-b-blok-5",
+"robot b'nin 6. bloğu hatalı.": "fb-pitir-robot-b-blok-6",
+"robot b'nin 7. bloğu hatalı.": "fb-pitir-robot-b-blok-7",
+"robot b'nin 8. bloğu hatalı.": "fb-pitir-robot-b-blok-8",
+"kodları karşılaştıralım... 1. blok farklı.": "fb-pitir-farkli-1",
+"kodları karşılaştıralım... 2. blok farklı.": "fb-pitir-farkli-2",
+"kodları karşılaştıralım... 3. blok farklı.": "fb-pitir-farkli-3",
+"kodları karşılaştıralım... 4. blok farklı.": "fb-pitir-farkli-4",
+"kodları karşılaştıralım... 5. blok farklı.": "fb-pitir-farkli-5",
+"kodları karşılaştıralım... 6. blok farklı.": "fb-pitir-farkli-6",
+"kodları karşılaştıralım... 7. blok farklı.": "fb-pitir-farkli-7",
+"kodları karşılaştıralım... 8. blok farklı.": "fb-pitir-farkli-8"
 };
 const SES_DOSYA=new Set(["bolge-1-bilgi", "bolge-1-sorun", "bolge-2-bilgi", "bolge-2-sorun", "bolge-3-bilgi", "bolge-3-sorun", "bolge-4-bilgi", "bolge-4-sorun", "bolge-5-bilgi", "bolge-5-sorun", "bolge-6-bilgi", "bolge-6-sorun", "bolge-7-bilgi", "bolge-7-sorun", "film-1-gorev", "film-1-katki", "film-1-sorun", "film-2-gorev", "film-2-katki", "film-2-sorun", "film-3-gorev", "film-3-katki", "film-3-sorun", "film-4-gorev", "film-4-katki", "film-4-sorun", "film-5-gorev", "film-5-katki", "film-5-sorun", "film-6-gorev", "film-6-katki", "film-6-sorun", "film-7-gorev", "film-7-katki", "film-7-sorun", "final-senlik", "genel-hosgeldin", "genel-oyna", "geri-basari-1", "geri-basari-2", "geri-basari-3", "geri-hata-carpti", "geri-hata-cukur", "geri-hata-disari", "geri-hata-eksik", "geri-hata-enerji", "geri-hata-tekrar", "geri-hata-yanlis-kutu", "geri-tekrar-1", "geri-tekrar-2", "giris-cicek-1", "giris-cicek-6", "giris-donusum-1", "giris-donusum-6", "giris-gece-1", "giris-gece-6", "giris-golet-1", "giris-golet-6", "giris-kalem-1", "giris-kalem-5", "giris-orman-1", "giris-orman-6", "giris-senlik-1", "giris-senlik-2", "giris-senlik-3", "giris-senlik-4", "giris-senlik-5", "giris-tarla-1", "giris-tarla-4", "giris-yaris-1", "gorev-cicek", "gorev-donusum", "gorev-gece", "gorev-golet", "gorev-orman", "gorev-senlik-1", "gorev-senlik-2", "gorev-senlik-3", "gorev-senlik-4", "gorev-senlik-5", "gorev-tarla", "gorev-tarla-sula", "kod-ek-goreli", "kod-ek-posta", "kod-ek-yer", "kod-giris-0", "kod-giris-1", "kod-giris-2", "kod-giris-3", "kod-giris-4", "kod-giris-5", "kod-giris-hata", "kod-giris-sensor", "kod-hedef-hastane", "kod-hedef-kutuphane", "kod-hedef-okul", "kod-hedef-park", "kod-hedef-pazar", "konus-cicek", "konus-donusum", "konus-gece", "konus-golet", "konus-hata", "konus-kalem-1", "konus-kalem-2", "konus-kod-1", "konus-kod-2", "konus-kod-3", "konus-kod-4", "konus-kod-5", "konus-kod-6", "konus-orman", "konus-senlik-1", "konus-senlik-2", "konus-senlik-3", "konus-senlik-4", "konus-senlik-5", "konus-tarla", "konus-yaris", "konus-yol-1", "konus-yol-2", "konus-yol-3", "konus-yol-4", "tahmin-dogru", "tahmin-sor", "tahmin-yanlis", "tesekkur-1", "tesekkur-2", "tesekkur-3", "tesekkur-4", "tesekkur-5", "tesekkur-6", "tesekkur-7", "yol-ek-anahtar", "yol-ek-kopru", "yol-ek-posta", "yol-ek-tekyon", "yol-ek-tunel", "yol-giris-1", "yol-giris-14", "yol-giris-18", "yol-giris-23", "yol-giris-28", "yol-giris-4", "yol-giris-6", "yol-giris-8", "yol-hedef-hastane", "yol-hedef-kutuphane", "yol-hedef-okul", "yol-hedef-park", "yol-hedef-pazar"]);
-function sesAnahtar(t){ return String(t||"").replace(/<[^>]+>/g,"").replace(/\s*\([^)]*\)/g,"").replace(/[\u2010\u2011\u2012\u2013]/g,"-").replace(/[“”"]/g,"").replace(/…/g,"...").replace(/×/g," kere ").replace(/\b2 kere/g,"iki kere").replace(/\b3 kere/g,"üç kere").replace(/\b4 kere/g,"dört kere").toLocaleLowerCase("tr").replace(/\s+([,.;:!?])/g,"$1").replace(/\s+/g," ").trim() }
-function sesKim(){ try{ if(typeof A!=="undefined"&&A&&A.m&&A.m.durak&&typeof WORLD!=="undefined") return WORLD[A.m.durak].friend }catch(e){} return "" }
+function sesAnahtar(t){ return String(t||"").replace(/<[^>]+>/g,"").replace(/\s*\([^)]*\)/g,"").replace(/[\u2010\u2011\u2012\u2013]/g,"-").replace(/[“”"]/g,"").replace(/…/g,"...").replace(/×/g," kere ").replace(/\b2 kere/g,"iki kere").replace(/\b3 kere/g,"üç kere").replace(/\b4 kere/g,"dört kere").toLocaleLowerCase("tr").replace(/!/g,".").replace(/\s+([,.;:!?])/g,"$1").replace(/\s+/g," ").trim() }
+function sesKim(){ try{ const act=document.getElementById("act"); if(act&&!act.hidden&&typeof A!=="undefined"&&A&&A.m&&A.m.durak&&typeof WORLD!=="undefined"&&WORLD[A.m.durak]) return WORLD[A.m.durak].friend }catch(e){} return "" }
 function sesDosya(k,who){ const f=(who&&SES_METIN[k+"|"+who])||SES_METIN[k]; return f&&SES_DOSYA.has(f)?f:null }
 // metni kayıtlara böler: [{file}] ya da cümle cümle [{file}|{tts}] ; hiç kayıt yoksa null
 function sesBul(text,who){
@@ -2300,8 +2543,10 @@ Voice.init();
 // görev yazıları değişince oku; yazıya dokununca tekrar oku
 (function(){
   const watch=id=>{ const el=$(id); if(!el) return; let last="";
-    new MutationObserver(()=>{ const t=el.textContent; if(t&&t!==last&&!el.closest("[hidden]")){ last=t; clearTimeout(el._vt); el._vt=setTimeout(()=>Voice.say(t),250) } }).observe(el,{childList:true,characterData:true,subtree:true});
-    el.addEventListener("click",()=>Voice.say(el.textContent,true)); el.classList.add("speakable") };
+    // data-say: ekranda görünenden farklı bir metin okunacaksa; class "quiet": okunmaz (durum satırları)
+    const txt=()=>el.classList.contains("quiet")?"":(el.dataset.say||el.textContent);
+    new MutationObserver(()=>{ const t=txt(); if(t&&t!==last&&!el.closest("[hidden]")){ last=t; clearTimeout(el._vt); el._vt=setTimeout(()=>Voice.say(t),250) } }).observe(el,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:["data-say","class"]});
+    el.addEventListener("click",()=>Voice.say(txt()||el.textContent,true)); el.classList.add("speakable") };
   ["aGoal","yGoal","kGoal"].forEach(watch);
   const f=$("aFriend"); if(f) f.addEventListener("click",()=>Voice.say($("aGoal").textContent,true));
 })();
@@ -2944,7 +3189,7 @@ regAct("kalem",{
   solved(st){ const r=run(st.L,st.prog,st.x), got=new Set(r.segs.map(key)); return !r.out&&got.size===st.target.size&&[...st.target].every(k=>got.has(k)) },
   auto(st){ st.prog=st.L.sol.split(""); st.x=st.L.x; return true },
   async solve(st){
-    for(const t of st.L.sol){ st.prog.push(t); sfx.click(); aRefresh(); aGoal(`Kod: ${st.prog.length} blok`); await aWait(450) }
+    for(const t of st.L.sol){ st.prog.push(t); sfx.click(); aRefresh(); aGoal(`Kod: ${st.prog.length} blok`,"quiet"); await aWait(450) }
     if(st.L.rep){ st.x=st.L.x; aGoal(`Bu kodu ${st.L.x} kez tekrarla`); aRefresh(); await aWait(900) }
     await this.play(st); A.busy=true;
   }
@@ -3165,12 +3410,12 @@ function reg(id){
     solved(st){ return !!simulate(st.L,st.prog).ok },
     auto(st){ st.prog=st.L.t>=LOOPS_FROM?compress(st.L.sol):st.L.sol.slice(); return true },
     async solve(st){
-      if(st.L.C.debug){ const sol=st.L.sol; for(let i=0;i<sol.length;i++) if(st.prog[i]!==sol[i]){ st.sel=i; aRefresh(); aGoal(`${i+1}. blok hatalı: ${BL[st.prog[i]][0]} yerine ${BL[sol[i]][0]}`); await aWait(1100); st.prog[i]=sol[i]; st.sel=-1; sfx.place(); aRefresh(); await aWait(600) } }
+      if(st.L.C.debug){ const sol=st.L.sol; for(let i=0;i<sol.length;i++) if(st.prog[i]!==sol[i]){ st.sel=i; aRefresh(); aGoal(`${i+1}. blok hatalı: ${BL[st.prog[i]][0]} yerine ${BL[sol[i]][0]}`,null,`${i+1}. blok hatalı.`); await aWait(1100); st.prog[i]=sol[i]; st.sel=-1; sfx.place(); aRefresh(); await aWait(600) } }
       else { const p=st.L.t>=LOOPS_FROM?compress(st.L.sol):st.L.sol; st.prog=[]; for(const t of p){ st.prog.push(t); sfx.click(); aRefresh(); await aWait(300) } }
       await play(st); A.busy=true;
     }
   });
-  function L_left(st){ const n=st.L.items.length-(st.run?st.run.got.size:0); return st.L.mode==="deliver"?`Program bitti ama ${n} atık hâlâ kutusunda değil.`:`Program bitti ama ${n} görev kaldı. Programı uzat ya da yolu değiştir.` }
+  function L_left(st){ const n=st.L.items.length-(st.run?st.run.got.size:0); return st.L.mode==="deliver"?`Program bitti ama atıklar hâlâ kutusunda değil. (${n} atık)`:`Program bitti ama görev bitmedi. Programı uzat ya da yolu değiştir. (${n} görev kaldı)` }
 }
 // ---- Kodla Sür ile aynı arayüz: sabit tahta, akıcı hareket, program kutuları, şimdi çalışan ----
 const CS=100;
@@ -3196,7 +3441,7 @@ function buildBoard(st){
   let s=`<rect x="-8" y="-8" width="${W}" height="${W}" rx="22" fill="${C.edge}"/>`;
   for(let y=0;y<N;y++) for(let x=0;x<N;x++) s+=`<rect x="${x*CS+4}" y="${y*CS+4}" width="${CS-8}" height="${CS-8}" rx="14" fill="${C.tile[(x+y)%2]}"/>`;
   if(C.kind==="cop") for(let y=0;y<N;y++) for(let x=0;x<N;x++) if((x*7+y*3)%5===0) s+=`<path d="M${x*CS+22} ${y*CS+70} q10 -7 20 0 t20 0" stroke="#d6f3fb" stroke-width="3" fill="none" stroke-linecap="round"/>`;
-  s+=`<g transform="translate(${L.sx*CS} ${L.sy*CS})" opacity=".9">${star8("#22a165").replace("#a8261e","#16794a")}</g>`;
+  s+=`<g transform="translate(${L.sx*CS} ${L.sy*CS})">${startArt}</g>`;
   L.obs.forEach(o=>s+=atCell(o.x,o.y,ART[C.obs]));
   L.bins.forEach(b=>s+=atCell(b.x,b.y,binArt(b.c)));
   L.items.forEach((it,i)=>s+=`<g data-it="${i}"></g>`);
