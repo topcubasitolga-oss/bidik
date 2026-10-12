@@ -616,15 +616,18 @@ h1,h2,h3{text-wrap:balance}
 #kCar.blink-L .bl-L,#kCar.blink-R .bl-R{animation:wave .3s ease-in-out 3}
 .petals{transform-box:view-box;transform-origin:0 0}
 .bloom .petals{animation:bloom 1.2s ease-in-out 2}
-.finish .fring{animation:finpulse 1.6s ease-in-out infinite}
-@keyframes finpulse{50%{stroke:#ffd23f;stroke-width:8}}
-.finish .fhalo{transform-box:fill-box;transform-origin:center;animation:fhalo 1.6s ease-out infinite}
-@keyframes fhalo{0%{transform:scale(1);opacity:.95}75%{transform:scale(1.18);opacity:0}100%{transform:scale(1.18);opacity:0}}
-.fpoint{transform-box:fill-box;transform-origin:center bottom;animation:fbounce .5s ease-in-out infinite alternate;filter:drop-shadow(0 4px 0 rgba(22,50,74,.25))}
-@keyframes fbounce{to{transform:translateY(-14px)}}
+.finish{transform-box:fill-box;transform-origin:center;animation:fbreathe 1.3s ease-in-out infinite}
+@keyframes fbreathe{50%{transform:scale(1.045)}}
+.finish .fpad{animation:fpad 1.3s ease-in-out infinite}
+@keyframes fpad{50%{fill:#ffd23f}}
+.finish .fring{animation:finpulse 1.3s ease-in-out infinite}
+@keyframes finpulse{50%{stroke:#ff9f1a;stroke-width:9}}
+.finish .fhalo{transform-box:fill-box;transform-origin:center;animation:fhalo 1.3s ease-out infinite}
+@keyframes fhalo{0%{transform:scale(1);opacity:.95}80%{transform:scale(1.2);opacity:0}100%{transform:scale(1.2);opacity:0}}
+.finish.flash,.finish.flash .fpad,.finish.flash .fring,.finish.flash .fhalo{animation-duration:.5s}
 .board{overflow:visible}
 .goal .gico{width:36px;height:36px;display:inline-block;vertical-align:middle;margin:-6px 6px -6px 0;flex:none}
-@media (prefers-reduced-motion:reduce){.finish .fhalo,.fpoint{animation:none}}
+@media (prefers-reduced-motion:reduce){.finish,.finish .fhalo{animation:none}.finish .fpad{animation-duration:2.6s}}
 .finish .cloth{transform-box:fill-box;transform-origin:left center}
 .finish.bloom .cloth{animation:flagwave .5s ease-in-out 4}
 @keyframes flagwave{50%{transform:scaleX(.82) skewY(-6deg)}}
@@ -1023,10 +1026,9 @@ const homeArt=`${tileShadow}<rect x="18" y="46" width="64" height="42" rx="3" fi
 function checkerArt(x0,y0,cols,rows,s){ let o=""; for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) o+=`<rect x="${x0+c*s}" y="${y0+r*s}" width="${s}" height="${s}" fill="${(r+c)%2?"#fff":"#16324a"}"/>`; return o }
 const flagArt=`<g class="flag"><path d="M13 88 V8" stroke="#16324a" stroke-width="5" stroke-linecap="round"/><circle cx="13" cy="7" r="4.5" fill="#e8443a"/><g class="cloth">${checkerArt(16,11,4,3,8)}<rect x="16" y="11" width="32" height="24" fill="none" stroke="#16324a" stroke-width="2.5"/></g></g>`;
 function finishArt(i,stub){return `<g class="finish"><rect class="fpad" x="5" y="5" width="90" height="90" rx="14" fill="#fff1a8"/>${stub||""}<rect class="fhalo" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#ffd23f" stroke-width="8"/><rect class="fring" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#f5b400" stroke-width="5"/><g transform="translate(9 6) scale(.82)">${destArt(DEST)}</g><g transform="translate(-3 -4) scale(.5)">${flagArt}</g><g class="flabel"><rect x="22" y="77" width="56" height="19" rx="9.5" fill="#16324a"/><text x="50" y="91" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" letter-spacing=".5">BİTİŞ</text></g></g>`}
-// Bölüm başında hedefi gösteren zıplayan ok (3 saniye sonra kalkar; hedef cümlesine dokununca yeniden)
-const pointArt=`<g class="fpoint"><path d="M50 -4 L30 -30 H41 V-58 H59 V-30 H70Z" fill="#f08a24" stroke="#16324a" stroke-width="3" stroke-linejoin="round"/><path d="M45 -52 V-34" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/></g>`;
-let pointT=null;
-function pointFinish(svg,i,N){ if(!svg||i==null||i<0) return; svg.querySelectorAll(".fpointw").forEach(e=>e.remove()); clearTimeout(pointT); const g=document.createElementNS("http://www.w3.org/2000/svg","g"); g.setAttribute("class","fpointw"); g.setAttribute("transform",`translate(${(i%N)*100} ${((i/N)|0)*100})`); g.innerHTML=pointArt; svg.appendChild(g); pointT=setTimeout(()=>g.remove(),3200) }
+// bitiş karesi sürekli nabız gibi atar; bölüm başında ve hedef cümlesine dokununca 2,5 saniye hızlı atar
+let flashT=null;
+function flashFinish(svg){ if(!svg) return; const f=svg.querySelector(".finish"); if(!f) return; clearTimeout(flashT); f.classList.remove("flash"); void f.getBBox; f.classList.add("flash"); flashT=setTimeout(()=>f.classList.remove("flash"),2500) }
 const gico=()=>`<svg class="gico" viewBox="0 0 100 100" aria-hidden="true">${destArt(DEST)}</svg>`;
 // Başlangıç hücresi (Kodla Sür ve bölge etkinlikleri): yeşil zemin + "BAŞLA" rozeti
 const startArt=`<g class="startpad"><rect x="8" y="8" width="84" height="84" rx="12" fill="#c5ecd0"/><rect x="8" y="8" width="84" height="84" rx="12" fill="none" stroke="#22a165" stroke-width="4" stroke-dasharray="7 6"/><rect x="16" y="70" width="68" height="24" rx="12" fill="#22a165"/><text x="50" y="87.5" text-anchor="middle" font-size="15" font-weight="800" fill="#fff" letter-spacing=".5">BAŞLA</text></g>`;
@@ -1384,7 +1386,7 @@ function start(n,keep,daily){
   $("yTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n; $("ySub").textContent=`Yol Kur · ${L.tier.name} · ${L.N}×${L.N}`;
   demo=false; $("ySolve").hidden=!teacherOn()||!!daily;
   setFriend("yFriend","yol",n,daily); setGoal(); renderTray(); render(); stats(); renderSpeedBars();
-  if(!keep) pointFinish($("yBoard"),L.cells.findIndex(c=>c.kind==="finish"),L.N);
+  if(!keep) flashFinish($("yBoard"));
   if(!keep&&!daily&&INTRO[n]) seenOnce("y"+n,INTRO[n]);
 }
 function setGoal(msg,cls,say){
@@ -1532,7 +1534,7 @@ $("ySolve").onclick=()=>{
   put();
 };
 $("yTalk").onclick=()=>{ if(!running) openTalk(isDaily?"yol":"yol",L.n) };
-$("yGoal").addEventListener("click",()=>{ if(L) pointFinish($("yBoard"),L.cells.findIndex(c=>c.kind==="finish"),L.N) });
+$("yGoal").addEventListener("click",()=>{ if(L) flashFinish($("yBoard")) });
 $("yHint").onclick=()=>{
   if(running) return;
   const i=L.order.find(k=>{const c=grid[k];return !(c.kind==="piece"&&same(c,L.solution[k]))});
@@ -1946,7 +1948,7 @@ function start(n,daily){
   $("kSub").textContent=`Kodla Sür · ${L.ch.name}`+(L.bug?" · Hata avcısı":"");
   demo=false; $("kSolve").hidden=!teacherOn()||!!daily;
   setFriend("kFriend","kod",n,daily); guess=null; predicting=false; guessDone=false; guessRes=null; goal(); renderBoard(); renderProg(); renderPal(); statsK(); renderSpeedBars(); setNow(null); fitBoard($("kBoard"),$("kRun"));
-  pointFinish($("kBoard"),L.fin,L.N);
+  flashFinish($("kBoard"));
   if(!daily){
     const bug=()=>{ if(L.bug) seenOnce("kbug",BUG) };
     const els=()=>{ if(n===SENSOR_FROM&&L.elseOk) seenOnce("kelse",ELSE_INTRO,bug); else bug() };
@@ -2133,7 +2135,7 @@ $("kSolve").onclick=()=>{
   setTimeout(()=>$("kRun").click(),350);
 };
 $("kTalk").onclick=()=>{ if(!anim) openTalk("kod",L.n) };
-$("kGoal").addEventListener("click",()=>{ if(L&&!anim) pointFinish($("kBoard"),L.fin,L.N) });
+$("kGoal").addEventListener("click",()=>{ if(L&&!anim) flashFinish($("kBoard")) });
 return {start,CH,TOTAL,isBug,makeLevel,execute,BUG,SENSOR_INTRO,ELSE_INTRO,EXPLICIT_INTRO};
 })();
 
