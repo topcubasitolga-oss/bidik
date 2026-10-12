@@ -49,6 +49,10 @@ h1,h2,h3{text-wrap:balance}
 .iconbtn svg{width:24px;height:24px}
 .chip{background:var(--panel);border:2px solid var(--panel-line);border-radius:999px;padding:8px 14px;font-weight:800;font-size:14px}
 .chip.on{border-color:var(--rail-edge);background:#fff3c4}
+.home-head-r{display:flex;align-items:center;gap:8px}
+.teachchip{display:flex;align-items:center;gap:6px;height:46px;padding:0 14px 0 10px}
+.teachchip svg{width:22px;height:22px}
+@media (max-width:480px){.teachchip span{display:none}.teachchip{padding:0 11px}}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .goal{font-weight:800;text-align:center;color:var(--ink-soft);font-size:14px;margin:-4px 0 0;text-wrap:balance;min-height:1.3em}
 .goal.bad{color:var(--red)} .goal.good{color:var(--green)}
@@ -768,7 +772,7 @@ body.printkart #cert{padding:0}
   <div class="home-head">
     <button class="who" id="whoBtn" aria-label="Oyuncu değiştir"></button>
     <button class="chip lvchip" id="lvBtn" aria-label="Seviye"></button>
-    <button class="iconbtn" id="soundBtn" aria-label="Ses"></button>
+    <span class="home-head-r"><button class="iconbtn" id="soundBtn" aria-label="Ses"></button><button class="chip teachchip" id="menuTop" aria-label="Öğretmen / veli menüsü"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Öğretmen / veli</span></button></span>
   </div>
   <div class="brand">
     <svg class="mascot" id="mascot" viewBox="0 0 200 200" aria-hidden="true"></svg>
@@ -4315,6 +4319,7 @@ function goHome(){
   $("dTxt").textContent=ds?`Bugünkü kartpostal çözüldü: ${starsTxt(ds)} · Yarın yenisi gelecek`:`Bir dosttan kartpostal geldi! Arkasında bugünün ${todayKey()%2?"Kodla Sür":"Yol Kur"} bulmacası var. Büyükler de dene!`;
   $("teacherBtn").setAttribute("aria-pressed",db.teacher);
   $("menuBtn").textContent=db.teacher?"Öğretmen / veli · öğretmen modu açık":"Öğretmen / veli"; $("menuBtn").classList.toggle("on",!!db.teacher);
+  $("menuTop").classList.toggle("on",!!db.teacher); $("menuTop").title=db.teacher?"Öğretmen modu açık":"Öğretmen / veli menüsü";
   if(typeof sinifHome==="function") sinifHome();
 }
 // ---- Bidik Haritası: kitaptaki yedi durak (B1–B7) ----
@@ -4398,7 +4403,7 @@ function openMenu(){
   if(typeof sinifOn==="function"&&sinifOn()){ $("miS0").hidden=false; $("miS0").onclick=()=>{ closeOverlay(); sinifOgretmen() } }
   $("miX").onclick=closeOverlay;
 }
-$("menuBtn").onclick=openMenu;
+$("menuBtn").onclick=openMenu; $("menuTop").onclick=openMenu;
 $("reportBtn").onclick=openReport;
 
 function openLevels(mode,opts){
