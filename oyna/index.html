@@ -641,6 +641,7 @@ h1,h2,h3{text-wrap:balance}
 /* sınıf kodu */
 .sinifchip{display:inline-flex;align-items:center;gap:6px}
 .sinifchip.on{background:#e3f6ea;border-color:#22a165}
+.sinifchip.teach{background:#22a165;color:#fff;border-color:#167a4a}
 .krz{display:inline-grid;place-items:center;border-radius:50%;overflow:hidden;flex:none;vertical-align:middle;border:2px solid #fff;box-shadow:0 1px 0 rgba(22,50,74,.15)}
 .krz svg{width:92%;height:92%;margin-top:6%}
 .sform label{margin-top:4px}
@@ -749,6 +750,7 @@ body.printkart #cert{padding:0}
   </button>
   <div class="home-tools">
     <button class="chip sinifchip" id="sinifBtn" hidden>Sınıf kodu</button>
+    <button class="chip sinifchip teach" id="sinifTeachBtn" hidden>Öğretmen: sınıf oluştur</button>
     <button class="chip" id="menuBtn">Öğretmen / veli</button>
   </div>
   <div hidden>
@@ -1012,7 +1014,7 @@ function winCard({stars,checks,msg,onAgain,onNext,nextLabel,talk}){
   overlay(`${typeof confettiHTML==="function"&&stars===3?confettiHTML(24):""}<h2>Tebrikler!</h2><div class="bigstars">${[0,1,2].map(i=>starSVG(i<stars)).join("")}</div>
    <div class="checks">${checks.map(c=>ck(c[0],c[1])).join("")}</div><p style="font-size:14px">${msg}</p>${talk?`<div class="talkbox speakable" id="ovTalk"><b>KONUŞALIM</b>${talk}</div>`:""}
    <div class="btns"><button class="btn-alt" id="ovAgain">Tekrar</button><button class="btn-main" id="ovNext">${nextLabel||"Sonraki"}</button></div>`);
-  if(talk){ const say=f=>Voice.say(String(talk).replace(/<[^>]+>/g,""),f); setTimeout(()=>{ if($("ovTalk")) say(false) },900); $("ovTalk").onclick=()=>say(true) }
+  if(talk){ const txt=String(talk).replace(/<[^>]+>/g,""); const say=f=>Voice.say(txt,f); setTimeout(()=>{ if($("ovTalk")) Voice.sayWhenFree(txt,false,()=>!!$("ovTalk")) },700); $("ovTalk").onclick=()=>say(true) }
   $("ovAgain").onclick=()=>{Voice.stop();onAgain()}; $("ovNext").onclick=()=>{Voice.stop();onNext()};
 }
 function introCard(c,then){
@@ -2603,7 +2605,11 @@ const Voice={
       else if(this.ready) this.tts(c.tts,next); else next(); };
     next(); return u;
   },
-  stop(){ this.tok=(this.tok||0)+1; try{ speechSynthesis.cancel() }catch(e){} if(this.aud){ try{ this.aud.onended=null; this.aud.onerror=null; this.aud.pause() }catch(e){} this.aud=null } }
+  stop(){ this.tok=(this.tok||0)+1; try{ speechSynthesis.cancel() }catch(e){} if(this.aud){ try{ this.aud.onended=null; this.aud.onerror=null; this.aud.pause() }catch(e){} this.aud=null } },
+  // şu an bir kayıt ya da cihaz sesi çalıyor mu?
+  busy(){ try{ return !!this.aud||(typeof speechSynthesis!=="undefined"&&speechSynthesis.speaking) }catch(e){ return !!this.aud } },
+  // süren konuşma bitince söyle (önceki cümleyi kesmez); guard() false dönerse vazgeçer
+  sayWhenFree(text,force,guard){ const t0=Date.now(); const tick=()=>{ if(guard&&!guard()) return; if(!this.busy()||Date.now()-t0>20000) this.say(text,force); else setTimeout(tick,150) }; tick() }
 };
 Voice.init();
 // görev yazıları değişince oku; yazıya dokununca tekrar oku
@@ -2611,7 +2617,9 @@ Voice.init();
   const watch=id=>{ const el=$(id); if(!el) return; let last="";
     // data-say: ekranda görünenden farklı bir metin okunacaksa; class "quiet": okunmaz (durum satırları)
     const txt=()=>el.classList.contains("quiet")?"":(el.dataset.say||el.textContent);
-    new MutationObserver(()=>{ const t=txt(); if(t&&t!==last&&!el.closest("[hidden]")){ last=t; clearTimeout(el._vt); el._vt=setTimeout(()=>Voice.say(t),250) } }).observe(el,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:["data-say","class"]});
+    // kart (giriş/kazanma) açıkken ya da başka bir konuşma sürerken bekler; metin bu arada değişirse vazgeçer
+    const sayLater=t=>{ const t0=Date.now(); const tick=()=>{ if(txt()!==t||el.closest("[hidden]")) return; if((!$("overlay").hidden||Voice.busy())&&Date.now()-t0<20000) return setTimeout(tick,150); Voice.say(t) }; tick() };
+    new MutationObserver(()=>{ const t=txt(); if(t&&t!==last&&!el.closest("[hidden]")){ last=t; clearTimeout(el._vt); el._vt=setTimeout(()=>sayLater(t),250) } }).observe(el,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:["data-say","class"]});
     el.addEventListener("click",()=>Voice.say(txt()||el.textContent,true)); el.classList.add("speakable") };
   ["aGoal","yGoal","kGoal"].forEach(watch);
   const f=$("aFriend"); if(f) f.addEventListener("click",()=>Voice.say($("aGoal").textContent,true));
@@ -2897,7 +2905,7 @@ function celebrateRegion(no){
     <div class="btns"><button class="btn-alt" id="ovSay" ${Voice.ready?"":"hidden"}>Tekrar dinle</button><button class="btn-main" id="ovSeed">Yaşasın!</button></div>`);
   sfx.win&&sfx.win();
   setTimeout(()=>friendChirp(no),900);
-  setTimeout(()=>Voice.say(THANKS[no],true),1500);
+  setTimeout(()=>Voice.sayWhenFree(THANKS[no],true,()=>!!$("ovSeed")),1500);
   $("ovSay").onclick=()=>{ friendChirp(no); Voice.say(THANKS[no],true) };
   $("ovSeed").onclick=()=>{ Voice.stop(); closeOverlay(); renderMap() };
 }
@@ -3790,6 +3798,7 @@ function sinifHome(){
   const b=$("sinifBtn"); if(!b) return;
   const s=ogrenciSinif();
   b.hidden=!sinifOn();
+  const tb=$("sinifTeachBtn"); if(tb){ tb.hidden=!sinifOn(); tb.textContent=ogretmenSinif()?`Sınıfım: ${ogretmenSinif().ad}`:"Öğretmen: sınıf oluştur" }
   b.innerHTML=s?`${karakterRozet(s.karakter,22)}<span>${esc(s.ad||s.kod)} · No ${s.no}</span>`:"Sınıf kodu";
   b.classList.toggle("on",!!s);
   if(s&&sinifOn()&&navigator.onLine&&(!s.cek||Date.now()-s.cek>5*60*1000)){ const d=P(); sinifPull(d).then(()=>{ if(!$("home").hidden) renderMap() }).catch(()=>{}); if(s.dirty) sinifPushAll().catch(()=>{}) }
@@ -4054,6 +4063,9 @@ function sinifKartYazdir(){
 // adres çubuğundan gelen davet: ?sinif=KOD&no=7
 try{ const q=new URLSearchParams(location.search); const kod=kodTemiz(q.get("sinif")||""); if(kod.length===6&&sinifOn()){ const no=+q.get("no")||0; history.replaceState(null,"",location.pathname); setTimeout(()=>{ const s=ogrenciSinif(); if(s&&s.kod===kod&&(!no||s.no===no)) return; sinifKatil(kod,no) },700) } }catch(e){}
 if($("sinifBtn")) $("sinifBtn").onclick=()=>{ sfx.click(); sinifKatil() };
+if($("sinifTeachBtn")) $("sinifTeachBtn").onclick=()=>{ sfx.click(); sinifOgretmen() };
+// adres çubuğundan: ?ogretmen=sinif → doğrudan öğretmen sınıf ekranı
+try{ const q=new URLSearchParams(location.search); if(q.get("ogretmen")==="sinif"&&sinifOn()){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ closeOverlay(); sinifOgretmen() },500) } }catch(e){}
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
