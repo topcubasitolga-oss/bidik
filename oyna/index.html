@@ -617,7 +617,14 @@ h1,h2,h3{text-wrap:balance}
 .petals{transform-box:view-box;transform-origin:0 0}
 .bloom .petals{animation:bloom 1.2s ease-in-out 2}
 .finish .fring{animation:finpulse 1.6s ease-in-out infinite}
-@keyframes finpulse{50%{stroke-opacity:.25;stroke-width:11}}
+@keyframes finpulse{50%{stroke:#ffd23f;stroke-width:8}}
+.finish .fhalo{transform-box:fill-box;transform-origin:center;animation:fhalo 1.6s ease-out infinite}
+@keyframes fhalo{0%{transform:scale(1);opacity:.95}75%{transform:scale(1.18);opacity:0}100%{transform:scale(1.18);opacity:0}}
+.fpoint{transform-box:fill-box;transform-origin:center bottom;animation:fbounce .5s ease-in-out infinite alternate;filter:drop-shadow(0 4px 0 rgba(22,50,74,.25))}
+@keyframes fbounce{to{transform:translateY(-14px)}}
+.board{overflow:visible}
+.goal .gico{width:36px;height:36px;display:inline-block;vertical-align:middle;margin:-6px 6px -6px 0;flex:none}
+@media (prefers-reduced-motion:reduce){.finish .fhalo,.fpoint{animation:none}}
 .finish .cloth{transform-box:fill-box;transform-origin:left center}
 .finish.bloom .cloth{animation:flagwave .5s ease-in-out 4}
 @keyframes flagwave{50%{transform:scaleX(.82) skewY(-6deg)}}
@@ -989,30 +996,38 @@ const INK="#16324a"; // ortak kontur rengi (karakterler, karolar, nesneler)
 const tileShadow=`<ellipse cx="50" cy="90" rx="36" ry="5" fill="${INK}" opacity=".14"/>`; // zemin gölgesi
 const winArt=(x,y,w,h)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="#bfe6f7" stroke="${INK}" stroke-width="2.2"/><path d="M${x+w/2} ${y} V${y+h} M${x} ${y+h/2} H${x+w}" stroke="${INK}" stroke-width="1.6"/>`;
 const doorArt=(x,y,w,h,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w/2}" fill="${c||"#b5743c"}" stroke="${INK}" stroke-width="2.2"/><rect x="${x}" y="${y+h/2}" width="${w}" height="${h/2}" fill="${c||"#b5743c"}" stroke="${INK}" stroke-width="2.2"/><circle cx="${x+w-4}" cy="${y+h*.62}" r="1.6" fill="${INK}"/>`;
+// Yeni hedef binalar, doğa engelleri, bitiş karesi — index.html'e yerleştirilecek parça
 function blockArt(v,i){
   i=i||0;
   if(v) return `${tileShadow}<rect x="45" y="58" width="10" height="28" rx="3" fill="#8a5a2b" stroke="${INK}" stroke-width="2.4"/><circle cx="29" cy="56" r="16" fill="#3fae5f" stroke="${INK}" stroke-width="2.6"/><circle cx="71" cy="56" r="16" fill="#3fae5f" stroke="${INK}" stroke-width="2.6"/><path d="M16 60 C30 76 70 76 84 60 C70 70 30 70 16 60Z" fill="#2e8a48" opacity=".5"/><circle cx="50" cy="40" r="27" fill="#3fae5f" stroke="${INK}" stroke-width="2.6"/><path d="M30 56 C40 66 60 66 70 56 C60 62 40 62 30 56Z" fill="#2e8a48" opacity=".45"/><path d="M34 30 Q42 20 54 20" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".4"/>`;
-  const k=i%4, roofs=["#e8443a","#2f7fd8","#8a5cd6","#f08a24"], roof=roofs[(i>>2)%4];
-  if(k===1) return `${tileShadow}<rect x="22" y="14" width="56" height="76" rx="5" fill="#f3d6b5" stroke="${INK}" stroke-width="2.6"/><rect x="18" y="10" width="64" height="10" rx="4" fill="#c98a52" stroke="${INK}" stroke-width="2.4"/>${[26,42].map(y=>[30,46,62].map(x=>winArt(x,y,9,10)).join("")).join("")}${winArt(30,58,9,10)}${winArt(62,58,9,10)}${doorArt(43,68,14,22)}`;
-  if(k===3) return `${tileShadow}<rect x="24" y="42" width="52" height="40" rx="3" fill="#fff6e6" stroke="${INK}" stroke-width="2.6"/><path d="M14 44 L50 14 L86 44Z" fill="#22a165" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/><rect x="62" y="20" width="8" height="12" fill="#b5743c" stroke="${INK}" stroke-width="2"/>${doorArt(43,58,14,24)}${winArt(29,52,11,11)}<path d="M8 86 H92" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/><path d="M8 86 H92" stroke="${INK}" stroke-width="1" opacity=".4"/><circle cx="14" cy="74" r="6" fill="#e0457b" stroke="${INK}" stroke-width="2"/><circle cx="86" cy="74" r="6" fill="#ffc93c" stroke="${INK}" stroke-width="2"/>`;
-  return `${tileShadow}<rect x="16" y="44" width="68" height="44" rx="3" fill="#fff6e6" stroke="${INK}" stroke-width="2.6"/><path d="M8 46 L50 10 L92 46Z" fill="${roof}" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/><path d="M22 44 L50 20 L78 44Z" fill="#fff" opacity=".12"/>${k===2?`<rect x="66" y="16" width="8" height="14" fill="#b5743c" stroke="${INK}" stroke-width="2"/>`:""}${doorArt(42,62,16,26)}${winArt(22,54,14,14)}${winArt(64,54,14,14)}`;
+  // engeller bina değil, doğa nesnesi: tahtadaki tek bina hedeftir
+  const k=i%4;
+  if(k===0) return `${tileShadow}<path d="M16 76 C12 56 26 34 48 32 C72 30 88 48 86 70 C84 84 22 88 16 76Z" fill="#9aa6b4" stroke="${INK}" stroke-width="2.8"/><path d="M30 44 Q44 34 58 38" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".45"/><path d="M24 70 C36 80 68 80 80 68 C70 76 34 76 24 70Z" fill="#5f7489" opacity=".4"/>`;
+  if(k===1) return `${tileShadow}<circle cx="34" cy="62" r="20" fill="#3d8a4a" stroke="${INK}" stroke-width="2.6"/><circle cx="66" cy="58" r="22" fill="#2f7a3e" stroke="${INK}" stroke-width="2.6"/><circle cx="50" cy="44" r="19" fill="#4a9a54" stroke="${INK}" stroke-width="2.6"/><path d="M40 34 Q50 26 58 30" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".4"/><circle cx="42" cy="52" r="4" fill="#e8443a" stroke="${INK}" stroke-width="1.6"/><circle cx="64" cy="64" r="4" fill="#e8443a" stroke="${INK}" stroke-width="1.6"/><circle cx="28" cy="70" r="3.5" fill="#e8443a" stroke="${INK}" stroke-width="1.6"/>`;
+  if(k===2) return `${tileShadow}<rect x="14" y="48" width="72" height="30" rx="14" fill="#a8693d" stroke="${INK}" stroke-width="2.6"/><path d="M26 52 H74 M26 74 H74" stroke="#7a4a20" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="86" cy="63" rx="9" ry="15" fill="#e0b48a" stroke="${INK}" stroke-width="2.6"/><ellipse cx="86" cy="63" rx="4.5" ry="7" fill="none" stroke="#b5743c" stroke-width="2"/><path d="M30 46 q-6 -10 2 -16 q2 8 -2 16Z M42 46 q0 -12 8 -14 q-2 8 -8 14Z" fill="#3fae5f" stroke="${INK}" stroke-width="1.8"/>`;
+  return `${tileShadow}${[18,50,82].map(x=>`<rect x="${x-5}" y="34" width="10" height="52" rx="3" fill="#d9a066" stroke="${INK}" stroke-width="2.4"/><path d="M${x-5} 34 L${x} 26 L${x+5} 34Z" fill="#d9a066" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`).join("")}<rect x="10" y="46" width="80" height="9" rx="3" fill="#e8b57a" stroke="${INK}" stroke-width="2.2"/><rect x="10" y="66" width="80" height="9" rx="3" fill="#e8b57a" stroke="${INK}" stroke-width="2.2"/><circle cx="34" cy="86" r="5" fill="#e0457b" stroke="${INK}" stroke-width="1.8"/><circle cx="66" cy="87" r="5" fill="#ffc93c" stroke="${INK}" stroke-width="1.8"/>`;
 }
-// hedef binalar (bitiş): okul, park, hastane, kütüphane, market
+// hedef binalar (bitiş): okul, park, hastane, kütüphane, pazar — her birinin tek bir güçlü simgesi var
 let DEST=0;
 const DESTS=[{ad:"okul",yon:"okula"},{ad:"park",yon:"parka"},{ad:"hastane",yon:"hastaneye"},{ad:"kütüphane",yon:"kütüphaneye"},{ad:"pazar",yon:"pazara"}];
+const DEST_FONT=`font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800"`;
 function destArt(k){
-  const flag=`<path d="M78 40 V6" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M78 7 L96 13 L78 19Z" fill="#e8443a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>`;
-  if(k===0) return `${tileShadow}<rect x="10" y="40" width="80" height="48" rx="3" fill="#ffd9a8" stroke="${INK}" stroke-width="2.6"/><path d="M4 42 L50 12 L96 42Z" fill="#2f7fd8" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/><circle cx="50" cy="32" r="7" fill="#fff" stroke="${INK}" stroke-width="2"/><path d="M50 28 V32 H53" stroke="${INK}" stroke-width="1.6" fill="none"/>${doorArt(42,62,16,26,"#7a5eb0")}${[16,28,62,74].map(x=>winArt(x,50,9,9)).join("")}<path d="M50 12 V0" stroke="${INK}" stroke-width="2.4"/><path d="M50 1 L62 5 L50 9Z" fill="#e8443a" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>`;
-  if(k===1) return `${tileShadow}<rect x="6" y="40" width="88" height="48" rx="12" fill="#7cc35a" stroke="${INK}" stroke-width="2.6"/><rect x="45" y="48" width="8" height="26" rx="3" fill="#8a5a2b" stroke="${INK}" stroke-width="2"/><circle cx="49" cy="40" r="17" fill="#3fae5f" stroke="${INK}" stroke-width="2.4"/><path d="M12 84 V60 H36 L46 46" stroke="#e0457b" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M12 84 V60 H36 L46 46" stroke="${INK}" stroke-width="1.2" fill="none" opacity=".4"/><path d="M64 86 V64 a10 10 0 0 1 20 0 V86" stroke="#2f7fd8" stroke-width="5" fill="none"/><path d="M64 74 H84" stroke="#2f7fd8" stroke-width="4"/><circle cx="22" cy="76" r="5" fill="#ffc93c" stroke="${INK}" stroke-width="1.8"/><circle cx="84" cy="52" r="4" fill="#e0457b" stroke="${INK}" stroke-width="1.6"/>${flag}`;
-  if(k===2) return `${tileShadow}<rect x="8" y="24" width="84" height="64" rx="5" fill="#fff" stroke="${INK}" stroke-width="2.6"/><rect x="36" y="30" width="28" height="28" rx="5" fill="#e8443a" stroke="${INK}" stroke-width="2.2"/><path d="M50 36 V52 M42 44 H58" stroke="#fff" stroke-width="6" stroke-linecap="round"/>${doorArt(42,66,16,22,"#7fd0ea")}${winArt(16,64,12,12)}${winArt(72,64,12,12)}`;
-  if(k===3) return `${tileShadow}<rect x="10" y="34" width="80" height="54" rx="3" fill="#efe8ff" stroke="${INK}" stroke-width="2.6"/><path d="M4 36 L50 10 L96 36Z" fill="#8a5cd6" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>${[18,32,46,60,74].map(x=>`<rect x="${x}" y="44" width="8" height="38" rx="3" fill="#d3c3f2" stroke="${INK}" stroke-width="2"/>`).join("")}<rect x="22" y="58" width="9" height="14" rx="1" fill="#e8443a"/><rect x="34" y="60" width="8" height="12" rx="1" fill="#2f7fd8"/><rect x="62" y="58" width="9" height="14" rx="1" fill="#22a165"/>`;
-  return `${tileShadow}<rect x="10" y="40" width="80" height="48" rx="3" fill="#fff6e6" stroke="${INK}" stroke-width="2.6"/><path d="M6 40 L16 20 H84 L94 40Z" fill="#f08a24" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>${[12,32,52,72].map((x,j)=>`<path d="M${x} 40 a8 8 0 0 0 16 0Z" fill="${j%2?"#fff":"#ffc93c"}" stroke="${INK}" stroke-width="2"/>`).join("")}<rect x="18" y="58" width="64" height="12" rx="3" fill="#c98a52" stroke="${INK}" stroke-width="2"/><circle cx="30" cy="58" r="8" fill="#e8443a" stroke="${INK}" stroke-width="2"/><circle cx="50" cy="58" r="8" fill="#ffc93c" stroke="${INK}" stroke-width="2"/><circle cx="70" cy="58" r="8" fill="#22a165" stroke="${INK}" stroke-width="2"/>`;
+  if(k===0) return `${tileShadow}<rect x="10" y="40" width="80" height="48" rx="4" fill="#ffd166" stroke="${INK}" stroke-width="2.6"/><path d="M4 42 L50 14 L96 42Z" fill="#2f7fd8" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/><circle cx="50" cy="31" r="7.5" fill="#fff" stroke="${INK}" stroke-width="2"/><path d="M50 26.5 V31 H53.5" stroke="${INK}" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M50 14 V2" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/><path d="M50 3 L64 8 L50 13Z" fill="#e8443a" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/><rect x="22" y="47" width="56" height="17" rx="4" fill="#fff" stroke="${INK}" stroke-width="2"/><text x="50" y="60.5" text-anchor="middle" ${DEST_FONT} font-size="14.5" fill="${INK}" letter-spacing="2">ABC</text>${doorArt(42,68,16,20,"#2f7fd8")}${winArt(16,68,11,11)}${winArt(73,68,11,11)}`;
+  if(k===1) return `${tileShadow}<rect x="4" y="36" width="92" height="54" rx="14" fill="#7cc35a" stroke="${INK}" stroke-width="2.6"/><rect x="70" y="48" width="8" height="30" rx="3" fill="#8a5a2b" stroke="${INK}" stroke-width="2.2"/><circle cx="74" cy="40" r="17" fill="#3fae5f" stroke="${INK}" stroke-width="2.4"/><path d="M15 86 V48 M27 86 V48" stroke="#e8443a" stroke-width="5.5" stroke-linecap="round"/><path d="M15 58 H27 M15 68 H27 M15 78 H27" stroke="#e8443a" stroke-width="4" stroke-linecap="round"/><path d="M15 58 H27 M15 68 H27 M15 78 H27" stroke="${INK}" stroke-width="1" opacity=".35"/><rect x="12" y="42" width="24" height="9" rx="4" fill="#e8443a" stroke="${INK}" stroke-width="2"/><path d="M36 46 C50 46 48 68 64 84" stroke="${INK}" stroke-width="12.5" fill="none" stroke-linecap="round"/><path d="M36 46 C50 46 48 68 64 84" stroke="#ffc93c" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M36 46 C50 46 48 68 64 84" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/><circle cx="42" cy="86" r="5" fill="#e0457b" stroke="${INK}" stroke-width="1.8"/><circle cx="90" cy="82" r="5" fill="#ffc93c" stroke="${INK}" stroke-width="1.8"/><circle cx="60" cy="88" r="4" fill="#fff" stroke="${INK}" stroke-width="1.6"/>`;
+  if(k===2) return `${tileShadow}<rect x="10" y="22" width="80" height="66" rx="5" fill="#fff" stroke="${INK}" stroke-width="2.6"/><path d="M10 34 H90" stroke="#7fd0ea" stroke-width="10"/><path d="M10 34 H90" stroke="${INK}" stroke-width="1.2" opacity=".35"/><rect x="33" y="40" width="34" height="34" rx="7" fill="#e8443a" stroke="${INK}" stroke-width="2.4"/><path d="M50 47 V67 M40 57 H60" stroke="#fff" stroke-width="7.5" stroke-linecap="round"/>${doorArt(42,76,16,12,"#7fd0ea")}${winArt(16,48,11,11)}${winArt(73,48,11,11)}${winArt(16,66,11,11)}${winArt(73,66,11,11)}`;
+  if(k===3) return `${tileShadow}<rect x="10" y="38" width="80" height="50" rx="4" fill="#efe8ff" stroke="${INK}" stroke-width="2.6"/><path d="M4 40 L50 14 L96 40Z" fill="#8a5cd6" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/><g transform="translate(50 30)"><path d="M-19 -9 Q-10 -13 0 -7 Q10 -13 19 -9 V7 Q10 1 0 7 Q-10 1 -19 7Z" fill="#fff" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/><path d="M0 -7 V7" stroke="${INK}" stroke-width="1.6"/><path d="M-13 -4 h8 M-13 1 h8 M5 -4 h8 M5 1 h8" stroke="#8a5cd6" stroke-width="1.6" stroke-linecap="round"/></g>${[16,25,34].map((x,j)=>`<rect x="${x}" y="48" width="7" height="30" rx="2" fill="${["#e8443a","#2f7fd8","#22a165"][j]}" stroke="${INK}" stroke-width="1.8"/>`).join("")}${[59,68,77].map((x,j)=>`<rect x="${x}" y="48" width="7" height="30" rx="2" fill="${["#ffc93c","#e0457b","#2f7fd8"][j]}" stroke="${INK}" stroke-width="1.8"/>`).join("")}${doorArt(43,64,14,24,"#8a5cd6")}`;
+  return `${tileShadow}<rect x="10" y="44" width="80" height="44" rx="4" fill="#fff6e6" stroke="${INK}" stroke-width="2.6"/><path d="M6 44 L16 24 H84 L94 44Z" fill="#f08a24" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/>${[6,28,50,72].map((x,j)=>`<path d="M${x} 44 a11 11 0 0 0 22 0Z" fill="${j%2?"#fff":"#f08a24"}" stroke="${INK}" stroke-width="2"/>`).join("")}<rect x="14" y="66" width="72" height="20" rx="3" fill="#c98a52" stroke="${INK}" stroke-width="2.2"/><path d="M38 66 V86 M62 66 V86" stroke="${INK}" stroke-width="1.6" opacity=".5"/><circle cx="22" cy="64" r="5.5" fill="#e8443a" stroke="${INK}" stroke-width="1.8"/><circle cx="31" cy="62" r="5.5" fill="#e8443a" stroke="${INK}" stroke-width="1.8"/><path d="M42 66 q4 -12 16 -10 q-2 10 -16 10Z" fill="#ffc93c" stroke="${INK}" stroke-width="1.8"/><circle cx="70" cy="63" r="6" fill="#22a165" stroke="${INK}" stroke-width="1.8"/><circle cx="79" cy="65" r="5" fill="#22a165" stroke="${INK}" stroke-width="1.8"/>`;
 }
 const homeArt=`${tileShadow}<rect x="18" y="46" width="64" height="42" rx="3" fill="#fff6e6" stroke="${INK}" stroke-width="2.6"/><path d="M8 48 L50 12 L92 48Z" fill="#e8443a" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round"/><circle cx="36" cy="36" r="4.5" fill="${INK}"/><circle cx="62" cy="31" r="4.5" fill="${INK}"/><circle cx="52" cy="43" r="4" fill="${INK}"/>${doorArt(42,62,16,26)}${winArt(24,56,12,12)}<circle cx="76" cy="76" r="11" fill="#22a165" stroke="#fff" stroke-width="3"/><path d="M73 70 L82 76 L73 82Z" fill="#fff"/>`;
-// Bitiş hücresi: damalı bayrak + "BİTİŞ" rozeti + yanıp sönen altın çerçeve (hedef bina küçük, sağ üstte). stub: Yol Kur'da hücreye giren yol parçası (giriş yönü görünsün diye zeminin üstüne çizilir)
+// Bitiş hücresi: büyük hedef bina + nabız gibi parlayan altın halka + küçük damalı bayrak + "BİTİŞ" rozeti. stub: Yol Kur'da hücreye giren yol parçası
 function checkerArt(x0,y0,cols,rows,s){ let o=""; for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) o+=`<rect x="${x0+c*s}" y="${y0+r*s}" width="${s}" height="${s}" fill="${(r+c)%2?"#fff":"#16324a"}"/>`; return o }
 const flagArt=`<g class="flag"><path d="M13 88 V8" stroke="#16324a" stroke-width="5" stroke-linecap="round"/><circle cx="13" cy="7" r="4.5" fill="#e8443a"/><g class="cloth">${checkerArt(16,11,4,3,8)}<rect x="16" y="11" width="32" height="24" fill="none" stroke="#16324a" stroke-width="2.5"/></g></g>`;
-function finishArt(i,stub){return `<g class="finish"><rect class="fpad" x="5" y="5" width="90" height="90" rx="14" fill="#fff1a8"/>${stub||""}<rect class="fring" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#f5b400" stroke-width="5"/><g transform="translate(51 9) scale(.44)">${destArt(DEST)}</g><g transform="translate(2 0)">${flagArt}</g><g class="flabel"><rect x="14" y="70" width="72" height="24" rx="12" fill="#16324a"/><text x="50" y="87.5" text-anchor="middle" font-size="16" font-weight="800" fill="#fff" letter-spacing=".5">BİTİŞ</text></g></g>`}
+function finishArt(i,stub){return `<g class="finish"><rect class="fpad" x="5" y="5" width="90" height="90" rx="14" fill="#fff1a8"/>${stub||""}<rect class="fhalo" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#ffd23f" stroke-width="8"/><rect class="fring" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#f5b400" stroke-width="5"/><g transform="translate(9 6) scale(.82)">${destArt(DEST)}</g><g transform="translate(-3 -4) scale(.5)">${flagArt}</g><g class="flabel"><rect x="22" y="77" width="56" height="19" rx="9.5" fill="#16324a"/><text x="50" y="91" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" letter-spacing=".5">BİTİŞ</text></g></g>`}
+// Bölüm başında hedefi gösteren zıplayan ok (3 saniye sonra kalkar; hedef cümlesine dokununca yeniden)
+const pointArt=`<g class="fpoint"><path d="M50 -4 L30 -30 H41 V-58 H59 V-30 H70Z" fill="#f08a24" stroke="#16324a" stroke-width="3" stroke-linejoin="round"/><path d="M45 -52 V-34" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/></g>`;
+let pointT=null;
+function pointFinish(svg,i,N){ if(!svg||i==null||i<0) return; svg.querySelectorAll(".fpointw").forEach(e=>e.remove()); clearTimeout(pointT); const g=document.createElementNS("http://www.w3.org/2000/svg","g"); g.setAttribute("class","fpointw"); g.setAttribute("transform",`translate(${(i%N)*100} ${((i/N)|0)*100})`); g.innerHTML=pointArt; svg.appendChild(g); pointT=setTimeout(()=>g.remove(),3200) }
+const gico=()=>`<svg class="gico" viewBox="0 0 100 100" aria-hidden="true">${destArt(DEST)}</svg>`;
 // Başlangıç hücresi (Kodla Sür ve bölge etkinlikleri): yeşil zemin + "BAŞLA" rozeti
 const startArt=`<g class="startpad"><rect x="8" y="8" width="84" height="84" rx="12" fill="#c5ecd0"/><rect x="8" y="8" width="84" height="84" rx="12" fill="none" stroke="#22a165" stroke-width="4" stroke-dasharray="7 6"/><rect x="16" y="70" width="68" height="24" rx="12" fill="#22a165"/><text x="50" y="87.5" text-anchor="middle" font-size="15" font-weight="800" fill="#fff" letter-spacing=".5">BAŞLA</text></g>`;
 const coinArt=`<g class="coin"><ellipse cx="50" cy="86" rx="16" ry="4" fill="${INK}" opacity=".15"/><rect x="46" y="54" width="8" height="32" rx="2" fill="#5f7489" stroke="${INK}" stroke-width="2"/><path d="M28 36 a22 22 0 0 1 44 0 V58 H28Z" fill="#2f7fd8" stroke="${INK}" stroke-width="2.6"/><rect x="37" y="38" width="26" height="6" rx="3" fill="${INK}"/><path d="M72 34 V16 H86 V26 H72" fill="#e8443a" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/></g>`;
@@ -1369,6 +1384,7 @@ function start(n,keep,daily){
   $("yTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n; $("ySub").textContent=`Yol Kur · ${L.tier.name} · ${L.N}×${L.N}`;
   demo=false; $("ySolve").hidden=!teacherOn()||!!daily;
   setFriend("yFriend","yol",n,daily); setGoal(); renderTray(); render(); stats(); renderSpeedBars();
+  if(!keep) pointFinish($("yBoard"),L.cells.findIndex(c=>c.kind==="finish"),L.N);
   if(!keep&&!daily&&INTRO[n]) seenOnce("y"+n,INTRO[n]);
 }
 function setGoal(msg,cls,say){
@@ -1380,7 +1396,7 @@ function setGoal(msg,cls,say){
   if(L.terrain.includes("water")) parts.push("Nehri köprüyle aş.");
   if(L.hasTunnel) parts.push("Tüneli kullan.");
   if(L.oneways.length) parts.push("Tek yön oklarına uy.");
-  g.textContent=parts.join(" ");
+  g.innerHTML=gico()+esc(parts.join(" "));
 }
 const pieceCount=()=>grid.filter(c=>c.kind==="piece").length;
 function stats(){$("yTries").textContent="Deneme: "+tries;$("yHints").textContent="İpucu: "+hints;$("yPieces").textContent=`Parça: ${pieceCount()} · En az: ${L.best}`}
@@ -1516,6 +1532,7 @@ $("ySolve").onclick=()=>{
   put();
 };
 $("yTalk").onclick=()=>{ if(!running) openTalk(isDaily?"yol":"yol",L.n) };
+$("yGoal").addEventListener("click",()=>{ if(L) pointFinish($("yBoard"),L.cells.findIndex(c=>c.kind==="finish"),L.N) });
 $("yHint").onclick=()=>{
   if(running) return;
   const i=L.order.find(k=>{const c=grid[k];return !(c.kind==="piece"&&same(c,L.solution[k]))});
@@ -1881,7 +1898,7 @@ function makeLevel(n,seed,o){
     const cand=[...new Set(pathIdx)].filter(i=>i!==start&&i!==fin);
     const coins=shuffle(cand,r).slice(0,Math.min(nCoins,cand.length));
     const off=[]; for(let i=0;i<N*N;i++) if(!onPath.has(i)) off.push(i);
-    const dens= cond&&sd.sensor?1:[.3,.3,.3,.32,.3,.35][chi];
+    const dens= cond&&sd.sensor?1:[.3,.3,.3,.32,.3,.35][chi]*(o.simple?.5:1); // 4-5 yaşta tahta daha sade
     shuffle(off,r).slice(0,Math.round(off.length*dens)).forEach((i,j)=>{cells[i]= j%4===3?{kind:"water"}:{kind:"block",v:(i+j)%2}});
     let paint=null;
     if(cond&&!sd.sensor){ paint={}; sd.turns.forEach(t=>{ paint[pathIdx[t.at]]= t.t==="R"?"A":"Y" }) }
@@ -1920,8 +1937,8 @@ const box=()=>$("kProg");
 function freshProg(){ prog=L.pre?{main:Blok.clone(L.pre.main),fn:Blok.clone(L.pre.fn)}:{main:[],fn:[]}; ed=Blok.editor(prog) }
 function start(n,daily){
   isDaily=!!daily;
-  const lvl=levelObj().id, explicit=lvl==="s4", elseOk=lvl==="s3"||lvl==="s4";
-  L=makeLevel(n,daily||null,{explicit,elseOk});
+  const lvl=levelObj().id, explicit=lvl==="s4", elseOk=lvl==="s3"||lvl==="s4", simple=lvl==="y4"||lvl==="y5";
+  L=makeLevel(n,daily||null,{explicit,elseOk,simple});
   DEST=(n+(daily?2:0))%DESTS.length;
   freshProg(); tries=0; hints=0; stop();
   show("kod");
@@ -1929,6 +1946,7 @@ function start(n,daily){
   $("kSub").textContent=`Kodla Sür · ${L.ch.name}`+(L.bug?" · Hata avcısı":"");
   demo=false; $("kSolve").hidden=!teacherOn()||!!daily;
   setFriend("kFriend","kod",n,daily); guess=null; predicting=false; guessDone=false; guessRes=null; goal(); renderBoard(); renderProg(); renderPal(); statsK(); renderSpeedBars(); setNow(null); fitBoard($("kBoard"),$("kRun"));
+  pointFinish($("kBoard"),L.fin,L.N);
   if(!daily){
     const bug=()=>{ if(L.bug) seenOnce("kbug",BUG) };
     const els=()=>{ if(n===SENSOR_FROM&&L.elseOk) seenOnce("kelse",ELSE_INTRO,bug); else bug() };
@@ -1946,7 +1964,7 @@ function goal(msg,cls,say){
     g.textContent=`Bidik ${parts.join(", ")} dönmeli. “Eğer” ve “∞” bloklarıyla tek bir kural yaz.`; return;
   }
   if(L.sensor){g.textContent="Bidik duvara gelince dönmeli. “Eğer önü kapalı” bloğuyla kural yaz.";return}
-  g.textContent=(L.coins.length?"Posta kutularına uğra. ":"")+`${DESTS[DEST].yon[0].toLocaleUpperCase("tr")}${DESTS[DEST].yon.slice(1)} ulaş.`+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":"");
+  g.innerHTML=gico()+esc((L.coins.length?"Posta kutularına uğra. ":"")+`${DESTS[DEST].yon[0].toLocaleUpperCase("tr")}${DESTS[DEST].yon.slice(1)} ulaş.`+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":""));
 }
 const used=()=>Blok.count(prog.main)+Blok.count(prog.fn);
 function statsK(){$("kTries").textContent="Deneme: "+tries;$("kHints").textContent="İpucu: "+hints;$("kBlocks").textContent=`Blok: ${used()} · En iyi: ${L.ideal}`}
@@ -2115,6 +2133,7 @@ $("kSolve").onclick=()=>{
   setTimeout(()=>$("kRun").click(),350);
 };
 $("kTalk").onclick=()=>{ if(!anim) openTalk("kod",L.n) };
+$("kGoal").addEventListener("click",()=>{ if(L&&!anim) pointFinish($("kBoard"),L.fin,L.N) });
 return {start,CH,TOTAL,isBug,makeLevel,execute,BUG,SENSOR_INTRO,ELSE_INTRO,EXPLICIT_INTRO};
 })();
 
