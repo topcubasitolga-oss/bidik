@@ -933,13 +933,17 @@ function closeOverlay(){$("overlay").hidden=true}
 function winCard({stars,checks,msg,onAgain,onNext,nextLabel,talk}){
   const ck=(ok,txt)=>`<span class="${ok?"y":"n"}">${ok?"✓":"○"} ${txt}</span>`;
   overlay(`${typeof confettiHTML==="function"&&stars===3?confettiHTML(24):""}<h2>Tebrikler!</h2><div class="bigstars">${[0,1,2].map(i=>starSVG(i<stars)).join("")}</div>
-   <div class="checks">${checks.map(c=>ck(c[0],c[1])).join("")}</div><p style="font-size:14px">${msg}</p>${talk?`<div class="talkbox"><b>KONUŞALIM</b>${talk}</div>`:""}
+   <div class="checks">${checks.map(c=>ck(c[0],c[1])).join("")}</div><p style="font-size:14px">${msg}</p>${talk?`<div class="talkbox speakable" id="ovTalk"><b>KONUŞALIM</b>${talk}</div>`:""}
    <div class="btns"><button class="btn-alt" id="ovAgain">Tekrar</button><button class="btn-main" id="ovNext">${nextLabel||"Sonraki"}</button></div>`);
-  $("ovAgain").onclick=onAgain; $("ovNext").onclick=onNext;
+  if(talk){ const say=f=>Voice.say(String(talk).replace(/<[^>]+>/g,""),f); setTimeout(()=>{ if($("ovTalk")) say(false) },900); $("ovTalk").onclick=()=>say(true) }
+  $("ovAgain").onclick=()=>{Voice.stop();onAgain()}; $("ovNext").onclick=()=>{Voice.stop();onNext()};
 }
 function introCard(c,then){
-  overlay(`<span class="kicker">${c.kicker||"Yeni"}</span>${c.art?`<svg class="art" viewBox="0 0 100 100">${c.art}</svg>`:""}<h2>${c.title}</h2><p>${c.text}</p>${c.ex&&c.ex.length?`<div class="ex">${c.ex.map(t=>blkHTML(t)).join("")}</div>`:""}<div class="btns"><button class="btn-main" id="ovOk">Anladım, başla</button></div>`);
-  $("ovOk").onclick=()=>{closeOverlay();then&&then()};
+  overlay(`<span class="kicker">${c.kicker||"Yeni"}</span>${c.art?`<svg class="art" viewBox="0 0 100 100">${c.art}</svg>`:""}<h2>${c.title}</h2><p id="ovText" class="speakable">${c.text}</p>${c.ex&&c.ex.length?`<div class="ex">${c.ex.map(t=>blkHTML(t)).join("")}</div>`:""}<div class="btns"><button class="btn-main" id="ovOk">Anladım, başla</button></div>`);
+  // kartı sesli oku (kayıt varsa karakterin sesiyle); metne dokununca yeniden okur
+  const said=`${c.title}${/[.!?]$/.test(c.title)?" ":". "}${c.text}`;
+  Voice.say(said); $("ovText").onclick=()=>Voice.say(said,true);
+  $("ovOk").onclick=()=>{Voice.stop();closeOverlay();then&&then()};
 }
 // Hız: küçük yaşlar için yavaş seçenekler (salyangoz 0,25× … çita 2×)
 const SPEEDS=[
@@ -1243,13 +1247,13 @@ function start(n,keep,daily){
 function setGoal(msg,cls){
   const g=$("yGoal"); g.className="goal"+(cls?" "+cls:"");
   if(msg){g.textContent=msg;return}
-  const parts=[`Bidik'in evinden ${DESTS[DEST].yon} yol yap`];
-  if(L.coins.length) parts.push(`${L.coins.length} posta kutusunun hepsine uğra`);
-  if(L.key>=0) parts.push("kapıdan önce anahtarı al");
-  if(L.terrain.includes("water")) parts.push("nehri köprüyle aş");
-  if(L.hasTunnel) parts.push("tüneli kullan");
-  if(L.oneways.length) parts.push("tek yön oklarına uy");
-  g.textContent=parts.join(", ")+".";
+  const parts=[`Bidik'in evinden ${DESTS[DEST].yon} yol yap.`];
+  if(L.coins.length) parts.push("Bütün posta kutularına uğra.");
+  if(L.key>=0) parts.push("Kapıdan önce anahtarı al.");
+  if(L.terrain.includes("water")) parts.push("Nehri köprüyle aş.");
+  if(L.hasTunnel) parts.push("Tüneli kullan.");
+  if(L.oneways.length) parts.push("Tek yön oklarına uy.");
+  g.textContent=parts.join(" ");
 }
 const pieceCount=()=>grid.filter(c=>c.kind==="piece").length;
 function stats(){$("yTries").textContent="Deneme: "+tries;$("yHints").textContent="İpucu: "+hints;$("yPieces").textContent=`Parça: ${pieceCount()} · En az: ${L.best}`}
@@ -1683,7 +1687,7 @@ function goal(msg,cls){
     g.textContent=`Bidik ${parts.join(", ")} dönmeli. “Eğer” ve “∞” bloklarıyla tek bir kural yaz.`; return;
   }
   if(L.sensor){g.textContent="Bidik duvara gelince dönmeli. “Eğer önü kapalı” bloğuyla kural yaz.";return}
-  g.textContent=(L.coins.length?`${L.coins.length} posta kutusuna uğra ve ${DESTS[DEST].yon} ulaş.`:`${DESTS[DEST].yon[0].toLocaleUpperCase("tr")}${DESTS[DEST].yon.slice(1)} ulaş.`)+(L.rel?" Sağ ve sol Bidik'e göredir.":"")+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":"");
+  g.textContent=(L.coins.length?"Posta kutularına uğra. ":"")+`${DESTS[DEST].yon[0].toLocaleUpperCase("tr")}${DESTS[DEST].yon.slice(1)} ulaş.`+(L.rel?" Sağ ve sol Bidik'e göredir.":"")+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":"");
 }
 const used=()=>prog.main.length+prog.fn.length;
 function statsK(){$("kTries").textContent="Deneme: "+tries;$("kHints").textContent="İpucu: "+hints;$("kBlocks").textContent=`Blok: ${used()} · En iyi: ${L.ideal}`}
@@ -2032,6 +2036,166 @@ function bindGrid(root,fn,hfn){
 }
 function chipsHTML(items){ return `<div class="achips">${items.map(t=>`<span class="achip ${t.cls||""}" ${t.style?`style="${t.style}"`:""}>${t.html}</span>`).join("")}</div>` }
 function optsHTML(opts,attr){ return `<div class="aopts">${opts.map((o,i)=>`<button class="aopt" data-${attr||"i"}="${i}">${o}</button>`).join("")}</div>` }
+// ===== Kayıtlı sesler (ElevenLabs): metin -> ses/<dosya>.mp3 =====
+// Üretim: bidik-src/gen_ses.py (kaynak: ses-listesi.csv). Dosya listesi derlemede build.py tarafından doldurulur.
+const SES_METIN={
+"merhaba! ben bidik. kasabamızda yedi sorun var. hadi, kodla birlikte çözelim!": "genel-hosgeldin",
+"hadi başlayalım!": "genel-oyna",
+"mahallede okula ve parka giden yol yok. çocuklar bisikletle güvenle gidemiyor!": "film-1-sorun",
+"sürdürülebilir şehirler: güvenli yollar ve bisiklet yolları herkesin hakkı. yürüyen ve bisiklete binen bir kasabanın havası temiz olur.": "bolge-1-bilgi",
+"gölete çöp atılmış. balıklar da ben de zor durumdayız, gölü temizler misin?": "film-2-sorun",
+"temiz su ve sudaki yaşam: suya atılan bir plastik şişe yüzlerce yıl kaybolmaz. temiz su bütün canlıların ihtiyacı.": "bolge-2-bilgi",
+"çiçekler azaldı, arılar polen bulamıyor. tarladaki bütün çiçeklere birlikte uğrayalım!": "film-3-sorun",
+"karadaki yaşam ve açlığa son: yediğimiz meyve ve sebzelerin çoğu arıların çiçekten çiçeğe taşıdığı polen sayesinde büyür.": "bolge-3-bilgi",
+"ağaçlar kesildi, yuvam kayboldu. yeniden fidan dikelim, orman büyüsün!": "film-4-sorun",
+"iklim eylemi: ağaçlar havayı temizler, gölge yapar, toprağı tutar ve hayvanlara yuva olur.": "bolge-4-bilgi",
+"çöpler karışmış! kâğıt mavi kutuya, plastik sarı kutuya. doğru yere ulaştıralım.": "film-5-sorun",
+"sorumlu üretim ve tüketim: ayrı toplanan kâğıt, plastik ve cam yeniden kullanılır; daha az ağaç kesilir, daha az çöp birikir.": "bolge-5-bilgi",
+"boş sokaklarda lambalar boşuna yanıyor. en kısa yoldan gidip enerjiyi boşa harcamayalım!": "film-6-sorun",
+"temiz enerji: gereksiz yanan bir lamba bile enerji harcar. en kısa yol, en az enerji demek. güneş enerjisi ise hiç tükenmez.": "bolge-6-bilgi",
+"sulama makinesinin programı bozuldu, tarla susuz kaldı. hatayı bulur musun?": "film-7-sorun",
+"temiz su ve açlığa son: tarlalar dünyadaki suyun en çoğunu kullanır. suyu damla damla, doğru yere vermek gerekir.": "bolge-7-bilgi",
+"teşekkürler! artık okula ve parka güvenle yürüyüp bisiklet sürebiliyoruz. ben kirpi kiko, şenlikte görüşürüz!": "tesekkur-1",
+"vırak vırak, teşekkürler! gölet tertemiz oldu, balıklar yeniden yüzüyor. ben kurbağa kuki, şenliğe geliyorum!": "tesekkur-2",
+"vızz vızz, teşekkürler! bütün çiçekler açtı, arılar polen buldu. ben arı bal, şenlikte bal ikram edeceğim!": "tesekkur-3",
+"teşekkürler! orman yeniden yeşerdi, yuvama kavuştum. ben sincap fındık, şenliğe fındık getiriyorum!": "tesekkur-4",
+"gak gak, teşekkürler! atıklar doğru kutularda, yeniden kullanılacak. ben karga kara, şenlikte buluşalım!": "tesekkur-5",
+"teşekkürler! enerjiyi boşa harcamıyoruz, gece sokaklar huzurlu. ben ateşböceği ışıl, şenliği ben aydınlatacağım!": "tesekkur-6",
+"teşekkürler! tarla suyuna kavuştu, fideler büyüyor. ben tavşan pıtır, şenliğe taze havuç getiriyorum!": "tesekkur-7",
+"gölete atılan bütün çöpleri topla.": "gorev-golet",
+"göleti temizleyelim! kurbağa kuki'nin göleti çöple dolmuş. bidik yaprak sandalıyla yüzüyor. bloklarla yol yaz, çalıştır'a bas: bidik geçtiği yerdeki çöpü toplar.": "giris-golet-1",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Kurbağa Kuki": "giris-golet-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Arı Bal": "giris-cicek-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Sincap Fındık": "giris-orman-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Karga Kara": "giris-donusum-6",
+"tekrar blokları. üç kere bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. ileri, ileri, ileri yerine üç kere ileri!|Ateşböceği Işıl": "giris-gece-6",
+"arı bal ile bütün solgun çiçeklere uğra. uğradığın çiçek açar!": "gorev-cicek",
+"çiçekler susadı. arılar azalınca çiçekler tozlaşamıyor. bidik'i bütün solgun çiçeklere götür, polen taşısın. aynı hareket tekrar ediyorsa iki kere, üç kere, dört kere bloklarını dene!": "giris-cicek-1",
+"her çukura git ve fidan dik bloğunu kullan.": "gorev-orman",
+"orman yeniden büyüsün. sincap fındık'ın ormanı kesilmiş. bidik'i çukurlara götür, çukurun üstündeyken yeşil fidan dik bloğunu koy. yanlış yerde dikersen olmaz!": "giris-orman-1",
+"atığı al, doğru renkli kutuya götür. plastik sarıya, kâğıt maviye, cam yeşile!": "gorev-donusum",
+"doğru kutu hangisi? karga kara'nın sokağında atıklar karışmış. bidik bir atığın üstünden geçince onu alır, aynı renkli kutuya gelince bırakır. bidik bir seferde tek atık taşır.": "giris-donusum-1",
+"boş sokaktaki bütün lambaları söndür. her blok enerji harcar: enerjin bitmeden bitir!": "gorev-gece",
+"enerjiyi koru. ateşböceği ışıl üzgün: boş sokakta lambalar boşuna yanıyor. bidik'i lambalara götür, söndürsün. ama dikkat: her blok enerji harcar. en kısa yolu bul!": "giris-gece-1",
+"sulama programı bozuk! programı çalıştır, nerede saptığını gör, hatalı bloğa dokun ve doğrusunu seç.": "gorev-tarla",
+"kuru fidelere git, hepsini sula!": "gorev-tarla-sula",
+"tarla susuz kaldı. tavşan pıtır'ın fideleri kurumuş. bidik'i kuru fidelere götür; geçtiği yer sulanır, fide yeşerir.": "giris-tarla-1",
+"sulama robotu bozuldu. tavşan pıtır'ın sulama robotunun programı bozulmuş. önce çalıştır'a bas ve izle. robot nerede yanlış yaptı? hatalı bloğa dokun, aşağıdan doğrusunu seç.": "giris-tarla-4",
+"şenlik bayrakları rüzgârla meydana dağılmış. hepsini topla!": "gorev-senlik-1",
+"şenlikten önce meydanı temizle: her atığı aynı renkli kutuya taşı.": "gorev-senlik-2",
+"boş saksılara git, fidan dik bloğuyla çiçek dik.": "gorev-senlik-3",
+"akşam oldu! güneş enerjisiyle dolan şenlik ışıklarını yak. enerjin sınırlı: en kısa yolu bul.": "gorev-senlik-4",
+"balonları dağıtma programı bozuldu! çalıştır, nerede saptığını gör, hatalı bloğu düzelt.": "gorev-senlik-5",
+"şenlik günü! bütün sorunlar çözüldü, kasaba şenlik yapıyor! kirpi kiko bayrakları asacak ama rüzgâr hepsini dağıtmış. bidik'le bayrakları topla.": "giris-senlik-1",
+"meydan tertemiz olsun. karga kara yardıma geldi: meydandaki atıkları doğru kutulara taşıyalım. plastik sarıya, kâğıt maviye, cam yeşile!": "giris-senlik-2",
+"meydan çiçek açsın. arı bal ve sincap fındık boş saksılar getirdi. her saksının üstünde yeşil fidan dik bloğunu kullan, meydan çiçeklensin.": "giris-senlik-3",
+"ışıklar yansın. ateşböceği ışıl gündüz güneşten enerji topladı. şimdi şenlik ışıklarını yakalım ama enerjiyi boşa harcamadan: her blok enerji harcar.": "giris-senlik-4",
+"son bir hata. tavşan pıtır balonları dostlara dağıtacak ama programında hata var. hata dedektifi, sıra sende: bul, düzelt, şenlik başlasın!": "giris-senlik-5",
+"fidanlarla desen. sincap fındık bidik'e fidan dolu bir çanta verdi! bidik ileri gidince geçtiği yere sıra sıra fidan diker. kesikli çizgideki orman desenini kuracak kodu yaz, sonra çiz'e bas. bidik başta yukarı bakıyor.": "giris-kalem-1",
+"tekrar. kısa bir kod yaz, kaç kez tekrar edeceğini seç. ileri ve sağa dön bloklarını dört kere tekrarla: kare olur!": "giris-kalem-5",
+"iki sulama robotu. iki robot aynı kuru fideye gidiyor. kodlar neredeyse aynı ama birinde tek bir hata var. 1) hangisi kuru fideye ulaşır, tahmin et. 2) yarışı izle. 3) hatalı bloğu bul ve düzelt. komutlar robota göre: sola dön, robotun soluna.": "giris-yaris-1",
+"yolu sen kur. aşağıdan bir parça seç, boş kareye dokun. parçaya tekrar dokunursan döner. hazır olunca çalıştır'a bas.": "yol-giris-1",
+"posta kutuları. bidik bugün postacı! yol bütün posta kutularının önünden geçmeli; bidik hedefe varmadan hepsine mektup bırakır.": "yol-giris-4",
+"köprü. tahtada nehir var. suyun üstüne sadece köprü konur, bidik ancak köprüden karşıya geçer.": "yol-giris-6",
+"kavşak. kavşakta bidik hep dümdüz gider. yolun kendi üstünden çapraz geçmesini sağlar.": "yol-giris-8",
+"çift viraj. tek karede iki ayrı viraj. bidik bu kareden bir kez bir yana, sonra bir kez öbür yana dönerek geçebilir.": "yol-giris-14",
+"anahtar ve kapı. kapı kilitli. bidik önce anahtarın olduğu kareden geçmeli, sonra kapıdan geçebilir. sıra önemli!": "yol-giris-18",
+"tünel. bidik bir tünelin ağzından girer, öbür tünelden çıkar. tünele sadece ağız tarafından girilir.": "yol-giris-23",
+"tek yön. oklu yollar tek yöndür. bidik bu yoldan sadece okun gösterdiği yöne gidebilir.": "yol-giris-28",
+"bidik'in evinden okula yol yap.": "yol-hedef-okul",
+"bidik'in evinden parka yol yap.": "yol-hedef-park",
+"bidik'in evinden hastaneye yol yap.": "yol-hedef-hastane",
+"bidik'in evinden kütüphaneye yol yap.": "yol-hedef-kutuphane",
+"bidik'in evinden pazara yol yap.": "yol-hedef-pazar",
+"bütün posta kutularına uğra.": "yol-ek-posta",
+"kapıdan önce anahtarı al.": "yol-ek-anahtar",
+"nehri köprüyle aş.": "yol-ek-kopru",
+"tüneli kullan.": "yol-ek-tunel",
+"tek yön oklarına uy.": "yol-ek-tekyon",
+"bidik, bee-bot gibi çalışır. ileri bloğu bidik'i yüzünün baktığı yöne bir kare götürür. geri bloğu bir kare geri götürür. sola dön ve sağa dön, bidik'i yerinde çeyrek tur döndürür. antenlerine bak: mavi anten sol, pembe anten sağ. bloğa dokun, programa eklenir; programdaki bloğa dokun, silinir.": "kod-giris-0",
+"bidik'in yerine geç. artık bidik her yöne bakabilir. sağ ve sol, ekrana göre değil bidik'e göredir; bee-bot'u yere koyup arkasına geçtiğin gibi düşün. antenlerine bak: mavi anten bidik'in solu, pembe anten sağı.": "kod-giris-1",
+"döngü: tekrar et. aynı bloğu üst üste koymak yerine önüne bir sayı bloğu koy. üç kere ileri bidik'i üç kare ileri götürür. programda yer az, döngü kullanmak zorundasın!": "kod-giris-2",
+"fonksiyon: kendi bloğun. tekrar eden bir hareket grubunu mor fonksiyon satırına bir kez yaz. ana programdaki f bloğu o satırın tamamını çalıştırır. üç kere f onu üç kez çalıştırır.": "kod-giris-3",
+"eğer: duruma göre karar. eğer pembe kare bloğu, yanındaki bloğu sadece bidik pembe karedeyken çalıştırır. ∞ bitene kadar bloğu ise bidik'i bitişe varana kadar tekrar tekrar çalıştırır. tek bir akıllı kural bütün yolu çözer!": "kod-giris-4",
+"hepsi bir arada. döngüleri ve fonksiyonları birlikte kullan. yer çok az: en kısa programı bulan kazanır. büyükler için de zor!": "kod-giris-5",
+"hata avcısı. bu program neredeyse doğru ama bir hata var. önce adım düğmesiyle tek tek çalıştır, bidik'in nerede yanlış gittiğini gör. sonra hatalı bloğu düzelt.": "kod-giris-hata",
+"eğer önü kapalı. artık renkli kare yok. bidik önüne bakar: önünde engel ya da duvar varsa bu blok yanındakini çalıştırır. gerçek robot süpürgeler de böyle düşünür!": "kod-giris-sensor",
+"okula ulaş.": "kod-hedef-okul",
+"parka ulaş.": "kod-hedef-park",
+"hastaneye ulaş.": "kod-hedef-hastane",
+"kütüphaneye ulaş.": "kod-hedef-kutuphane",
+"pazara ulaş.": "kod-hedef-pazar",
+"posta kutularına uğra.": "kod-ek-posta",
+"sağ ve sol bidik'e göredir.": "kod-ek-goreli",
+"yer az, akıllı kullan!": "kod-ek-yer",
+"harika!": "geri-basari-1",
+"süper, başardın!": "geri-basari-2",
+"kusursuz! üç yıldız!": "geri-basari-3",
+"olmadı, bir daha dene.": "geri-tekrar-1",
+"neredeyse oldu! bir daha bak.": "geri-tekrar-2",
+"eyvah, bidik dışarı çıktı!": "geri-hata-disari",
+"bidik bir engele çarptı!": "geri-hata-carpti",
+"yanlış kutu! atığın rengine bak.": "geri-hata-yanlis-kutu",
+"burada çukur yok, fidan dikilemez.": "geri-hata-cukur",
+"enerji bitti! daha kısa bir yol bul.": "geri-hata-enerji",
+"program bitti ama görev bitmedi. programı uzat ya da yolu değiştir.": "geri-hata-eksik",
+"tekrar bloğundan sonra bir hareket bloğu koy.": "geri-hata-tekrar",
+"bu çöpler göle nasıl gelmiş olabilir? göletin temiz kalması için biz ne yapabiliriz?": "konus-golet",
+"arılar olmasaydı meyve ve sebzelerimize ne olurdu? aynı hareketi tekrarladığın yerleri kısaltabildin mi?": "konus-cicek",
+"ağaçlar bize ve hayvanlara neler verir? bir ağacın büyümesi kaç yıl sürer, düşündün mü?": "konus-orman",
+"evinde ya da okulunda geri dönüşüm kutusu var mı? hangi atık hangi kutuya gider?": "konus-donusum",
+"evde boşuna yanan bir ışık var mı? enerjiyi korumak için neler yapabiliriz? en kısa yolu nasıl buldun?": "konus-gece",
+"robot nerede saptı? hata, saptığı yerde mi başlamıştı, yoksa daha önce mi? suyu boşa harcamadan sulamak neden önemli?": "konus-tarla",
+"kare biçiminde orman kurmak için kaç blok kullandın? hangi blokların tekrar ettiğini fark ettin mi? ağaçlar kasabaya ne kazandırır?": "konus-kalem-1",
+"ileri, sağa dön bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık nasıl bir desen çıkardı?": "konus-kalem-2",
+"takılan robotun kodu hangi adımda ayrıldı? iki kodu karşılaştırmak hatayı bulmayı neden kolaylaştırdı?": "konus-yaris",
+"şenliği hazırlamak büyük bir iş. hangi küçük işlere böldük? herkes bir işi üstlenirse ne olur?": "konus-senlik-1",
+"şenlikte çöp çıkmaması için neler yapabiliriz? tek kullanımlık bardak yerine ne kullanırdın?": "konus-senlik-2",
+"arılar şenliğe neden gelecek? kasabanda çiçek ve ağaç dikebileceğin bir yer var mı?": "konus-senlik-3",
+"ışıklar gün boyu neden kapalıydı? güneş enerjisi nereden geliyor, tükenir mi?": "konus-senlik-4",
+"bugün hangi becerileri kullandın? kasabanın sorunlarını çözmek için kodlamayı nasıl kullandık? kendi mahallende hangi sorunu çözmek isterdin?": "konus-senlik-5",
+"hangi parçaları kullandın? çalıştırmadan önce yolu parmağınla izledin mi?": "konus-yol-1",
+"köprü olmasa bidik nehri nasıl geçerdi? kavşak ne işe yarıyor?": "konus-yol-2",
+"anahtarı almadan kapıya gitseydin ne olurdu? sıra neden önemli?": "konus-yol-3",
+"bu uzun yolu hangi küçük parçalara böldün? önce neyi çözdün?": "konus-yol-4",
+"programını yüksek sesle oku: ileri, ileri, sağa dön... ayağa kalk, bidik ol ve programı sen yap!": "konus-kod-1",
+"bidik aşağı bakarken sağa dön dersen hangi yöne döner? bidik'in yerine geçip dene.": "konus-kod-2",
+"hangi blok tekrar ediyordu? tekrar sayısı 100 olsa ne yapardın?": "konus-kod-3",
+"fonksiyonuna bir ad verseydin ne derdin? neden işimizi kolaylaştırdı?": "konus-kod-4",
+"kural sayesinde bidik'e her adımı tek tek söylemek gerekti mi? kural neden güçlü?": "konus-kod-5",
+"daha kısa bir program bulabilir misin? kısa program neden iyidir?": "konus-kod-6",
+"hatayı nasıl buldun? bidik ilk hangi adımda yanlış yöne gitti? hangi blok sorumluydu?": "konus-hata",
+"şenlik başladı! yedi dost meydanda, büyük çiçek açtı. kasabanın sorunlarını kodla birlikte çözdünüz; tek başına değil, hep birlikte!": "final-senlik",
+"önce tahmin et: bidik en son hangi karede duracak? o kareye dokun.": "tahmin-sor",
+"tahminin doğru, bidik tam o karede durdu!": "tahmin-dogru",
+"bidik tahmin ettiğin karede durmadı.": "tahmin-yanlis",
+"görevin: yol parçalarıyla bidik'in evinden okula ve parka güvenli bir yol kur.": "film-1-gorev",
+"yaptığın güvenli yollarla çocuklar okula ve parka bisikletle gidebilecek. böylece herkesin mutlu yaşadığı bir şehir kurmuş olacaksın!": "film-1-katki",
+"görevin: bloklarla bidik'e yol göster, göletteki bütün çöpleri topla.": "film-2-gorev",
+"göleti temizlersen balıklar, kurbağalar ve bütün canlılar temiz suya kavuşacak. böylece dünyamızın sularını korumuş olacaksın!": "film-2-katki",
+"görevin: bidik'i bütün solgun çiçeklere götür, arılar için polen taşısın.": "film-3-gorev",
+"çiçeklere polen taşırsan arılar mutlu olacak, bahçelerde meyve ve sebze yetişecek. böylece herkesin sofrasına yiyecek gelmesine yardım etmiş olacaksın!": "film-3-katki",
+"görevin: bidik'i çukurlara götür ve fidan dik bloğuyla ağaç dik.": "film-4-gorev",
+"diktiğin her fidan büyüyüp ağaç olacak, havamızı temizleyecek, hayvanlara yuva olacak. böylece dünyamızı korumuş olacaksın!": "film-4-katki",
+"görevin: her atığı aynı renkli kutuya taşı. plastik sarıya, kâğıt maviye, cam yeşile.": "film-5-gorev",
+"atıkları doğru kutuya koyarsan onlar yeniden kullanılacak, dünyamız daha az kirlenecek. böylece dünyamıza iyilik yapmış olacaksın!": "film-5-katki",
+"görevin: en kısa yoldan git, boşuna yanan lambaları söndür, enerjiyi koru.": "film-6-gorev",
+"boşuna yanan lambaları söndürürsen enerji boşa gitmeyecek. böylece dünyamızın havasını korumuş olacaksın!": "film-6-katki",
+"görevin: sulama programındaki hatayı bul, düzelt ve tarlayı sula.": "film-7-gorev",
+"tarlayı doğru sularsan su boşa gitmeyecek, sebzeler büyüyecek. böylece hem suyu korumuş hem de herkese yiyecek yetiştirmiş olacaksın!": "film-7-katki"
+};
+const SES_DOSYA=new Set(["bolge-1-bilgi", "bolge-1-sorun", "bolge-2-bilgi", "bolge-2-sorun", "bolge-3-bilgi", "bolge-3-sorun", "bolge-4-bilgi", "bolge-4-sorun", "bolge-5-bilgi", "bolge-5-sorun", "bolge-6-bilgi", "bolge-6-sorun", "bolge-7-bilgi", "bolge-7-sorun", "film-1-gorev", "film-1-katki", "film-1-sorun", "film-2-gorev", "film-2-katki", "film-2-sorun", "film-3-gorev", "film-3-katki", "film-3-sorun", "film-4-gorev", "film-4-katki", "film-4-sorun", "film-5-gorev", "film-5-katki", "film-5-sorun", "film-6-gorev", "film-6-katki", "film-6-sorun", "film-7-gorev", "film-7-katki", "film-7-sorun", "final-senlik", "genel-hosgeldin", "genel-oyna", "geri-basari-1", "geri-basari-2", "geri-basari-3", "geri-hata-carpti", "geri-hata-cukur", "geri-hata-disari", "geri-hata-eksik", "geri-hata-enerji", "geri-hata-tekrar", "geri-hata-yanlis-kutu", "geri-tekrar-1", "geri-tekrar-2", "giris-cicek-1", "giris-cicek-6", "giris-donusum-1", "giris-donusum-6", "giris-gece-1", "giris-gece-6", "giris-golet-1", "giris-golet-6", "giris-kalem-1", "giris-kalem-5", "giris-orman-1", "giris-orman-6", "giris-senlik-1", "giris-senlik-2", "giris-senlik-3", "giris-senlik-4", "giris-senlik-5", "giris-tarla-1", "giris-tarla-4", "giris-yaris-1", "gorev-cicek", "gorev-donusum", "gorev-gece", "gorev-golet", "gorev-orman", "gorev-senlik-1", "gorev-senlik-2", "gorev-senlik-3", "gorev-senlik-4", "gorev-senlik-5", "gorev-tarla", "gorev-tarla-sula", "kod-ek-goreli", "kod-ek-posta", "kod-ek-yer", "kod-giris-0", "kod-giris-1", "kod-giris-2", "kod-giris-3", "kod-giris-4", "kod-giris-5", "kod-giris-hata", "kod-giris-sensor", "kod-hedef-hastane", "kod-hedef-kutuphane", "kod-hedef-okul", "kod-hedef-park", "kod-hedef-pazar", "konus-cicek", "konus-donusum", "konus-gece", "konus-golet", "konus-hata", "konus-kalem-1", "konus-kalem-2", "konus-kod-1", "konus-kod-2", "konus-kod-3", "konus-kod-4", "konus-kod-5", "konus-kod-6", "konus-orman", "konus-senlik-1", "konus-senlik-2", "konus-senlik-3", "konus-senlik-4", "konus-senlik-5", "konus-tarla", "konus-yaris", "konus-yol-1", "konus-yol-2", "konus-yol-3", "konus-yol-4", "tahmin-dogru", "tahmin-sor", "tahmin-yanlis", "tesekkur-1", "tesekkur-2", "tesekkur-3", "tesekkur-4", "tesekkur-5", "tesekkur-6", "tesekkur-7", "yol-ek-anahtar", "yol-ek-kopru", "yol-ek-posta", "yol-ek-tekyon", "yol-ek-tunel", "yol-giris-1", "yol-giris-14", "yol-giris-18", "yol-giris-23", "yol-giris-28", "yol-giris-4", "yol-giris-6", "yol-giris-8", "yol-hedef-hastane", "yol-hedef-kutuphane", "yol-hedef-okul", "yol-hedef-park", "yol-hedef-pazar"]);
+function sesAnahtar(t){ return String(t||"").replace(/<[^>]+>/g,"").replace(/\s*\([^)]*\)/g,"").replace(/[\u2010\u2011\u2012\u2013]/g,"-").replace(/[“”"]/g,"").replace(/…/g,"...").replace(/×/g," kere ").replace(/\b2 kere/g,"iki kere").replace(/\b3 kere/g,"üç kere").replace(/\b4 kere/g,"dört kere").toLocaleLowerCase("tr").replace(/\s+([,.;:!?])/g,"$1").replace(/\s+/g," ").trim() }
+function sesKim(){ try{ if(typeof A!=="undefined"&&A&&A.m&&A.m.durak&&typeof WORLD!=="undefined") return WORLD[A.m.durak].friend }catch(e){} return "" }
+function sesDosya(k,who){ const f=(who&&SES_METIN[k+"|"+who])||SES_METIN[k]; return f&&SES_DOSYA.has(f)?f:null }
+// metni kayıtlara böler: [{file}] ya da cümle cümle [{file}|{tts}] ; hiç kayıt yoksa null
+function sesBul(text,who){
+  const k=sesAnahtar(text); if(!k) return null; who=who||sesKim();
+  const f=sesDosya(k,who); if(f) return [{file:f}];
+  const parts=(k.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[]).map(s=>s.trim()).filter(Boolean); if(parts.length<2) return null;
+  const out=parts.map(s=>{ const g=sesDosya(s,who); return g?{file:g}:{tts:s} });
+  return out.some(o=>o.file)?out:null;
+}
 // ===== Yaş / sınıf seviyesi ve sesli yönerge =====
 const LEVELS=[
   {id:"y4",name:"4 yaş",long:"Okul öncesi · 4 yaş",desc:"Büyük düğmeler, az seçenek, sesli yönerge",scale:1.16,speed:.25,voice:true},
@@ -2106,15 +2270,31 @@ function levelChipClick(){
 // ---- sesli yönerge (tarayıcının Türkçe sesi varsa) ----
 const Voice={
   v:null, ready:false,
-  init(){ try{ if(!("speechSynthesis" in window)) return; const pick=()=>{ const vs=speechSynthesis.getVoices(); this.v=vs.find(x=>/^tr(-|_|$)/i.test(x.lang))||null; this.ready=!!this.v; document.documentElement.classList.toggle("has-voice",this.ready) }; pick(); speechSynthesis.onvoiceschanged=pick }catch(e){} },
-  on(){ const d=P(); return this.ready&&(d.voice!=null?d.voice:levelObj().voice) },
+  init(){ try{ if(!("speechSynthesis" in window)) return; const pick=()=>{ const vs=speechSynthesis.getVoices(); this.v=vs.find(x=>/^tr(-|_|$)/i.test(x.lang))||null; this.ready=!!this.v; document.documentElement.classList.toggle("has-voice",this.ready||this.kayit()) }; pick(); speechSynthesis.onvoiceschanged=pick }catch(e){} document.documentElement.classList.toggle("has-voice",this.ready||this.kayit()) },
+  kayit(){ return typeof SES_DOSYA!=="undefined"&&SES_DOSYA.size>0 },
+  on(){ const d=P(); return (this.ready||this.kayit())&&(d.voice!=null?d.voice:levelObj().voice) },
   // konuşmayı başlatır; konuşma nesnesini döndürür (bitişi beklemek isteyen onend dinleyebilir)
   say(text,force){
-    if(!this.ready||!db.sound) return null; if(!force&&!this.on()) return null;
-    try{ const t=String(text).replace(/[“”"]/g,"").replace(/×/g," kere ").replace(/→/g,", ").replace(/·/g,", ").trim(); if(!t) return null;
-      speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.voice=this.v; u.lang=this.v.lang; u.rate=levelObj().id.startsWith("y")?.85:.95; u.pitch=1.1; this.cur=u; speechSynthesis.speak(u); return u }catch(e){ return null }
+    if(!db.sound) return null; if(!force&&!this.on()) return null;
+    const t=String(text||"").replace(/[“”"]/g,"").replace(/×/g," kere ").replace(/→/g,", ").replace(/·/g,", ").trim(); if(!t) return null;
+    this.stop();
+    // önce kayıtlı ses (ElevenLabs); yoksa cihazın Türkçe sesi
+    const clips=(typeof sesBul==="function")?sesBul(text):null;
+    if(clips) return this.playClips(clips);
+    if(!this.ready) return null;
+    return this.tts(t,null);
   },
-  stop(){ try{ speechSynthesis.cancel() }catch(e){} }
+  tts(t,onend){ try{ const u=new SpeechSynthesisUtterance(t); u.voice=this.v; u.lang=this.v.lang; u.rate=levelObj().id.startsWith("y")?.85:.95; u.pitch=1.1; if(onend){ u.onend=onend; u.onerror=onend } this.cur=u; speechSynthesis.speak(u); return u }catch(e){ onend&&onend(); return null } },
+  // kayıtları (ve araya giren cihaz sesi parçalarını) sırayla çalar; onend atanabilen sahte bir konuşma nesnesi döndürür
+  playClips(clips){
+    const u={onend:null,onerror:null}, tok=this.tok; let i=0;
+    const next=()=>{ if(tok!==this.tok) return; if(i>=clips.length){ this.aud=null; u.onend&&u.onend(); return }
+      const c=clips[i++];
+      if(c.file){ try{ const a=new Audio(`ses/${c.file}.mp3`); this.aud=a; a.onended=next; a.onerror=next; a.play().catch(next) }catch(e){ next() } }
+      else if(this.ready) this.tts(c.tts,next); else next(); };
+    next(); return u;
+  },
+  stop(){ this.tok=(this.tok||0)+1; try{ speechSynthesis.cancel() }catch(e){} if(this.aud){ try{ this.aud.onended=null; this.aud.onerror=null; this.aud.pause() }catch(e){} this.aud=null } }
 };
 Voice.init();
 // görev yazıları değişince oku; yazıya dokununca tekrar oku
@@ -2391,9 +2571,11 @@ function openDurak(no){
   const seedTxt= mx===0? (dk.acts.some(a=>!a.soon)?"Bu seviyede oyun yok":"Oyunlar yakında") : ok? `Sorun çözüldü, ${w.friend} şenliğe geliyor ✓` : `Sorunu çözmek için ${need-g} yıldız kaldı`;
   const h=$("dHead"); h.style.background=w.land;
   h.innerHTML=`<div class="scene">${sceneSVG(no,ok)}</div>
-    <div class="dtext"><h2>${w.kita}</h2><p class="friend"><b>${w.friend}:</b> “${w.sorun}”</p><p class="sir">${w.sir}</p>
+    <div class="dtext"><h2>${w.kita}</h2><p class="friend speakable" id="dSorun"><b>${w.friend}:</b> “${w.sorun}”</p><p class="sir speakable" id="dSir">${w.sir}</p>
     <div class="dmeta"><span class="code">${dk.code}</span><span class="code">${w.ska}</span><span class="seed">${seedTxt}</span><button class="chip filmbtn" id="dFilm">▶ Filmi izle</button></div></div>`;
   $("dFilm").onclick=()=>playFilm(no);
+  // dostun sözü dostun sesiyle, bilgi cümlesi Bidik'in sesiyle (dokununca)
+  $("dSorun").onclick=()=>{ friendChirp&&friendChirp(no); Voice.say(w.sorun,true) }; $("dSir").onclick=()=>Voice.say(w.sir,true);
   const box=$("dActs"); box.innerHTML="";
   dk.acts.forEach(a=>{
     const pg=a.prog?a.prog():null, other=pg&&pg[1]===0;
@@ -2453,8 +2635,7 @@ const FILM={
      blocks:["F","R","F"],props:["kuru","kuru","kuru"]}
 };
 // ses: önce kayıt (ElevenLabs), yoksa cihaz sesi; bitince ya da süre dolunca devam
-// ses/ klasörüne eklenen kayıtların adları (ElevenLabs dosyaları gelince doldurulur); listede olmayan satır cihaz sesiyle okunur
-const SES_DOSYA=new Set(["genel-hosgeldin"]);
+// kayıt listesi (SES_DOSYA) 01-ses.js içinde; listede olmayan satır cihaz sesiyle okunur
 let filmAudio=null;
 function sayLine(file,text){
   return new Promise(res=>{
@@ -2710,7 +2891,7 @@ regAct("kalem",{
   doneText:"Orman deseni tamam",
   talk:n=> n<=4?"Kare biçiminde orman kurmak için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi? Ağaçlar kasabaya ne kazandırır?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık nasıl bir desen çıkardı? (İklim eylemi)",
   intro:n=> n===1?{key:"p1",kicker:"Orman",title:"Fidanlarla desen",art:`<path d="M30 80 V30 H70" stroke="#a8693d" stroke-width="8" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Sincap Fındık Bidik'e fidan dolu bir çanta verdi! Bidik <b>İleri</b> gidince geçtiği yere sıra sıra fidan diker. Kesikli çizgideki orman desenini kuracak kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
-        : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını 4 kez tekrarla: kare olur!"}:null,
+        : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını dört kere tekrarla: kare olur!"}:null,
   setup(n){ const L=LV[n], tg=run(L,L.sol.split(""),L.x); return {n,L,runAt:-1,target:new Set(tg.segs.map(key)),tsegs:tg.segs,prog:[],x:L.rep?1:1,drawn:[],pos:[L.s[0],L.s[1],0],running:false,err:null} },
   goal(st){ return st.L.rep?`${st.L.name} biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.`:`${st.L.name} biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.` },
   checkLabel(){ return "Çiz" },
@@ -3399,7 +3580,7 @@ window.bidikBack=function(){
   if(!$("home").hidden) return false;
   goHome(); return true;
 };
-window.__bidik={Yol,Kod,Daily,ACT,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
+window.__bidik={Yol,Kod,Daily,ACT,Voice,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DOSYA,db:()=>db,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
   actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS,
