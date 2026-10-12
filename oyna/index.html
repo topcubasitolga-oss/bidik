@@ -48,6 +48,7 @@ h1,h2,h3{text-wrap:balance}
 .iconbtn:active{transform:translateY(2px);box-shadow:none}
 .iconbtn svg{width:24px;height:24px}
 .chip{background:var(--panel);border:2px solid var(--panel-line);border-radius:999px;padding:8px 14px;font-weight:800;font-size:14px}
+.chip.on{border-color:var(--rail-edge);background:#fff3c4}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .goal{font-weight:800;text-align:center;color:var(--ink-soft);font-size:14px;margin:-4px 0 0;text-wrap:balance;min-height:1.3em}
 .goal.bad{color:var(--red)} .goal.good{color:var(--green)}
@@ -2774,8 +2775,10 @@ function openLevelPicker(first){
 }
 function levelChipClick(){
   if(!curLevel()||teacherOn()) { openLevelPicker(!curLevel()); return }
-  overlay(`<span class="kicker">Seviye</span><h2 style="font-size:26px">${levelObj().long}</h2><p>Seviyeyi değiştirmek için ana ekrandan <b>Öğretmen modu</b>nu açın, sonra bu düğmeye yeniden dokunun.</p><div class="btns"><button class="btn-main" id="ovLv">Tamam</button></div>`);
+  // çocuk seviyeyi kendisi değiştirmesin: öğretmen/veli buradan öğretmen modunu açıp seçer
+  overlay(`<span class="kicker">Seviye</span><h2 style="font-size:26px">${levelObj().long}</h2><p>Seviyeyi öğretmen ya da veli değiştirir. <b>Öğretmen modunu aç</b>'a dokunun, seviye listesi hemen açılır. (Öğretmen modu ana ekrandaki <b>Öğretmen / veli</b> düğmesinin içinden de açılıp kapatılır.)</p><div class="btns"><button class="btn-alt" id="ovLv">Vazgeç</button><button class="btn-main" id="ovLvT">Öğretmen modunu aç</button></div>`);
   $("ovLv").onclick=closeOverlay;
+  $("ovLvT").onclick=()=>{ db.teacher=true; save(); sfx.click(); goHome(); openLevelPicker(false) };
 }
 // ---- sesli yönerge (tarayıcının Türkçe sesi varsa) ----
 const Voice={
@@ -4311,6 +4314,7 @@ function goHome(){
   const ds=d.daily[todayKey()];
   $("dTxt").textContent=ds?`Bugünkü kartpostal çözüldü: ${starsTxt(ds)} · Yarın yenisi gelecek`:`Bir dosttan kartpostal geldi! Arkasında bugünün ${todayKey()%2?"Kodla Sür":"Yol Kur"} bulmacası var. Büyükler de dene!`;
   $("teacherBtn").setAttribute("aria-pressed",db.teacher);
+  $("menuBtn").textContent=db.teacher?"Öğretmen / veli · öğretmen modu açık":"Öğretmen / veli"; $("menuBtn").classList.toggle("on",!!db.teacher);
   if(typeof sinifHome==="function") sinifHome();
 }
 // ---- Bidik Haritası: kitaptaki yedi durak (B1–B7) ----
@@ -4380,7 +4384,7 @@ function openMenu(){
       <button class="mi" id="miS0" hidden style="border-color:var(--green);background:#e3f6ea"><b>Sınıf kodu oluştur · Sınıfım</b><small>Öğretmen: sınıf kodu al, öğrencilere dağıt; kim ne oynadı, hangi beceri gelişecek; bölüm kilitleri</small></button>
       <button class="mi" id="miLv"><b>Seviye</b><small>Şu an: ${L}${teacherOn()?"":" · değiştirmek için önce öğretmen modunu açın"}</small></button>
       <button class="mi" id="miTah"><b>Önce tahmin et: ${predictOn()?"açık":"kapalı"}</b><small>Açıksa çocuk Çalıştır'dan önce Bidik'in duracağı kareyi tahmin eder</small></button>
-      <button class="mi" id="miT"><b>Öğretmen modu: ${teacherOn()?"açık":"kapalı"}</b><small>Akıllı tahtada “Çözümü göster” düğmesi ve seviye değiştirme</small></button>
+      <button class="mi" id="miT" style="${teacherOn()?"":"border-color:var(--rail-edge);background:#fff3c4"}"><b>Öğretmen modu: ${teacherOn()?"açık · kapatmak için dokun":"kapalı · açmak için dokun"}</b><small>Açıkken oyunlarda “Çözümü göster” düğmesi görünür ve seviye değiştirilebilir</small></button>
       <button class="mi" id="miR"><b>Hedef Defteri</b><small>Her çocuğun beceri ve hedef ilerlemesi</small></button>
       ${/^https?:/.test(location.protocol)?`<a class="mi" href="../ogretmen.html" target="_blank" rel="noopener"><b>Öğretmen Odası</b><small>Ders planı, çalışma yaprağı, değerlendirme</small></a><a class="mi" href="../kartlar.html" target="_blank" rel="noopener"><b>Masa başı kartlar</b><small>Ekransız etkinlikler: yazdırıp sınıfta oynayın</small></a>`:""}
       <button class="mi" id="miP"><b>Oyuncular</b><small>Öğrenci ekle, değiştir</small></button>
