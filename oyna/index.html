@@ -1027,7 +1027,12 @@ const homeArt=`${tileShadow}<rect x="18" y="46" width="64" height="42" rx="3" fi
 // Bitiş hücresi: büyük hedef bina + nabız gibi parlayan altın halka + küçük damalı bayrak + "BİTİŞ" rozeti. stub: Yol Kur'da hücreye giren yol parçası
 function checkerArt(x0,y0,cols,rows,s){ let o=""; for(let r=0;r<rows;r++) for(let c=0;c<cols;c++) o+=`<rect x="${x0+c*s}" y="${y0+r*s}" width="${s}" height="${s}" fill="${(r+c)%2?"#fff":"#16324a"}"/>`; return o }
 const flagArt=`<g class="flag"><path d="M13 88 V8" stroke="#16324a" stroke-width="5" stroke-linecap="round"/><circle cx="13" cy="7" r="4.5" fill="#e8443a"/><g class="cloth">${checkerArt(16,11,4,3,8)}<rect x="16" y="11" width="32" height="24" fill="none" stroke="#16324a" stroke-width="2.5"/></g></g>`;
-function finishArt(i,stub){return `<g class="finish"><rect class="fpad" x="5" y="5" width="90" height="90" rx="14" fill="#fff1a8"/>${stub||""}<rect class="fhalo" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#ffd23f" stroke-width="8"/><rect class="fring" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#f5b400" stroke-width="5"/><g transform="translate(9 6) scale(.82)">${destArt(DEST)}</g><g transform="translate(-3 -4) scale(.5)">${flagArt}</g><g class="flabel"><rect x="22" y="77" width="56" height="19" rx="9.5" fill="#16324a"/><text x="50" y="91" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" letter-spacing=".5">BİTİŞ</text></g></g>`}
+function finishArt(i,stub,dir){
+  // dir: Yol Kur'da yolun bitişe girdiği kenar (0 kuzey,1 doğu,2 güney,3 batı). Giriş yolu ve kenardaki beyaz ok görünür kalsın diye bina küçülüp karşı tarafa kayar.
+  const pos=[[16,24],[4,12],[16,2],[28,12]], tr= dir==null?`translate(9 6) scale(.82)`:`translate(${pos[dir][0]} ${pos[dir][1]}) scale(.68)`;
+  const chev= dir==null?"" : `<g class="fentry" transform="rotate(${dir*90} 50 50)"><path d="M36 3 L50 19 L64 3" fill="none" stroke="#16324a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/><path d="M36 3 L50 19 L64 3" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  const labelTop= dir===2, flagRight= dir===3;
+  return `<g class="finish"><rect class="fpad" x="5" y="5" width="90" height="90" rx="14" fill="#fff1a8"/>${stub||""}<rect class="fhalo" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#ffd23f" stroke-width="8"/><rect class="fring" x="5" y="5" width="90" height="90" rx="14" fill="none" stroke="#f5b400" stroke-width="5"/><g transform="${tr}">${destArt(DEST)}</g>${chev}<g transform="translate(${flagRight?62:-3} -4) scale(.5)">${flagArt}</g><g class="flabel"><rect x="22" y="${labelTop?4:77}" width="56" height="19" rx="9.5" fill="#16324a"/><text x="50" y="${labelTop?18:91}" text-anchor="middle" font-size="13" font-weight="800" fill="#fff" letter-spacing=".5">BİTİŞ</text></g></g>`}
 // Bitiş karesi sürekli nabız gibi atar. Bölüm başında (ve hedef cümlesine dokununca) 3 saniye: hedefin üstünde zıplayan ok + hızlı nabız; sonra ok kalkar, nabız sürer.
 const pointArt=`<g class="fpoint"><path d="M50 -4 L30 -30 H41 V-58 H59 V-30 H70Z" fill="#f08a24" stroke="#16324a" stroke-width="3" stroke-linejoin="round"/><path d="M45 -52 V-34" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/></g>`;
 let flashT=null, pointT=null;
@@ -1178,7 +1183,7 @@ function pieceFrom(a,b){ if(OPP(a)===b) return {type:"S",rot:a%2}; for(let r=0;r
 const same=(a,b)=>a.type===b.type&&(a.type==="X"||JSON.stringify(pairs(a))===JSON.stringify(pairs(b)));
 
 const TIERS=[
-  {name:"Başlangıç",sub:"Düz yol ve viraj",from:1, to:10,N:4,len:[5,9],  reveal:[.5,.25],obst:.5},
+  {name:"Başlangıç",sub:"Düz yol ve viraj",from:1, to:10,N:4,len:[5,9],  reveal:[.5,.25],obst:.35},
   {name:"Orta",sub:"Köprü, kavşak, çift viraj",from:11,to:20,N:5,len:[8,14], reveal:[.3,.12],obst:.4},
   {name:"Zor",sub:"Anahtar, kapı ve tünel",from:21,to:30,N:6,len:[12,19],reveal:[.15,0], obst:.3},
   {name:"Usta",sub:"Tek yön tabelaları, hepsi bir arada",from:31,to:40,N:7,len:[16,26],reveal:[.06,0], obst:.25},
@@ -1371,7 +1376,7 @@ function cellSVG(c,i){
   if(c.kind==="obstacle") g+=blockArt(c.v,i);
   if(c.kind==="piece"){ g+=pieceArt(c); if(c.oneway!=null) g+=onewayArt(c.oneway); if(c.gate) g+=`<g class="gate" transform="rotate(${pairs(c)[0][0]%2?0:90} 50 50)">${gateArt}</g>`; if(c.fixed&&!c.gate&&c.oneway==null) g+=LOCK; }
   if(c.kind==="start"){ g+=railPath(`M50 50 L${EDGE[c.dir]}`)+homeArt }
-  if(c.kind==="finish") g+=finishArt(i,railPath(`M50 50 L${EDGE[c.dir]}`));
+  if(c.kind==="finish") g+=finishArt(i,railPath(`M50 50 L${EDGE[c.dir]}`),c.dir);
   if(c.kind==="tunnel") g+=railPath(`M50 50 L${EDGE[c.dir]}`)+tunnelArt(c.dir);
   if(L.coins.includes(i)) g+=coinArt;
   if(L.key===i) g+=keyArt;
@@ -1432,7 +1437,7 @@ $("yBoard").addEventListener("click",e=>{
   const g=e.target.closest(".cell"); if(!g) return;
   const i=+g.dataset.i, c=grid[i], water=L.terrain[i]==="water";
   if(failCell>=0){failCell=-1;setGoal()}
-  if(c.kind==="piece"&&c.fixed){setGoal(c.gate?"Kapı ve tabelalar sabittir.":"Kilitli parçalar ipucudur, değiştirilemez.","bad");sfx.no();return}
+  if(c.kind==="piece"&&c.fixed){setGoal(c.gate?"Kapı ve tabelalar sabittir.":c.hint?"Kilitli parçalar ipucudur, değiştirilemez.":"Bu yol parçası hazır geldi, değiştirilemez. Yolu ona bağla.","bad");sfx.no();return}
   if(c.kind==="empty"||c.kind==="water"||(c.kind==="piece"&&c.type!==tool)){
     if(c.kind!=="piece"&&tool==="E"){sfx.no();return}
     if(tool==="E"){grid[i]=emptyOf(i);sfx.erase()}
@@ -1453,7 +1458,7 @@ function simulate(){
     if(x<0||y<0||x>=N||y>=N) return {ok:false,segs,fail:pos,why:"Bidik tahtanın dışına çıktı!"};
     const ni=y*N+x, c=grid[ni], ent=OPP(dir);
     if(c.kind==="finish"){
-      if(c.dir!==ent) return {ok:false,segs,fail:ni,why:"Bitişe yanlış taraftan gelindi."};
+      if(c.dir!==ent) return {ok:false,segs,fail:ni,why:"Bitişe yanlış taraftan gelindi. Beyaz okun olduğu kenardan gir.",say:"Bitişe yanlış taraftan gelindi."};
       segs.push({i:ni,a:ent,b:null});
       const missing=L.coins.filter(k=>!seen.has(k));
       if(missing.length) return {ok:false,segs,fail:missing[0],why:`Hedefe vardın ama ${missing.length} posta kutusuna uğramadın.`,say:"Bütün posta kutularına uğra."};
@@ -1546,7 +1551,7 @@ $("yHint").onclick=()=>{
   const i=L.order.find(k=>{const c=grid[k];return !(c.kind==="piece"&&same(c,L.solution[k]))});
   if(i==null){setGoal("Kurduğun yol çözümle aynı. Çalıştır'a bas!","good");return}
   const keepGate=grid[i].gate, keepOne=grid[i].oneway;
-  grid[i]={kind:"piece",fixed:true,...L.solution[i]}; if(keepGate) grid[i].gate=true; if(keepOne!=null) grid[i].oneway=keepOne;
+  grid[i]={kind:"piece",fixed:true,hint:true,...L.solution[i]}; if(keepGate) grid[i].gate=true; if(keepOne!=null) grid[i].oneway=keepOne;
   hints++; failCell=-1;
   tone(880,.1,"sine");tone(1175,.15,"sine",.08);
   setGoal(`İpucu: bir ${TYPES[L.solution[i].type].name.toLowerCase()} kilitlendi.`,null,"İpucu: bir parça kilitlendi.");
