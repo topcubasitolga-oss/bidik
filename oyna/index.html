@@ -3822,7 +3822,9 @@ function sinifKatil(kodOn,noOn){
       <p class="note" style="text-align:left">Kod 6 karakterdir; öğretmeninin dağıttığı kartta yazar. Adın hiçbir yere gönderilmez; yalnızca numaran ve seçtiğin karakter sınıfında görünür.</p>
       <p class="serr" id="sErr" hidden></p>
       <button class="btn main" type="submit" id="sGo">Devam</button>
-    </form>`);
+    </form>
+    <div class="menu" style="margin-top:6px"><button class="mi" id="sTeach"><b>Öğretmen misiniz?</b><small>Sınıf kodu oluşturmak ve öğrencilerinizi izlemek için buraya dokunun (üyelik gerekmez)</small></button></div>`);
+  $("sTeach").onclick=sinifOgretmen;
   $("sKod").addEventListener("input",()=>{ $("sKod").value=kodTemiz($("sKod").value).slice(0,6) });
   $("sForm").onsubmit=async e=>{
     e.preventDefault(); const kod=kodTemiz($("sKod").value);
@@ -4135,12 +4137,12 @@ function openMenu(){
   const L=curLevel()?levelObj().name:"seçilmedi";
   overlay(`<span class="kicker">Öğretmen / veli</span><h2 style="font-size:28px">Ayarlar ve takip</h2>
     <div class="menu">
+      <button class="mi" id="miS0" hidden style="border-color:var(--green);background:#e3f6ea"><b>Sınıf kodu oluştur · Sınıfım</b><small>Öğretmen: sınıf kodu al, öğrencilere dağıt; kim ne oynadı, hangi beceri gelişecek; bölüm kilitleri</small></button>
       <button class="mi" id="miLv"><b>Seviye</b><small>Şu an: ${L}${teacherOn()?"":" · değiştirmek için önce öğretmen modunu açın"}</small></button>
       <button class="mi" id="miTah"><b>Önce tahmin et: ${predictOn()?"açık":"kapalı"}</b><small>Açıksa çocuk Çalıştır'dan önce Bidik'in duracağı kareyi tahmin eder</small></button>
       <button class="mi" id="miT"><b>Öğretmen modu: ${teacherOn()?"açık":"kapalı"}</b><small>Akıllı tahtada “Çözümü göster” düğmesi ve seviye değiştirme</small></button>
       <button class="mi" id="miR"><b>Hedef Defteri</b><small>Her çocuğun beceri ve hedef ilerlemesi</small></button>
       ${/^https?:/.test(location.protocol)?`<a class="mi" href="../ogretmen.html" target="_blank" rel="noopener"><b>Öğretmen Odası</b><small>Ders planı, çalışma yaprağı, değerlendirme</small></a><a class="mi" href="../kartlar.html" target="_blank" rel="noopener"><b>Masa başı kartlar</b><small>Ekransız etkinlikler: yazdırıp sınıfta oynayın</small></a>`:""}
-      <button class="mi" id="miS" hidden><b>Sınıfım</b><small>Sınıf kodu oluştur; kim ne oynadı, hangi beceri gelişecek; bölüm kilitleri</small></button>
       <button class="mi" id="miP"><b>Oyuncular</b><small>Öğrenci ekle, değiştir</small></button>
       <a class="mi" href="${$("fbBtn").getAttribute("href")}"><b>Görüş / hata bildir</b><small>E-posta ile bize yazın</small></a>
     </div><div class="btns"><button class="btn-main" id="miX">Kapat</button></div>`);
@@ -4149,7 +4151,7 @@ function openMenu(){
   $("miTah").onclick=()=>{ db.predict=!db.predict; save(); sfx.click(); openMenu() };
   $("miR").onclick=()=>{ closeOverlay(); openReport() };
   $("miP").onclick=()=>{ closeOverlay(); openProfiles() };
-  if(typeof sinifOn==="function"&&sinifOn()){ $("miS").hidden=false; $("miS").onclick=()=>{ closeOverlay(); sinifOgretmen() } }
+  if(typeof sinifOn==="function"&&sinifOn()){ $("miS0").hidden=false; $("miS0").onclick=()=>{ closeOverlay(); sinifOgretmen() } }
   $("miX").onclick=closeOverlay;
 }
 $("menuBtn").onclick=openMenu;
