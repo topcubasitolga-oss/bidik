@@ -167,6 +167,10 @@ h1,h2,h3{text-wrap:balance}
 #film.s3 .fbidik svg{animation:fjoy .8s ease-in-out infinite}
 .fprog{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);display:flex;gap:8px;background:rgba(255,255,255,.92);padding:8px;border-radius:16px;opacity:0;transition:opacity .4s}
 .fprog .fb{width:clamp(36px,8vw,62px);aspect-ratio:1;display:grid}
+.fprog{align-items:flex-start}
+.fprog .fb.wide{width:auto;aspect-ratio:auto;display:block}
+.fprog .frame{flex-wrap:nowrap}
+.fprog .strip{--bs:clamp(36px,8vw,62px);padding:0;min-height:0;gap:6px}
 #film.s2 .fprog{opacity:1}
 #film.s2 .fprog .fb{animation:fpop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(.6s + var(--i)*.55s)}
 @keyframes fpop{from{transform:scale(0) rotate(-20deg)}}
@@ -444,8 +448,6 @@ h1,h2,h3{text-wrap:balance}
 /* görevli kodla sür */
 .gboard{width:min(100%,500px)!important;height:auto}
 #gCar.blink-L .bl-L,#gCar.blink-R .bl-R{animation:wave .3s ease-in-out 3}
-#gProg.running .slot.filled:not(.on):not(.err) .blk,#kalProg.running .slot.filled:not(.on) .blk{opacity:.35}
-.slot.sel .blk{box-shadow:0 0 0 3px #fff,0 0 0 7px #ffc93c;transform:translateY(-3px)}
 #aBody .palette{width:min(100%,500px)}
 .kb3{width:44px;height:44px;border-radius:12px;padding:0;border:3px solid transparent;flex:none}
 .kb3 .blk{font-size:17px}
@@ -544,18 +546,52 @@ h1,h2,h3{text-wrap:balance}
 .bigbtn[disabled]{opacity:.6;pointer-events:none}
 
 /* kod modu */
-.prog{width:min(100%,500px);display:flex;flex-direction:column;gap:8px}
+.prog{width:min(100%,500px);display:flex;flex-direction:column;gap:8px;--bs:44px}
+@media (min-width:700px){.prog{--bs:50px}}
 .row{background:var(--panel);border:3px solid var(--panel-line);border-radius:18px;padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px;text-align:left}
 .row.active{border-color:var(--ink)}
 .row-head{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:13px;color:var(--ink-soft)}
 .row-head b{color:var(--ink);font-size:14px}
-.slots{display:grid;grid-template-columns:repeat(8,1fr);gap:5px}
-@media (max-width:420px){.slots{grid-template-columns:repeat(6,1fr)}}
-.slot{aspect-ratio:1;max-width:100%;border-radius:10px;border:2px dashed var(--panel-line);display:grid;place-items:center;padding:0}
-.slot.filled{border:0}
-.slots{padding:6px 4px}
-.slot.on .blk{transform:scale(1.08);box-shadow:0 0 0 3px #fff,0 0 0 7px var(--ink),0 8px 16px rgba(22,50,74,.3);position:relative;z-index:1}
-#kProg.running .slot.filled:not(.on):not(.err) .blk{opacity:.35}
+/* blok şeridi: yatay, satır sonunda alta kıvrılır; çerçeveler (Tekrarla, Sürekli, Eğer) içlerine blok alır */
+.strip{display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start;padding:4px 2px;min-height:calc(var(--bs) + 8px)}
+.strip.ro{pointer-events:none;--bs:40px}
+.strip.ro.mid{justify-content:center}
+.bw{position:relative;width:var(--bs);height:var(--bs);padding:0;border:0;background:none;flex:none;border-radius:10px}
+.bw .blk{width:100%;height:100%}
+.bw.sel .blk{box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 0 0 3px #fff,0 0 0 6px var(--ink)}
+.bw .del{position:absolute;top:-9px;right:-9px;width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;font-size:17px;line-height:24px;text-align:center;font-style:normal;box-shadow:0 2px 0 rgba(0,0,0,.25);z-index:2}
+.gap{width:var(--bs);height:var(--bs);border-radius:10px;border:2px dashed var(--panel-line);background:transparent;flex:none;padding:0;position:relative}
+.gap.tail{width:calc(var(--bs)*.82);opacity:.85}
+.gap.tail::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;color:var(--ink-soft);font-weight:800;font-size:20px;line-height:1}
+.gap.cur{border-color:var(--ink);background:#fff3c4;animation:gapblink 1.1s ease-in-out infinite}
+.gap.cur::after{content:"";position:absolute;left:50%;top:18%;width:3px;height:64%;background:var(--ink);border-radius:2px;transform:translateX(-50%);animation:caret 1.1s steps(2) infinite}
+.gap.hole{display:inline-block;border-color:rgba(255,255,255,.75)}
+@keyframes gapblink{50%{box-shadow:0 0 0 4px rgba(22,50,74,.14)}}
+@keyframes caret{50%{opacity:0}}
+.frame{display:flex;flex-wrap:wrap;align-items:stretch;border-radius:14px;padding:4px;background:var(--orange);box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);max-width:100%;position:relative;transition:box-shadow .2s}
+.frame.if{background:#0e6f7c}
+.frame.sel,.frame.on{box-shadow:inset 0 -4px 0 rgba(0,0,0,.18),0 0 0 3px #fff,0 0 0 6px var(--ink)}
+.fhead{display:flex;align-items:center;gap:3px;color:#fff;font-family:var(--display);font-weight:800;font-size:17px;padding:0 5px 0 3px;min-height:var(--bs);cursor:pointer;line-height:1}
+.fhead .fic{width:calc(var(--bs)*.6);height:calc(var(--bs)*.6);display:grid;flex:none}
+.fhead .fic .blk{box-shadow:none;background:rgba(255,255,255,.2);font-size:18px}
+.fnum{min-width:calc(var(--bs)*.82);height:calc(var(--bs)*.82);border-radius:9px;background:#fff;color:#b4581c;font-family:var(--display);font-weight:800;font-size:20px;padding:0 6px;border:0;box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);line-height:1;white-space:nowrap}
+.fnum small{font-size:13px;margin-left:1px}
+.fnum.cnt,.ftxt.cnt{background:#fff3c4;color:var(--ink);border-radius:9px;padding:0 6px;min-height:calc(var(--bs)*.82);display:inline-grid;place-items:center;font-size:17px;white-space:nowrap}
+.fcond{width:calc(var(--bs)*.82);height:calc(var(--bs)*.82);border-radius:9px;background:rgba(255,255,255,.22);padding:4px;border:0;flex:none}
+.fcond svg{width:100%;height:100%;display:block}
+.ftxt{font-size:15px}
+.fdel{position:absolute;top:-10px;left:-10px;width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;font-weight:800;font-size:17px;border:0;box-shadow:0 2px 0 rgba(0,0,0,.25);line-height:1;z-index:2;padding:0}
+.fbody{display:flex;flex-wrap:wrap;gap:4px;align-items:flex-start;background:var(--panel);border-radius:10px;padding:4px;min-width:calc(var(--bs) + 8px);min-height:calc(var(--bs) + 8px);flex:0 1 auto;max-width:100%}
+.fediv{display:flex;align-items:center;gap:4px;color:#fff;font-weight:800;font-size:14px;padding:0 6px;align-self:center;cursor:pointer;min-height:var(--bs)}
+.fedel{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.3);color:#fff;font-weight:800;font-size:14px;border:0;padding:0;line-height:1}
+.felse{align-self:center;margin:0 4px;padding:5px 8px;border-radius:9px;border:2px dashed rgba(255,255,255,.75);background:transparent;color:#fff;font-weight:800;font-size:13px;white-space:nowrap}
+.fend{display:block;width:14px;min-height:0;border-radius:0 10px 10px 0;background:rgba(0,0,0,.14);border:0;padding:0;flex:none;align-self:stretch;cursor:pointer}
+.running .gap{opacity:.25}
+.running .felse{visibility:hidden}
+.bw.on .blk{transform:scale(1.08);box-shadow:0 0 0 3px #fff,0 0 0 7px var(--ink),0 8px 16px rgba(22,50,74,.3);position:relative;z-index:1}
+.bw.err .blk{outline:4px solid var(--red);outline-offset:1px}
+.running .bw:not(.on):not(.err) .blk{opacity:.35}
+.row.shake{animation:shake .35s}
 .speedbar{width:min(100%,500px);display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
 .speedbar .lbl{font-weight:800;font-size:13px;color:var(--ink-soft);margin-right:2px}
 .spd{display:flex;align-items:center;gap:5px;height:46px;padding:0 10px 0 6px;border-radius:14px;background:var(--panel);border:2px solid var(--panel-line);box-shadow:0 3px 0 var(--panel-line);font-weight:800;font-size:14px;font-variant-numeric:tabular-nums}
@@ -568,10 +604,9 @@ h1,h2,h3{text-wrap:balance}
 .nowbar .txt{font-family:var(--display);font-weight:800;font-size:22px;line-height:1.1}
 .nowbar .txt small{display:block;font-family:var(--body);font-size:13px;color:var(--ink-soft)}
 .nowbar.idle .txt{font-family:var(--body);font-size:14px;color:var(--ink-soft);font-weight:700}
-.slot.err .blk{outline:4px solid var(--red);outline-offset:1px}
 .blk{width:100%;height:100%;border-radius:10px;display:grid;place-items:center;color:#fff;font-family:var(--display);font-weight:800;font-size:20px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);transition:transform .2s,opacity .2s,box-shadow .2s}
 .blk svg{width:64%;height:64%}
-.blk.g{background:var(--green)} .blk.b{background:var(--blue)} .blk.p{background:var(--purple)} .blk.o{background:var(--orange)} .blk.c{background:#0e6f7c} .blk.gd{background:#13704a} .blk.r{background:#d6409f}
+.blk.g{background:var(--green)} .blk.b{background:var(--blue)} .blk.p{background:var(--purple)} .blk.o{background:var(--orange)} .blk.c{background:#0e6f7c} .blk.gd{background:#13704a} .blk.r{background:#d6409f} .blk.st{background:#d6283c}
 .bl{transform-box:fill-box;transform-origin:center}
 #kCar.blink-L .bl-L,#kCar.blink-R .bl-R{animation:wave .3s ease-in-out 3}
 .petals{transform-box:view-box;transform-origin:0 0}
@@ -586,8 +621,10 @@ h1,h2,h3{text-wrap:balance}
 @keyframes bloom{50%{transform:rotate(60deg) scale(1.3)}}
 @keyframes wave{50%{transform:scale(1.7)}}
 .blk svg text{font-family:var(--display)}
-.palette{width:min(100%,500px);display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
-.palbtn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:800;color:var(--ink-soft);line-height:1.1;text-align:center}
+.palette{width:min(100%,500px);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.palbtn{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:800;color:var(--ink-soft);line-height:1.1;text-align:center;min-width:0}
+.palbtn span{max-width:100%;overflow-wrap:break-word}
+@media (max-width:480px){.palbtn{font-size:10.5px}}
 .palbtn .blk{aspect-ratio:1;height:auto}
 .palbtn:active .blk{transform:translateY(2px)}
 .ctrls{width:min(100%,500px);display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px}
@@ -1027,7 +1064,7 @@ const TEBRIK="Tebrikler! Görevi başarıyla tamamladın.";
 // Konuşalım sorusu aynı etkinlikte her bölümde yinelenmesin: aynı soru bu oyuncuya bir kez gösterilir (Konuşalım düğmesinden her zaman açılabilir)
 function talkOnce(talk){ if(!talk) return false; const key="talk:"+String(talk).replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim().slice(0,80); const d=P(); d.seen=d.seen||{}; if(d.seen[key]) return false; d.seen[key]=1; save(); return true }
 function introCard(c,then){
-  overlay(`<span class="kicker">${c.kicker||"Yeni"}</span>${c.art?`<svg class="art" viewBox="0 0 100 100">${c.art}</svg>`:""}<h2>${c.title}</h2><p id="ovText" class="speakable">${c.text}</p>${c.ex&&c.ex.length?`<div class="ex">${c.ex.map(t=>blkHTML(t)).join("")}</div>`:""}<div class="btns"><button class="btn-main" id="ovOk">Anladım, başla</button></div>`);
+  overlay(`<span class="kicker">${c.kicker||"Yeni"}</span>${c.art?`<svg class="art" viewBox="0 0 100 100">${c.art}</svg>`:""}<h2>${c.title}</h2><p id="ovText" class="speakable">${c.text}</p>${c.ex&&c.ex.length?`<div class="ex">${typeof c.ex==="string"?Blok.html(Blok.parse(c.ex)):c.ex.map(t=>blkHTML(t)).join("")}</div>`:""}<div class="btns"><button class="btn-main" id="ovOk">Anladım, başla</button></div>`);
   // kartı sesli oku (kayıt varsa karakterin sesiyle); metne dokununca yeniden okur
   const said=`${c.title}${/[.!?]$/.test(c.title)?" ":". "}${c.text}`;
   Voice.say(said); $("ovText").onclick=()=>Voice.say(said,true);
@@ -1494,23 +1531,171 @@ return {start,TIERS,TOTAL,makeLevel,features,UNLOCK,INTRO,gateArt,tunnelArt,piec
 // KODLA SÜR
 // =====================================================================
 const TILE_A="#f49ac1", TILE_Y="#ffd75e";
+// Koşullar: Eğer bloğunun başındaki küçük simge ve adı
+const COND={
+  A:{name:"pembe kare",raw:`<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="${TILE_A}" stroke="#fff" stroke-width="2"/></svg>`},
+  Y:{name:"sarı kare",raw:`<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="${TILE_Y}" stroke="#fff" stroke-width="2"/></svg>`},
+  K:{name:"önü kapalı",raw:`<svg viewBox="0 0 24 24" fill="none"><g fill="#fff"><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="9.5" width="8" height="5" rx="1"/><rect x="13" y="16" width="8" height="5" rx="1"/></g><path d="M3 12h6M6.5 9l3 3-3 3" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`},
+  B:{name:"bitişte",raw:`<svg viewBox="0 0 24 24"><path d="M5 21V4" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M6 4h13l-3 4 3 4H6z" fill="#fff"/><path d="M8.5 6h2v2h-2zM12.5 6h2v2h-2zM10.5 8h2v2h-2zM14.5 8h2v2h-2z" fill="#16324a"/></svg>`}
+};
 const BLK={
   F:{name:"İleri",cls:"g",svg:'<path d="M12 20V5M6 11l6-6 6 6"/>'},
   L:{name:"Sola dön",cls:"b",svg:'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'},
   R:{name:"Sağa dön",cls:"r",svg:'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>'},
   G:{name:"Geri",cls:"gd",svg:'<path d="M12 4v16M6 14l6 6 6-6"/>'},
-  N:{name:"Yukarı",cls:"g",svg:'<path d="M12 20V4M5 11l7-7 7 7"/>'},
-  E:{name:"Sağa",cls:"g",svg:'<path d="M4 12h16M13 5l7 7-7 7"/>'},
-  S:{name:"Aşağı",cls:"g",svg:'<path d="M12 4v16M5 13l7 7 7-7"/>'},
-  W:{name:"Sola",cls:"g",svg:'<path d="M20 12H4M11 5l-7 7 7 7"/>'},
-  "2":{name:"2 kez",cls:"o",txt:"2×"},"3":{name:"3 kez",cls:"o",txt:"3×"},"4":{name:"4 kez",cls:"o",txt:"4×"},
-  I:{name:"Bitene kadar",cls:"o",txt:"∞"},
+  D:{name:"Fidan dik",cls:"g",svg:'<path d="M12 21v-8"/><path d="M12 14c-4 0-6-3-6-6 3 0 6 2 6 6zM12 12c0-4 2-7 6-7 0 4-2 7-6 7z" fill="currentColor"/>'},
+  rep:{name:"Tekrarla",cls:"o",raw:`<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 0 1 13-5.2"/><path d="M17.5 3v4h-4"/><path d="M19.5 12a7.5 7.5 0 0 1-13 5.2"/><path d="M6.5 21v-4h4"/></svg>`},
+  inf:{name:"Sürekli tekrarla",cls:"o",txt:"∞"},
   P:{name:"Fonksiyon",cls:"p",txt:"F"},
-  A:{name:"Eğer pembe kare",cls:"c",raw:`<svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="12" height="12" rx="3" fill="${TILE_A}" stroke="#fff" stroke-width="1.8"/><text x="19" y="16.5" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="13" fill="#fff">?</text></svg>`},
-  Y:{name:"Eğer sarı kare",cls:"c",raw:`<svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="12" height="12" rx="3" fill="${TILE_Y}" stroke="#fff" stroke-width="1.8"/><text x="19" y="16.5" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="13" fill="#fff">?</text></svg>`},
-  K:{name:"Eğer önü kapalı",cls:"c",raw:`<svg viewBox="0 0 24 24" fill="none"><g fill="#fff"><rect x="9" y="3" width="6" height="4" rx="1"/><rect x="9" y="8.5" width="6" height="4" rx="1"/><rect x="9" y="14" width="6" height="4" rx="1"/></g><path d="M2 10.5h4.5M4.5 8l2.5 2.5L4.5 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><text x="20" y="22" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="10" fill="#fff">?</text></svg>`}
+  S:{name:"Dur",cls:"st",raw:`<svg viewBox="0 0 24 24"><path d="M8 3h8l5 5v8l-5 5H8l-5-5V8z" fill="#fff"/><path d="M9 5.5h6l3.5 3.5v6L15 18.5H9L5.5 15V9z" fill="#d6283c"/><rect x="9.5" y="9.5" width="5" height="5" rx="1" fill="#fff"/></svg>`},
+  // eski düz işaretler (film kartlarındaki örnek programlar için)
+  "2":{name:"2 kez",cls:"o",txt:"2×"},"3":{name:"3 kez",cls:"o",txt:"3×"},"4":{name:"4 kez",cls:"o",txt:"4×"},
+  I:{name:"Bitene kadar",cls:"o",txt:"∞"}
 };
+// Eğer blokları: koşul simgesi + soru işareti
+["A","Y","K","B"].forEach(c=>{
+  const inner= c==="A"||c==="Y" ? `<rect x="2.5" y="5" width="12" height="12" rx="3" fill="${c==="A"?TILE_A:TILE_Y}" stroke="#fff" stroke-width="1.8"/>`
+    : c==="K" ? `<g fill="#fff"><rect x="8" y="3" width="6" height="4" rx="1"/><rect x="8" y="8.5" width="6" height="4" rx="1"/><rect x="8" y="14" width="6" height="4" rx="1"/></g><path d="M1.5 10.5h4M4 8l2.5 2.5L4 13" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`
+    : `<path d="M3 20V5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M4 5h10l-2.5 3.5L14 12H4z" fill="#fff"/>`;
+  BLK["if:"+c]={name:"Eğer "+COND[c].name,cls:"c",raw:`<svg viewBox="0 0 24 24" fill="none">${inner}<text x="19" y="17" text-anchor="middle" font-family="Baloo 2,Trebuchet MS,sans-serif" font-weight="800" font-size="13" fill="#fff">?</text></svg>`};
+  BLK[c]=BLK["if:"+c];
+});
 function blkHTML(t){const b=BLK[t];return `<span class="blk ${b.cls}" aria-label="${b.name}">${b.raw?b.raw:b.svg?`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${b.svg}</svg>`:b.txt}</span>`}
+
+// =====================================================================
+// BLOK AĞACI: Scratch benzeri kapsayıcı bloklar
+//  düz blok: {t:"F"|"G"|"L"|"R"|"D"|"P"|"S"}   Tekrarla: {t:"rep",n,k:[]}   Sürekli: {t:"inf",k:[]}
+//  Eğer: {t:"if",c:"A"|"Y"|"K"|"B",k:[],e:null|[]}  (e: değilse kolu)
+//  Metin biçimi: "F F R 3[F R] *[?A[R] F] ?K[R]![F] P S"
+// Düzenleme: sürükleme yok; dokunma + imleç. Çerçeveye dokununca imleç içine girer.
+// =====================================================================
+const Blok=(()=>{
+let SEQ=1;
+const FR={rep:1,inf:1,if:1};
+function mk(t,o){ const b=Object.assign({t,id:SEQ++},o||{}); if(t==="rep"){ b.n=b.n||2; b.k=b.k||[] } else if(t==="inf") b.k=b.k||[]; else if(t==="if"){ b.k=b.k||[]; if(b.e===undefined) b.e=null } return b }
+function fromTok(t,n){ if(t==="rep") return mk("rep",{n:n||2}); if(t==="inf") return mk("inf"); if(t.slice(0,3)==="if:") return mk("if",{c:t.slice(3)}); return mk(t) }
+const tok=b=> b.t==="if"?"if:"+b.c:b.t;
+const isFrame=b=>!!FR[b.t];
+const name=b=> b.t==="rep"?`Tekrarla ${b.n}`:(BLK[tok(b)]||{name:b.t}).name;
+function count(list){ let n=0; for(const b of list){ n++; if(b.k) n+=count(b.k); if(b.e) n+=1+count(b.e) } return n }
+function clone(list){ return list.map(b=>{ const c=Object.assign({},b,{id:SEQ++}); if(b.k) c.k=clone(b.k); if(b.e) c.e=clone(b.e); return c }) }
+function ser(list){ return list.map(b=> b.t==="rep"?`${b.n}[${ser(b.k)}]` : b.t==="inf"?`*[${ser(b.k)}]` : b.t==="if"?`?${b.c}[${ser(b.k)}]`+(b.e?`![${ser(b.e)}]`:"") : b.t).join(" ") }
+function parse(s){
+  let i=0; const S=String(s||"").trim();
+  function list(){ const out=[]; while(i<S.length){ const ch=S[i]; if(ch===" "){ i++; continue } if(ch==="]") break;
+    if(/[2-9]/.test(ch)&&S[i+1]==="["){ const n=+ch; i+=2; const k=list(); i++; out.push(mk("rep",{n,k})) }
+    else if(ch==="*"&&S[i+1]==="["){ i+=2; const k=list(); i++; out.push(mk("inf",{k})) }
+    else if(ch==="?"){ const c=S[i+1]; i+=3; const k=list(); i++; const b=mk("if",{c,k}); if(S[i]==="!"&&S[i+1]==="["){ i+=2; b.e=list(); i++ } out.push(b) }
+    else { let j=i; while(j<S.length&&S[j]!==" "&&S[j]!=="]") j++; out.push(mk(S.slice(i,j))); i=j } }
+    return out }
+  return list();
+}
+// eski düz dizi (ön ek sayılar/koşullar: "3","F" → 3[F]) → ağaç
+function fromTokens(arr){ const out=[]; let i=0; while(i<arr.length){ const pre=[]; while(i<arr.length&&/^[234IAYK]$/.test(arr[i])) pre.push(arr[i++]); if(i>=arr.length) break; let b=mk(arr[i++]); for(let p=pre.length-1;p>=0;p--){ const t=pre[p]; b= t==="I"?mk("inf",{k:[b]}) : /[234]/.test(t)?mk("rep",{n:+t,k:[b]}) : mk("if",{c:t,k:[b]}) } out.push(b) } return out }
+// koşulsuz programı düz komut dizisine aç (sürekli döngü bir kez sayılır)
+function flat(list){ const out=[]; for(const b of list){ if(b.t==="rep") for(let k=0;k<b.n;k++) out.push(...flat(b.k)); else if(b.k){ out.push(...flat(b.k)); if(b.e) out.push(...flat(b.e)) } else out.push(b.t) } return out }
+// ---- yorumlayıcı ----
+// env: op(t)→hata|null, cond(c)→bool, done()→bool (hedefe varıldı; yoksa program sonuna kadar koşar),
+//      after(step) (adım sonrası durum kaydı), fn: fonksiyon gövdesi, explicit: Sürekli döngü hedefte kendiliğinden durmaz, max: adım sınırı
+// adımlar: {kind:"op",op,bid,path} {kind:"iter",bid,k,n,path} {kind:"check",bid,c,val,path} {kind:"call",bid,path}
+function run(main,env){
+  const steps=[]; let halt=null, ops=0; const max=env.max||200;
+  const push=s=>{ steps.push(s); return s };
+  const after=s=>{ if(env.after) env.after(s) };
+  function exec(list,path){
+    for(const b of list){ if(halt) return;
+      if(b.t==="rep"){ for(let k=1;k<=b.n&&!halt;k++){ after(push({kind:"iter",bid:b.id,k,n:b.n,path})); exec(b.k,path.concat(b.id)) } }
+      else if(b.t==="inf"){ let g=0; while(!halt){ if(!env.explicit&&env.done&&env.done()){ halt="done"; break } const before=steps.length; after(push({kind:"iter",bid:b.id,k:g+1,n:0,path})); exec(b.k,path.concat(b.id)); if(halt) break; if(steps.length===before+1){ halt="empty"; break } if(++g>max){ halt="loop"; break } } }
+      else if(b.t==="if"){ const v=!!env.cond(b.c); after(push({kind:"check",bid:b.id,c:b.c,val:v,path})); if(v) exec(b.k,path.concat(b.id)); else if(b.e) exec(b.e,path.concat(b.id)) }
+      else if(b.t==="P"){ after(push({kind:"call",bid:b.id,path})); if(path.includes("fn")){ halt="recur"; return } exec(env.fn||[],path.concat(b.id,"fn")) }
+      else if(b.t==="S"){ after(push({kind:"op",op:"S",bid:b.id,path})); halt="stop" }
+      else { if(++ops>max){ halt="loop"; return } const s=push({kind:"op",op:b.t,bid:b.id,path}); const f=env.op(b.t); if(f){ s.fail=f; halt="fail" } after(s); if(!halt&&!env.explicit&&env.done&&env.done()) halt="done" }
+    }
+  }
+  exec(main,[]);
+  if(!halt||halt==="stop") halt= env.done&&env.done()?"done":"end";
+  return {steps,halt};
+}
+// ---- en az blokla ağaç: aynı dizinin ardışık tekrarlarını Tekrarla bloğuna sarar (dinamik programlama) ----
+function compress(cmds,opt){
+  opt=opt||{}; const counts=opt.counts||[2,3,4], maxPat=opt.maxPat||4, memo=new Map();
+  function best(i,j){
+    const key=i+","+j; if(memo.has(key)) return memo.get(key);
+    if(i>=j) return {c:0,list:[]};
+    const r1=best(i+1,j); let res={c:1+r1.c,list:[mk(cmds[i])].concat(r1.list)};
+    for(let p=1;p<=maxPat;p++) for(const k of counts){ const len=p*k; if(i+len>j) continue;
+      let ok=true; for(let q=p;q<len&&ok;q++) if(cmds[i+q]!==cmds[i+q-p]) ok=false; if(!ok) continue;
+      if(p===1&&cmds[i]==="D") continue;
+      const inner=best(i,i+p), rest=best(i+len,j), c=1+inner.c+rest.c;
+      if(c<res.c) res={c,list:[mk("rep",{n:k,k:clone(inner.list)})].concat(rest.list)} }
+    memo.set(key,res); return res }
+  return clone(best(0,cmds.length).list);
+}
+// ---- düzenleyici durumu ----
+// rows: {main:[...], fn:[...]}  cur: {row,list,i} (imleç)  sel: seçili blok kimliği
+function editor(rows,row){ row=row||"main"; return {rows,cur:{row,list:rows[row],i:rows[row].length},sel:null} }
+function search(list,bid,row){ for(let i=0;i<list.length;i++){ const b=list[i]; if(b.id===bid) return {row,list,i,b}; if(b.k){ const r=search(b.k,bid,row); if(r) return r } if(b.e){ const r=search(b.e,bid,row); if(r) return r } } return null }
+function find(ed,bid){ for(const row in ed.rows){ const r=search(ed.rows[row],bid,row); if(r) return r } return null }
+function inside(b,list){ if(!b.k) return false; if(b.k===list||b.e===list) return true; return b.k.some(x=>inside(x,list))||(b.e||[]).some(x=>inside(x,list)) }
+function insert(ed,t,n){ const b=fromTok(t,n), c=ed.cur; c.list.splice(c.i,0,b); if(isFrame(b)) ed.cur={row:c.row,list:b.k,i:0}; else c.i++; ed.sel=null; return b }
+function remove(ed,bid){ const r=find(ed,bid); if(!r) return false; const c=ed.cur; if(c.list===r.list&&c.i>r.i) c.i--; else if(inside(r.b,c.list)) ed.cur={row:r.row,list:r.list,i:r.i}; r.list.splice(r.i,1); if(ed.sel===bid) ed.sel=null; return true }
+function cursorAfter(ed,bid){ const r=find(ed,bid); if(r) ed.cur={row:r.row,list:r.list,i:r.i+1} }
+function reset(ed,row){ row=row||"main"; ed.cur={row,list:ed.rows[row],i:ed.rows[row].length}; ed.sel=null }
+// ---- çizim ----
+function gapHTML(row,owner,i,cur,tail){ return `<button class="gap${cur?" cur":""}${tail&&!cur?" tail":""}" data-g="1" data-row="${row}" data-bid="${owner?owner.bid:""}" data-br="${owner?owner.br:""}" data-i="${i}" aria-label="${cur?"İmleç burada: yeni blok buraya eklenir":"Buraya blok eklemek için dokun"}"></button>` }
+function listHTML(list,row,ed,opt,top,owner){
+  const isCur=!!ed&&ed.cur.list===list, ro=!ed||opt.ro||opt.replace||(top&&opt.outer===false);
+  let s=""; list.forEach((b,i)=>{ if(isCur&&ed.cur.i===i&&!ro) s+=gapHTML(row,owner,i,true); s+=blockHTML(b,row,ed,opt) });
+  if(!ro) s+=gapHTML(row,owner,list.length,isCur&&ed.cur.i===list.length,true);
+  else if(!list.length) s+=`<span class="gap hole"></span>`;
+  return `<div class="${top?"strip":"fbody"}">${s}</div>` }
+function blockHTML(b,row,ed,opt){
+  const sel=!!ed&&ed.sel===b.id, ro=!ed||opt.ro||(opt.keep&&opt.keep.has(b.id)), rep=!!opt.replace;
+  if(!isFrame(b)) return `<button class="bw${sel?" sel":""}" data-bid="${b.id}" aria-label="${name(b)}${sel&&!rep&&!ro?", silmek için yeniden dokun":""}">${blkHTML(b.t)}${sel&&!rep&&!ro?`<i class="del" aria-hidden="true">×</i>`:""}</button>`;
+  let head;
+  if(b.t==="rep") head=`<span class="fic">${blkHTML("rep")}</span><button class="fnum" data-bid="${b.id}" aria-label="Tekrar sayısı ${b.n}, değiştirmek için dokun">${b.n}<small>×</small></button>`;
+  else if(b.t==="inf") head=`<span class="fic">${blkHTML("inf")}</span><span class="ftxt">Sürekli</span>`;
+  else head=`<span class="ftxt">Eğer</span><button class="fcond" data-bid="${b.id}" aria-label="Koşul: ${COND[b.c].name}, değiştirmek için dokun">${COND[b.c].raw}</button><span class="ftxt">ise</span>`;
+  if(sel&&!rep&&!ro) head+=`<button class="fdel" data-bid="${b.id}" aria-label="Bloğu sil">×</button>`;
+  let s=`<div class="frame ${b.t}${sel?" sel":""}" data-bid="${b.id}"><div class="fhead" data-bid="${b.id}" role="button" aria-label="${name(b)} bloğu: içine blok eklemek için dokun">${head}</div>${listHTML(b.k,row,ed,opt,false,{bid:b.id,br:"k"})}`;
+  if(b.t==="if"){ if(b.e) s+=`<div class="fediv" data-bid="${b.id}" role="button" aria-label="Değilse kolu"><span>değilse</span>${!b.e.length&&!rep&&!ro?`<button class="fedel" data-bid="${b.id}" aria-label="Değilse kolunu kaldır">×</button>`:""}</div>${listHTML(b.e,row,ed,opt,false,{bid:b.id,br:"e"})}`;
+    else if(opt.elseOk&&!rep&&!ro) s+=`<button class="felse" data-bid="${b.id}" aria-label="Değilse kolu ekle">+ değilse</button>` }
+  s+=`<span class="fend" data-bid="${b.id}" title="Bloğun sonu"></span></div>`;
+  return s }
+function html(list,center){ return `<div class="strip ro${center===false?"":" mid"}">${list.map(b=>blockHTML(b,null,null,{ro:true})).join("")}</div>` }
+// box: #kProg / #gProg; opt: rows:[{id,label,lim}], counts, conds, elseOk, replace, locked(), canAdd(row,n), onChange(programChanged)
+function render(box,ed,opt){
+  const cnt=r=>count(ed.rows[r.id])-(opt.keep?[...opt.keep].filter(id=>search(ed.rows[r.id],id,r.id)).length:0);
+  box.innerHTML=opt.rows.map(r=>`<div class="row${ed.cur.row===r.id?" active":""}" data-row="${r.id}"><div class="row-head"><b>${r.label}</b><span>${cnt(r)} / ${r.lim}</span></div>${listHTML(ed.rows[r.id],r.id,ed,opt,true,null)}</div>`).join("");
+  box.onclick=e=>{
+    if(opt.locked&&opt.locked()) return;
+    const t=e.target, q=c=>t.closest(c); let el, moved=false, changed=false;
+    if(el=q(".fnum")){ const b=find(ed,+el.dataset.bid).b, cs=opt.counts||[2,3,4]; b.n=cs[(cs.indexOf(b.n)+1)%cs.length]; sfx.click(); changed=true }
+    else if(el=q(".fcond")){ const b=find(ed,+el.dataset.bid).b, cs=opt.conds||[b.c]; if(cs.length>1){ b.c=cs[(cs.indexOf(b.c)+1)%cs.length]; sfx.click(); changed=true } else { sfx.no() } }
+    else if(el=q(".fdel")){ remove(ed,+el.dataset.bid); sfx.erase(); changed=true }
+    else if(el=q(".fedel")){ const r=find(ed,+el.dataset.bid); if(ed.cur.list===r.b.e) ed.cur={row:r.row,list:r.list,i:r.i+1}; r.b.e=null; sfx.erase(); changed=true }
+    else if(el=q(".felse")){ const r=find(ed,+el.dataset.bid); if(opt.canAdd&&!opt.canAdd(r.row,1)) return; r.b.e=[]; ed.cur={row:r.row,list:r.b.e,i:0}; ed.sel=null; sfx.click(); changed=true }
+    else if(el=q(".fend")){ cursorAfter(ed,+el.dataset.bid); ed.sel=null; sfx.click(); moved=true }
+    else if(el=q(".fediv")){ const r=find(ed,+el.dataset.bid); ed.cur={row:r.row,list:r.b.e,i:r.b.e.length}; ed.sel=null; sfx.click(); moved=true }
+    else if(el=q(".gap")){ const row=el.dataset.row, o=el.dataset.bid?find(ed,+el.dataset.bid).b:null, list=o?(el.dataset.br==="e"?o.e:o.k):ed.rows[row]; ed.cur={row,list,i:+el.dataset.i}; ed.sel=null; sfx.click(); moved=true }
+    else if(el=q(".bw")){ const bid=+el.dataset.bid; if(opt.replace){ ed.sel=ed.sel===bid?null:bid; sfx.click(); moved=true } else if(ed.sel===bid&&!(opt.keep&&opt.keep.has(bid))){ remove(ed,bid); sfx.erase(); changed=true } else { ed.sel=bid; cursorAfter(ed,bid); sfx.click(); moved=true } }
+    else if(el=q(".fhead")){ const r=find(ed,+el.dataset.bid); if(opt.replace){ sfx.no(); return } ed.cur={row:r.row,list:r.b.k,i:r.b.k.length}; ed.sel=r.b.id; sfx.click(); moved=true }
+    else if(el=q(".row")){ const row=el.dataset.row; if(ed.rows[row]&&ed.cur.row!==row&&!opt.replace&&opt.outer!==false){ reset(ed,row); moved=true } }
+    if(changed||moved) opt.onChange&&opt.onChange(changed);
+  };
+}
+// çalışan bloğu ve onu kapsayan çerçeveleri işaretle; cls "err" hata bloğu için
+function hl(box,s,cls){ if(!box) return; box.querySelectorAll(".on,.err").forEach(e=>e.classList.remove("on","err")); if(!s) return;
+  (s.path||[]).forEach(id=>{ if(id==="fn") return; const f=box.querySelector(`.frame[data-bid="${id}"],.bw[data-bid="${id}"]`); if(f) f.classList.add("on") });
+  const el=box.querySelector(`.frame[data-bid="${s.bid}"],.bw[data-bid="${s.bid}"]`); if(el) el.classList.add(cls||"on") }
+// döngü başlığında tur sayacı (k/n)
+function counter(box,s){ if(!box||!s||s.kind!=="iter") return; const f=box.querySelector(`.frame[data-bid="${s.bid}"]`); if(!f) return; const h=f.querySelector(":scope>.fhead .fnum,:scope>.fhead .ftxt"); if(h){ h.classList.add("cnt"); h.innerHTML=s.n?`${s.k}<small>/${s.n}</small>`:`${s.k}.` } }
+function palHTML(t){ return `${blkHTML(t)}<span>${BLK[t].name}</span>` }
+// "şimdi çalışan" satırı için etiket
+function stepLabel(s){ if(s.kind==="iter") return s.n?`Tekrarla · ${s.k}. tur / ${s.n}`:`Sürekli tekrarla · ${s.k}. tur`; if(s.kind==="check") return `Eğer ${COND[s.c].name}? <b style="color:${s.val?"var(--green)":"var(--red)"}">${s.val?"Evet":"Hayır"}</b>`; if(s.kind==="call") return "Fonksiyon çalışıyor"; return BLK[s.op].name }
+const stepTok=s=> s.kind==="iter"?(s.n?"rep":"inf") : s.kind==="check"?"if:"+s.c : s.kind==="call"?"P" : s.op;
+return {mk,fromTok,tok,isFrame,name,count,clone,ser,parse,fromTokens,flat,run,compress,editor,find,insert,remove,cursorAfter,reset,render,html,hl,counter,palHTML,stepLabel,stepTok,COND};
+})();
 const isPre=t=>/^[234IAYK]$/.test(t), isCond=t=>t==="A"||t==="Y"||t==="K";
 
 // telefonda tahtayı, Çalıştır düğmesi ekrana sığacak kadar küçült
@@ -1523,147 +1708,113 @@ function fitBoard(board,btn){
 const Kod=(()=>{
 const CH=[
   {name:"İlk adımlar",sub:"Bee‑Bot gibi: ileri, geri, dön",from:1,to:10,pal:["F","G","L","R"],
-   intro:{kicker:"Kodla Sür",title:"Bidik, Bee‑Bot gibi çalışır",text:"İleri bloğu Bidik'i yüzünün baktığı yöne bir kare götürür. Geri bloğu bir kare geri götürür. Sola dön ve sağa dön, Bidik'i yerinde çeyrek tur döndürür. Antenlerine bak: mavi anten sol, pembe anten sağ. Bloğa dokun, programa eklenir; programdaki bloğa dokun, silinir.",ex:["F","F","R","F"]}},
+   intro:{kicker:"Kodla Sür",title:"Bidik, Bee‑Bot gibi çalışır",text:"İleri bloğu Bidik'i yüzünün baktığı yöne bir kare götürür. Geri bloğu bir kare geri götürür. Sola dön ve sağa dön, Bidik'i yerinde çeyrek tur döndürür. Antenlerine bak: mavi anten sol, pembe anten sağ. Bloğa dokun, programa eklenir; programdaki bir bloğu silmek için ona iki kez dokun.",ex:"F F R F"}},
   {name:"Dönüşler",sub:"Bidik'in yerine geç",from:11,to:20,pal:["F","G","L","R"],
-   intro:{kicker:"Yeni zorluk",title:"Bidik'in yerine geç",text:"Artık Bidik her yöne bakabilir. Sağ ve sol, ekrana göre değil Bidik'e göredir; Bee‑Bot'u yere koyup arkasına geçtiğin gibi düşün. Antenlerine bak: mavi anten Bidik'in solu, pembe anten sağı.",ex:["R","F","F","L","F"]}},
-  {name:"Döngüler",sub:"Tekrar eden adımları kısalt",from:21,to:30,pal:["F","G","L","R","2","3","4"],
-   intro:{kicker:"Yeni kavram",title:"Döngü: tekrar et",text:"Aynı bloğu üst üste koymak yerine önüne bir sayı bloğu koy. “3× İleri” Bidik'i üç kare ileri götürür. Programda yer az, döngü kullanmak zorundasın!",ex:["3","F","R","2","F"]}},
-  {name:"Fonksiyonlar",sub:"Kendi bloğunu yap",from:31,to:40,pal:["F","L","R","2","3","4","P"],
-   intro:{kicker:"Yeni kavram",title:"Fonksiyon: kendi bloğun",text:"Tekrar eden bir hareket grubunu mor Fonksiyon satırına bir kez yaz. Ana programdaki F bloğu o satırın tamamını çalıştırır. “3× F” onu üç kez çalıştırır.",ex:["3","P"]}},
-  {name:"Koşullar",sub:"Eğer… ise: duruma göre karar ver",from:41,to:50,pal:["F","L","R","2","3","4","P","I","A","Y"],cond:true,
-   intro:{kicker:"Yeni kavram",title:"Eğer: duruma göre karar",text:"“Eğer pembe kare” bloğu, yanındaki bloğu sadece Bidik pembe karedeyken çalıştırır. “∞ Bitene kadar” bloğu ise Bidik'i bitişe varana kadar tekrar tekrar çalıştırır. Tek bir akıllı kural bütün yolu çözer!",ex:["A","R","F"]}},
-  {name:"Usta",sub:"Döngü + fonksiyon + hata avcılığı",from:51,to:60,pal:["F","L","R","2","3","4","P","I"],
-   intro:{kicker:"Usta bölümler",title:"Hepsi bir arada",text:"Döngüleri ve fonksiyonları birlikte kullan. Yer çok az: en kısa programı bulan kazanır. Büyükler için de zor!",ex:["2","P","L","2","P"]}}
+   intro:{kicker:"Yeni zorluk",title:"Bidik'in yerine geç",text:"Artık Bidik her yöne bakabilir. Sağ ve sol, ekrana göre değil Bidik'e göredir; Bee‑Bot'u yere koyup arkasına geçtiğin gibi düşün. Antenlerine bak: mavi anten Bidik'in solu, pembe anten sağı.",ex:"R F F L F"}},
+  {name:"Döngüler",sub:"Tekrar eden adımları kısalt",from:21,to:30,pal:["F","G","L","R","rep"],
+   intro:{kicker:"Yeni kavram",title:"Döngü: Tekrarla",text:"Aynı blokları üst üste koymak yerine turuncu Tekrarla bloğunun içine koy. Üstündeki sayıya dokun: kaç kez tekrarlanacağını seçersin. İçine birden çok blok da koyabilirsin. Programda yer az, döngü kullanmak zorundasın!",ex:"3[F] R 2[F L]"}},
+  {name:"Fonksiyonlar",sub:"Kendi bloğunu yap",from:31,to:40,pal:["F","L","R","rep","P"],
+   intro:{kicker:"Yeni kavram",title:"Fonksiyon: kendi bloğun",text:"Tekrar eden bir hareket grubunu mor Fonksiyon satırına bir kez yaz. Ana programdaki F bloğu o satırın tamamını çalıştırır. F bloğunu Tekrarla bloğunun içine koyarsan fonksiyon üç kez de çalışır.",ex:"3[P]"}},
+  {name:"Koşullar",sub:"Eğer… ise: duruma göre karar ver",from:41,to:50,pal:["F","L","R","rep","inf","if:A","if:Y"],cond:true,
+   intro:{kicker:"Yeni kavram",title:"Eğer: duruma göre karar",text:"“Eğer pembe kare” bloğunun içindeki bloklar sadece Bidik pembe karedeyken çalışır. “Sürekli tekrarla” bloğu içindekileri Bidik bitişe varana kadar tekrar tekrar çalıştırır. Tek bir akıllı kural bütün yolu çözer!",ex:"*[?A[R] F]"}},
+  {name:"Usta",sub:"Döngü + fonksiyon + hata avcılığı",from:51,to:60,pal:["F","L","R","rep","P"],
+   intro:{kicker:"Usta bölümler",title:"Hepsi bir arada",text:"Döngüleri ve fonksiyonları birlikte kullan; Tekrarla bloğunun içine fonksiyon ve dönüş de koyabilirsin. Yer çok az: en kısa programı bulan kazanır. Büyükler için de zor!",ex:"4[P R]"}}
 ];
+// 4. sınıf: Sürekli tekrarla hedefte kendiliğinden durmaz; “Eğer bitişte: Dur” konur
+const EXPLICIT_INTRO={kicker:"Yeni kavram",title:"Eğer: duruma göre karar",text:"“Eğer pembe kare” bloğunun içindeki bloklar sadece Bidik pembe karedeyken çalışır. “Sürekli tekrarla” bloğu içindekileri durmadan tekrar eder; Bidik bitişe gelince durması için içine “Eğer bitişte: Dur” koy. Tek bir akıllı kural bütün yolu çözer!",ex:"*[?B[S] ?A[R] F]"};
 const SENSOR_FROM=46;
-const SENSOR_INTRO={kicker:"Yeni sensör",title:"Eğer önü kapalı",text:"Artık renkli kare yok. Bidik önüne bakar: önünde engel ya da duvar varsa bu blok yanındakini çalıştırır. Gerçek robot süpürgeler de böyle düşünür!",ex:["K","R","F"]};
+const SENSOR_INTRO={kicker:"Yeni sensör",title:"Eğer önü kapalı",text:"Artık renkli kare yok. Bidik önüne bakar: önünde engel ya da duvar varsa bu bloğun içindekiler çalışır. Gerçek robot süpürgeler de böyle düşünür!",ex:"*[?K[R] F]"};
+const ELSE_INTRO={kicker:"Yeni kavram",title:"Değilse",text:"Eğer bloğuna bir “değilse” kolu ekleyebilirsin: koşul doğruysa üst kol, değilse alt kol çalışır. “Eğer önü kapalı ise sağa dön, değilse ileri git” bütün koridoru tek kuralla gezer.",ex:"*[?K[R]![F]]"};
 const BUG={kicker:"Yeni görev",title:"Hata avcısı",text:"Bu program neredeyse doğru ama bir hata var. Önce Adım düğmesiyle tek tek çalıştır, Bidik'in nerede yanlış gittiğini gör. Sonra hatalı bloğu düzelt.",ex:[]};
 const TOTAL=60, chOf=n=>CH.find(c=>n>=c.from&&n<=c.to), isBug=n=>n%5===0;
 
-// --- koşulsuz programı adımlara aç (sadece bölüm üretirken) ---
-function expand(prog){
-  const out=[];
-  function runList(list,row,outer,depth){
-    let mult=1;
-    for(let i=0;i<list.length;i++){
-      const t=list[i];
-      if(t==="2"||t==="3"||t==="4"){mult*=+t;continue}
-      for(let k=0;k<mult;k++){
-        if(out.length>400) return;
-        if(t==="P"){ if(depth===0) runList(prog.fn,"fn",outer,1) } else out.push({op:t});
-      }
-      mult=1;
-    }
-  }
-  runList(prog.main,"main",[],0);
-  return out;
-}
 // --- çalışma anı yorumlayıcısı: koşullar Bidik ilerledikçe değerlendirilir ---
 function execute(lv,prog,maxSteps=200){
-  const N=lv.N; let x=lv.start%N, y=(lv.start/N)|0, d=lv.d0, ang=d*90-90;
-  const got=new Set(), steps=[], states=[{x,y,d,ang}]; let st=null;
+  const N=lv.N; let x=lv.start%N, y=(lv.start/N)|0, d=lv.d0, ang=d*90-90, lastCoin=null, passedFin=false, crash=null;
+  const got=new Set(), states=[{x,y,d,ang}];
   const blockedAt=(nx,ny)=>{ if(nx<0||ny<0||nx>=N||ny>=N) return "out"; const k=lv.cells[ny*N+nx].kind; return k==="block"||k==="water"?k:null };
-  const loopFail=()=>{st={ok:false,loop:true,why:"Döngü hiç bitmiyor, Bidik bitişe ulaşamadı. Kuralını kontrol et."}};
-  function op(o,src){
-    if(st) return; if(steps.length>=maxSteps){loopFail();return}
-    const i=steps.length; steps.push({op:o,src});
-    const ABS={N:0,E:1,S:2,W:3};
-    if(o in ABS){ const t=ABS[o], dl=(t-d+4)%4; ang+= dl===1?90: dl===3?-90: dl===2?180:0; d=t; o="F" }
-    if(o==="F"||o==="G"){
-      const md= o==="G"?OPP(d):d;
-      const nx=x+DX[md], ny=y+DY[md], b=blockedAt(nx,ny);
-      if(b){ st={ok:false,crash:true,fail:i,why:b==="out"?"Bidik tahtadan çıkıyor!":b==="water"?"Bidik suya düşecek!":"Bidik engele çarpacak!",cell:b==="out"?y*N+x:ny*N+nx}; return }
-      x=nx;y=ny; const ni=y*N+x; const isCoin=lv.coins.includes(ni); if(isCoin) got.add(ni);
-      states.push({x,y,d,ang,coin:isCoin?ni:null});
-      if(ni===lv.fin&&got.size===lv.coins.length) st={ok:true,end:i};
-    } else { if(o==="R"){d=(d+1)%4;ang+=90} else {d=(d+3)%4;ang-=90} states.push({x,y,d,ang}) }
-  }
-  function check(c,src){
-    if(st) return false; if(steps.length>=maxSteps){loopFail();return false}
-    const v= c==="K" ? !!blockedAt(x+DX[d],y+DY[d]) : (lv.paint&&lv.paint[y*N+x])===c;
-    steps.push({op:c,src,check:true,val:v}); states.push({x,y,d,ang}); return v;
-  }
-  function runList(list,row,outer,depth){
-    let i=0;
-    while(i<list.length&&!st){
-      let mult=1, inf=false; const conds=[], pre=[];
-      while(i<list.length&&isPre(list[i])){const t=list[i]; if(isCond(t)) conds.push({t,i}); else {pre.push(i); if(t==="I") inf=true; else mult*=+t} i++}
-      if(i>=list.length) break;
-      const a=list[i], ai=i; i++;
-      const iter=()=>{
-        for(const c of conds) if(!check(c.t,[...outer,{row,i:c.i}])) return;
-        const src=[...outer,{row,i:ai},...pre.map(j=>({row,i:j}))];
-        if(a==="P"){ if(depth===0) runList(prog.fn,"fn",src,1) } else op(a,src);
-      };
-      if(inf){ let guard=0; while(!st){ const before=steps.length; iter(); if(st) break; if(steps.length===before){st={ok:false,why:"Döngünün içi boş, Bidik hiç hareket etmiyor."};break} if(++guard>maxSteps){loopFail();break} } }
-      else for(let k=0;k<mult&&!st;k++) iter();
-    }
-  }
-  runList(prog.main,"main",[],0);
-  const base={steps,states};
-  if(st&&st.ok) return {...base,ok:true,end:st.end};
-  if(st&&st.crash) return {...base,ok:false,crash:true,fail:st.fail,why:st.why,cell:st.cell};
-  const at=y*N+x;
-  if(st) return {...base,ok:false,fail:steps.length-1,why:st.why,cell:at};
+  const atFin=()=>y*N+x===lv.fin&&got.size===lv.coins.length;
+  const env={fn:prog.fn,explicit:!!lv.explicit,max:maxSteps,done:atFin,
+    cond:c=> c==="K"?!!blockedAt(x+DX[d],y+DY[d]) : c==="B"?atFin() : (lv.paint&&lv.paint[y*N+x])===c,
+    op:o=>{
+      if(o==="F"||o==="G"){ const md=o==="G"?OPP(d):d, nx=x+DX[md], ny=y+DY[md], b=blockedAt(nx,ny);
+        if(b){ crash={b,cell:b==="out"?y*N+x:ny*N+nx}; return b }
+        x=nx; y=ny; const ni=y*N+x; if(lv.coins.includes(ni)){ got.add(ni); lastCoin=ni } return null }
+      if(o==="R"){ d=(d+1)%4; ang+=90 } else if(o==="L"){ d=(d+3)%4; ang-=90 } return null },
+    after:()=>{ states.push({x,y,d,ang,coin:lastCoin}); lastCoin=null; if(atFin()) passedFin=true }};
+  const {steps,halt}=Blok.run(prog.main,env);
+  const base={steps,states}, last=steps.length-1, at=y*N+x;
+  if(halt==="done") return {...base,ok:true,end:last};
+  if(halt==="fail") return {...base,ok:false,crash:true,fail:last,why:crash.b==="out"?"Bidik tahtadan çıkıyor!":crash.b==="water"?"Bidik suya düşecek!":"Bidik engele çarpacak!",cell:crash.cell};
+  if(halt==="loop") return {...base,ok:false,fail:last,why: lv.explicit&&passedFin?"Bidik bitişe geldi ama durmadı! Döngünün içine “Eğer bitişte: Dur” koy.":"Döngü hiç bitmiyor, Bidik bitişe ulaşamadı. Kuralını kontrol et.",cell:at};
+  if(halt==="empty") return {...base,ok:false,fail:last,why:"Döngünün içi boş, Bidik hiç hareket etmiyor.",cell:at};
+  if(halt==="recur") return {...base,ok:false,fail:last,why:"Fonksiyon kendini çağıramaz.",cell:at};
   if(!steps.length) return {...base,ok:false,fail:-1,why:"Program boş. Önce aşağıdan blok ekle."};
   const miss=lv.coins.length-got.size;
-  return {...base,ok:false,fail:steps.length-1,why: at===lv.fin?`Hedeftesin ama ${miss} posta kutusu eksik.`:"Program bitti ama görev bitmedi. Programı uzat ya da yolu değiştir.",say:at===lv.fin?"Posta kutularına uğra.":null,cell:at};
+  if(at===lv.fin&&miss) return {...base,ok:false,fail:last,why:`Hedeftesin ama ${miss} posta kutusu eksik.`,say:"Posta kutularına uğra.",cell:at};
+  if(lv.explicit&&passedFin) return {...base,ok:false,fail:last,why:"Bidik bitişe uğradı ama orada durmadı. Programı kısalt ya da Dur bloğu kullan.",cell:at};
+  return {...base,ok:false,fail:last,why:"Program bitti ama görev bitmedi. Programı uzat ya da yolu değiştir.",cell:at};
 }
 
 // --- bölüm üretici ---
+const PATS=[["F","R"],["F","L"],["F","F","R"],["F","F","L"],["F","R","F","L"],["F","L","F","R"]];
+// ardışık İleri'leri (ve İleri döngülerini) en fazla 4'lük Tekrarla bloklarına topla
+function norm(list){
+  const key=b=> (b.t==="F"||b.t==="P")?b.t : (b.t==="rep"&&b.k.length===1&&(b.k[0].t==="F"||b.k[0].t==="P"))?b.k[0].t : null;
+  const u=[]; for(const b of list){ const f=key(b); if(f){ const m=b.t==="rep"?b.n:1; if(u.length&&u[u.length-1].f===f) u[u.length-1].c+=m; else u.push({f,c:m}) } else u.push({b}) }
+  const out=[]; u.forEach(x=>{ if(!x.f){ out.push(x.b); return } let c=x.c; while(c>0){ const k=Math.min(4,c); out.push(k===1?Blok.mk(x.f):Blok.mk("rep",{n:k,k:[Blok.mk(x.f)]})); c-=k } }); return out;
+}
+const runKey=b=> (b.t==="F"||b.t==="P")?b.t : (b.t==="rep"&&b.k.length===1&&(b.k[0].t==="F"||b.k[0].t==="P"))?b.k[0].t : null;
+const overRun=list=>list.some((b,i)=>i>0&&runKey(b)&&runKey(b)===runKey(list[i-1])); // 4'ten uzun İleri/Fonksiyon dizisi (4[F] 2[F]) istemiyoruz
 function units(r,len,opt){
-  const t=[]; let prevTurn=true;
-  while(t.length<len){
+  const t=[]; let prevTurn=true, c=0, guard=0;
+  while(c<len&&guard++<300){
     const roll=r(); let u;
-    if(!prevTurn&&roll<opt.turn) u=[pick(r,["R","L"])];
-    else if(opt.P&&roll<opt.turn+opt.P) u= r()<opt.repP?[pick(r,["2","3"]),"P"]:["P"];
-    else u= opt.rep&&r()<opt.rep?[pick(r,opt.counts||["2","3","4"]),"F"]:["F"];
-    if(t.length+u.length>len+1) continue;
-    t.push(...u); prevTurn=u[0]==="R"||u[0]==="L";
+    if(!prevTurn&&roll<opt.turn) u=[Blok.mk(pick(r,["R","L"]))];
+    else if(opt.P&&roll<opt.turn+opt.P){ const rr=r(); u= rr<(opt.repP||0)?[Blok.mk("rep",{n:pick(r,[2,3]),k:[Blok.mk("P")]})] : rr<(opt.repP||0)+(opt.repPT||0)?[Blok.mk("rep",{n:pick(r,[2,3,4]),k:[Blok.mk("P"),Blok.mk(pick(r,["R","L"]))]})] : [Blok.mk("P")] }
+    else if(opt.pat&&r()<opt.pat){ const p=pick(r,PATS); u=[Blok.mk("rep",{n:pick(r,p.length>=4?[2,3,4]:[2,3]),k:p.map(x=>Blok.mk(x))})] }
+    else u= opt.rep&&r()<opt.rep?[Blok.mk("rep",{n:pick(r,opt.counts||[2,3,4]),k:[Blok.mk("F")]})]:[Blok.mk("F")];
+    const cc=Blok.count(u); if(c+cc>len+2) continue;
+    t.push(...u); c+=cc; prevTurn=u[0].t==="R"||u[0].t==="L";
   }
-  return t;
+  return opt.flat?t:norm(t);
 }
-function simplify(list){
-  const u=[]; let m=1;
-  for(const t of list){ if(/[234]/.test(t)){m*=+t;continue} if(u.length&&u[u.length-1].a===t&&t!=="R"&&t!=="L") u[u.length-1].c+=m; else u.push({a:t,c:m}); m=1 }
-  const out=[];
-  u.forEach(({a,c})=>{ while(c>0){const k=Math.min(4,c); if(k===1) out.push(a); else out.push(String(k),a); c-=k} });
-  return out;
-}
+// programı sınırsız tahtada koştur: geçilen kareler, hareket sayısı, fonksiyon çağrısı sayısı
 function trace(prog,d0){
-  const steps=expand(prog); let x=0,y=0,d=d0; const cells=[[0,0]];
-  for(const s of steps){ if(s.op==="F"){x+=DX[d];y+=DY[d];cells.push([x,y])} else if(s.op==="R") d=(d+1)%4; else d=(d+3)%4 }
-  return {steps,cells};
+  let x=0,y=0,d=d0; const cells=[[0,0]];
+  const env={fn:prog.fn,max:400,cond:()=>false,op:o=>{ if(o==="F"||o==="G"){ const md=o==="G"?OPP(d):d; x+=DX[md]; y+=DY[md]; cells.push([x,y]) } else if(o==="R") d=(d+1)%4; else if(o==="L") d=(d+3)%4; return null }};
+  const {steps,halt}=Blok.run(prog.main,env);
+  return {cells,n:steps.filter(s=>s.kind==="op").length,calls:steps.filter(s=>s.kind==="call").length,halt};
 }
 function seedFor(g,k,r,fixD0){ // g: 0 sıralama, 1 döngü, 2 fonksiyon, 3 usta
   const maxSide=[4,5,6,6][g], minDistinct=[3+Math.round(k*3),6,7,9][g];
   for(let a=0;a<4000;a++){
     let prog;
-    if(g===0) prog={main:units(r,3+Math.round(k*5),{turn:.4}),fn:[]};
-    else if(g===1) prog={main:units(r,5+Math.round(k*4),{turn:.35,rep:.75}),fn:[]};
-    else if(g===2) prog={fn:units(r,3+Math.round(k*2),{turn:.4,rep:.35,counts:["2","3"]}),main:units(r,2+Math.round(k*2),{turn:.25,P:.75,repP:.5})};
-    else prog={fn:units(r,4+Math.round(k*2),{turn:.35,rep:.5,counts:["2","3"]}),main:units(r,3+Math.round(k*3),{turn:.25,P:.7,repP:.6})};
-    if(g>=1){prog.main=simplify(prog.main);prog.fn=simplify(prog.fn)}
-    const last=prog.main[prog.main.length-1]; if(last==="R"||last==="L") continue;
-    if(g>=2){
-      if(!prog.main.includes("P")||!prog.fn.includes("F")||!prog.fn.some(t=>t==="R"||t==="L")) continue;
-      const nCalls=prog.main.reduce((s,t,i)=>s+(t==="P"?(/[234]/.test(prog.main[i-1]||"")?+prog.main[i-1]:1):0),0);
-      if(nCalls<2) continue;
-    }
+    if(g===0) prog={main:units(r,3+Math.round(k*5),{turn:.4,flat:true}),fn:[]};
+    else if(g===1) prog={main:units(r,5+Math.round(k*3),{turn:.35,rep:.75,pat:k<.25?0:.3}),fn:[]};
+    else if(g===2) prog={fn:units(r,3+Math.round(k*2),{turn:.4,rep:.35,counts:[2,3]}),main:units(r,3+Math.round(k*2),{turn:.3,P:.7,repP:.5})};
+    else prog={fn:units(r,4+Math.round(k*2),{turn:.35,rep:.5,counts:[2,3]}),main:units(r,3+Math.round(k*3),{turn:.25,P:.7,repP:.4,repPT:.3})};
+    const last=prog.main[prog.main.length-1]; if(!last||last.t==="R"||last.t==="L") continue;
+    if(g>=1&&(overRun(prog.main)||overRun(prog.fn))) continue;
+    const cm=Blok.count(prog.main), cf=Blok.count(prog.fn);
+    if(g>=2){ const ff=Blok.flat(prog.fn); if(!Blok.flat(prog.main).includes("P")||!ff.includes("F")||!ff.some(t=>t==="R"||t==="L")) continue;
+      if(k>=.3&&prog.main.length<2) continue } // ilk fonksiyon bölümlerinden sonra ana program tek bir döngüden ibaret olmasın
     const d0=fixD0!=null?fixD0:Math.floor(r()*4), tr=trace(prog,d0);
+    if(tr.halt!=="end"&&tr.halt!=="done") continue;
+    if(g>=2&&tr.calls<2) continue;
     const xs=tr.cells.map(c=>c[0]), ys=tr.cells.map(c=>c[1]);
     const w=Math.max(...xs)-Math.min(...xs)+1, h=Math.max(...ys)-Math.min(...ys)+1;
     if(w>maxSide||h>maxSide) continue;
     if(new Set(tr.cells.map(c=>c.join())).size<minDistinct) continue;
     const endC=tr.cells[tr.cells.length-1]; if(endC[0]===0&&endC[1]===0) continue;
-    if(g>=1&&tr.steps.length<prog.main.length+prog.fn.length+2) continue;
-    if(tr.steps.length>70) continue;
+    if(g>=1&&tr.n<cm+cf+2) continue;
+    if(tr.n>70) continue;
     return {prog,d0,cells:tr.cells,w,h,minx:Math.min(...xs),miny:Math.min(...ys)};
   }
   return null;
 }
 // Koşul bölümleri: kendini kesmeyen bir koridor yol, dönüşler renkli kare ya da duvarla işaretli
-function condFor(n,k,r){
+function condFor(n,k,r,o){
   const j=n-SENSOR_FROM+5, sensor=n>=SENSOR_FROM, oneDir= sensor? j<7 : j<2;
   for(let a=0;a<3000;a++){
     const turnDir=pick(r,["R","L"]);
@@ -1671,7 +1822,7 @@ function condFor(n,k,r){
     let x=0,y=0,d=Math.floor(r()*4); const d0=d; const cells=[[0,0]], seen=new Set(["0,0"]), turns=[]; let ok=true;
     for(let s=0;s<nSeg&&ok;s++){
       const len=1+Math.floor(r()*3);
-      for(let j=0;j<len;j++){ x+=DX[d];y+=DY[d]; const key=x+","+y; if(seen.has(key)){ok=false;break} seen.add(key); cells.push([x,y]) }
+      for(let q=0;q<len;q++){ x+=DX[d];y+=DY[d]; const key=x+","+y; if(seen.has(key)){ok=false;break} seen.add(key); cells.push([x,y]) }
       if(s<nSeg-1){ const t=oneDir?turnDir:pick(r,["R","L"]); turns.push({at:cells.length-1,t}); d=t==="R"?(d+1)%4:(d+3)%4 }
     }
     if(!ok) continue;
@@ -1679,29 +1830,41 @@ function condFor(n,k,r){
     const xs=cells.map(c=>c[0]), ys=cells.map(c=>c[1]);
     const w=Math.max(...xs)-Math.min(...xs)+1, h=Math.max(...ys)-Math.min(...ys)+1;
     if(w>6||h>6||cells.length<8) continue;
-    const prog = sensor
-      ? {main:["I","P"],fn: oneDir?["K",turnDir,"F"]:["K",turnDir,"K","2",turnDir,"F"]}
-      : {main:["I","P"],fn: oneDir?[turnDir==="R"?"A":"Y",turnDir,"F"]:["A","R","Y","L","F"]};
-    // tek renk bölümlerinde pembe her zaman sağ, sarı her zaman sol demek
-    return {prog,d0,cells,w,h,minx:Math.min(...xs),miny:Math.min(...ys),turns,sensor};
+    // tek yönlü bölümlerde pembe her zaman sağ, sarı her zaman sol demek
+    let body= sensor ? (oneDir ? (o.elseOk?`?K[${turnDir}]![F]`:`?K[${turnDir}] F`) : `?K[${turnDir}] ?K[2[${turnDir}]] F`)
+                     : (oneDir ? `?${turnDir==="R"?"A":"Y"}[${turnDir}] F` : `?A[R] ?Y[L] F`);
+    if(o.explicit) body="?B[S] "+body;
+    return {prog:{main:Blok.parse(`*[${body}]`),fn:[]},d0,cells,w,h,minx:Math.min(...xs),miny:Math.min(...ys),turns,sensor};
   }
   return null;
 }
-// göreli yolu ekran oklarına çevir (küçük yaşlar için)
-function toAbs(cells,loops){
-  const out=[];
-  for(let i=1;i<cells.length;i++){const dx=cells[i][0]-cells[i-1][0], dy=cells[i][1]-cells[i-1][1]; out.push(dy<0?"N":dx>0?"E":dy>0?"S":"W")}
-  return loops?simplify(out):out;
+// hata avcısı: örnek çözümde bir bloğu boz
+function bugify(lv,r){
+  for(let b=0;b<80;b++){
+    const pre={main:Blok.clone(lv.seed.main),fn:Blok.clone(lv.seed.fn)}, sites=[];
+    const walk=(list,path)=>list.forEach((x,i)=>{ const p=path.concat(i); sites.push({x,p,list,i}); if(x.k) walk(x.k,p.concat("k")); if(x.e) walk(x.e,p.concat("e")) });
+    walk(pre.main,["main"]); walk(pre.fn,["fn"]);
+    const s=pick(r,sites), x=s.x;
+    if(x.t==="R"||x.t==="L") x.t= x.t==="R"?"L":"R";
+    else if(x.t==="rep") x.n=pick(r,[2,3,4].filter(v=>v!==x.n));
+    else if(x.t==="if"&&(x.c==="A"||x.c==="Y")) x.c= x.c==="A"?"Y":"A";
+    else if(x.t==="F"&&s.i>0&&(s.list[s.i-1].t==="R"||s.list[s.i-1].t==="L")){ const prev=s.list[s.i-1]; s.list[s.i-1]=x; s.list[s.i]=prev }
+    else continue;
+    if(!execute(lv,pre).ok){ lv.pre=pre; lv.bugPath=s.p; lv.bug=true; return }
+  }
 }
-function makeLevel(n,seed){
+function byPath(prog,p){ if(!p) return null; let list=prog[p[0]], b=null; for(let i=1;i<p.length;i++){ const q=p[i]; if(q==="k"||q==="e"){ if(!b||!b[q]) return null; list=b[q] } else { b=list[q]; if(!b) return null } } return b }
+const hasElse=list=>list.some(b=>b.e||(b.k&&hasElse(b.k)));
+function makeLevel(n,seed,o){
+  o=o||{}; const explicit=!!o.explicit, elseOk=!!o.elseOk;
   const ch=chOf(n), chi=CH.indexOf(ch), k=(n-ch.from)/Math.max(1,ch.to-ch.from), r=rng(seed!=null?seed:n*104729+77);
-  const cond=!!ch.cond, abs=false;
+  const cond=!!ch.cond;
   // üretici türü: 0 sıra, 1 döngü, 2 fonksiyon, 3 usta
   const g= chi<=1?0 : chi===2?1 : chi===3?2 : 3;
   const kk= chi===0?k*.45 : chi===1?.45+k*.55 : k;
   const north= chi===0&&n<=5; // ilk bölümlerde Bidik yukarı bakar: ekran ve Bidik aynı yönü gösterir
   for(let attempt=0;attempt<60;attempt++){
-    let sd= cond? condFor(n,k,r) : seedFor(g,kk,r,north?0:null);
+    let sd= cond? condFor(n,k,r,{explicit,elseOk}) : seedFor(g,kk,r,north?0:null);
     if(!sd) continue;
     const N=Math.max(5,Math.min(8,Math.max(sd.w,sd.h)+(chi?2:1)));
     const ox=Math.floor(r()*(N-sd.w+1))-sd.minx, oy=Math.floor(r()*(N-sd.h+1))-sd.miny;
@@ -1718,39 +1881,44 @@ function makeLevel(n,seed){
     let paint=null;
     if(cond&&!sd.sensor){ paint={}; sd.turns.forEach(t=>{ paint[pathIdx[t.at]]= t.t==="R"?"A":"Y" }) }
     let pal=ch.pal.slice();
-    if(cond) pal= sd.sensor? ["F","L","R","2","P","I","K"] : ["F","L","R","2","P","I","A","Y"];
-    const lv={n,N,cells,start,fin,d0:sd.d0,coins,seed:sd.prog,chi,ch,pal,paint,sensor:!!sd.sensor,abs,rel:!abs,bug:false,pre:null};
+    if(cond){ pal= sd.sensor? ["F","L","R","rep","inf","if:K"] : ["F","L","R","rep","inf","if:A","if:Y"]; if(explicit) pal.push("if:B","S") }
+    const lv={n,N,cells,start,fin,d0:sd.d0,coins,seed:sd.prog,chi,ch,pal,paint,sensor:!!sd.sensor,bug:false,pre:null,explicit,elseOk:elseOk&&cond&&!!sd.sensor,conds:pal.filter(t=>t.slice(0,3)==="if:").map(t=>t.slice(3))};
     if(!execute(lv,sd.prog).ok) continue;
-    const slack= chi===0?2 : chi===1?1 : chi===2?(n<23?1:0) : chi===3?1 : cond?(n%5===1?1:0) : 0;
-    lv.limits={main:sd.prog.main.length+(cond?1:slack),fn:sd.prog.fn.length+(sd.prog.fn.length?slack:0)};
-    lv.ideal=sd.prog.main.length+sd.prog.fn.length;
-    if(isBug(n)&&seed==null){
-      lv.limits={main:sd.prog.main.length,fn:sd.prog.fn.length};
-      for(let b=0;b<80;b++){
-        const pre={main:sd.prog.main.slice(),fn:sd.prog.fn.slice()};
-        const row=pre.fn.length&&r()<.65?"fn":"main", arr=pre[row], i=Math.floor(r()*arr.length), t=arr[i];
-        if(t==="R"||t==="L") arr[i]=t==="R"?"L":"R";
-        else if(t==="A"||t==="Y") arr[i]=t==="A"?"Y":"A";
-        else if("NESW".includes(t)) arr[i]=pick(r,"NESW".split("").filter(x=>x!==t&&x!==({N:"S",S:"N",E:"W",W:"E"})[t]));
-        else if(/[234]/.test(t)) arr[i]=pick(r,["2","3","4"].filter(x=>x!==t));
-        else if(t==="F"&&i>0&&arr[i-1]!==arr[i]&&!isPre(arr[i-1])) {[arr[i-1],arr[i]]=[arr[i],arr[i-1]]}
-        else continue;
-        if(!execute(lv,pre).ok){lv.pre=pre;lv.bugAt={row,i};lv.bug=true;break}
-      }
-    }
+    const cm=Blok.count(sd.prog.main), cf=Blok.count(sd.prog.fn);
+    const slack= chi===0?2 : chi===1?1 : chi===2?(n<23?1:0) : chi===3?1 : 0;
+    lv.limits={main: cm+(cond?1:slack)+(lv.elseOk&&!hasElse(sd.prog.main)?1:0), fn: cf+(cf?slack:0)};
+    lv.ideal=cm+cf;
+    if(isBug(n)&&seed==null){ lv.limits={main:cm,fn:cf}; bugify(lv,r) }
     return lv;
   }
   throw new Error("Bölüm üretilemedi: "+n);
 }
+// ipucu: iki ağaç arasındaki ilk fark
+function diff(have,want,ctx){
+  const n=Math.max(have.length,want.length);
+  for(let i=0;i<n;i++){
+    const h=have[i], w=want[i];
+    if(!w) return {msg:`${ctx} ${i+1}. bloğu fazla görünüyor.`,bid:h.id};
+    if(!h) return {msg:`${ctx} ${i+1}. bloğu “${Blok.name(w)}” olabilir.`};
+    if(Blok.tok(h)!==Blok.tok(w)) return {msg:`${ctx} ${i+1}. bloğu “${Blok.name(w)}” olabilir.`,bid:h.id};
+    if(h.t==="rep"&&h.n!==w.n) return {msg:`${ctx} ${i+1}. bloğundaki tekrar sayısı ${w.n} olabilir.`,bid:h.id};
+    if(h.k){ const r=diff(h.k,w.k,(h.t==="rep"?"Tekrarla":h.t==="inf"?"Sürekli tekrarla":"Eğer")+" bloğunun içindeki"); if(r) return r }
+    if(!!h.e!==!!w.e) return {msg: w.e?`${ctx} ${i+1}. Eğer bloğuna “değilse” kolu ekle.`:`${ctx} ${i+1}. Eğer bloğunun “değilse” kolu gereksiz.`,bid:h.id};
+    if(h.e){ const r=diff(h.e,w.e,"Değilse kolundaki"); if(r) return r }
+  }
+  return null;
+}
 
 // --- arayüz ---
-let L=null, prog=null, active="main", tries=0, hints=0, sess=null, anim=null, isDaily=false, demo=false, guess=null, predicting=false, guessDone=false, guessRes=null;
+let L=null, prog=null, ed=null, tries=0, hints=0, sess=null, anim=null, isDaily=false, demo=false, guess=null, predicting=false, guessDone=false, guessRes=null;
+const box=()=>$("kProg");
+function freshProg(){ prog=L.pre?{main:Blok.clone(L.pre.main),fn:Blok.clone(L.pre.fn)}:{main:[],fn:[]}; ed=Blok.editor(prog) }
 function start(n,daily){
   isDaily=!!daily;
-  L=daily?makeLevel(n,daily):makeLevel(n);
+  const lvl=levelObj().id, explicit=lvl==="s4", elseOk=lvl==="s3"||lvl==="s4";
+  L=makeLevel(n,daily||null,{explicit,elseOk});
   DEST=(n+(daily?2:0))%DESTS.length;
-  prog=L.pre?{main:L.pre.main.slice(),fn:L.pre.fn.slice()}:{main:[],fn:[]};
-  active="main"; tries=0; hints=0; stop();
+  freshProg(); tries=0; hints=0; stop();
   show("kod");
   $("kTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n;
   $("kSub").textContent=`Kodla Sür · ${L.ch.name}`+(L.bug?" · Hata avcısı":"");
@@ -1758,8 +1926,9 @@ function start(n,daily){
   setFriend("kFriend","kod",n,daily); guess=null; predicting=false; guessDone=false; guessRes=null; goal(); renderBoard(); renderProg(); renderPal(); statsK(); renderSpeedBars(); setNow(null); fitBoard($("kBoard"),$("kRun"));
   if(!daily){
     const bug=()=>{ if(L.bug) seenOnce("kbug",BUG) };
-    const sensor=()=>{ if(n===SENSOR_FROM) seenOnce("k"+SENSOR_FROM,SENSOR_INTRO,bug); else bug() };
-    if(n===L.ch.from) seenOnce("k"+L.ch.from,L.ch.intro,sensor); else sensor();
+    const els=()=>{ if(n===SENSOR_FROM&&L.elseOk) seenOnce("kelse",ELSE_INTRO,bug); else bug() };
+    const sensor=()=>{ if(n===SENSOR_FROM) seenOnce("k"+SENSOR_FROM,SENSOR_INTRO,els); else els() };
+    if(n===L.ch.from) seenOnce("k"+L.ch.from,(L.ch.cond&&explicit)?EXPLICIT_INTRO:L.ch.intro,sensor); else sensor();
   }
 }
 function goal(msg,cls,say){
@@ -1772,9 +1941,9 @@ function goal(msg,cls,say){
     g.textContent=`Bidik ${parts.join(", ")} dönmeli. “Eğer” ve “∞” bloklarıyla tek bir kural yaz.`; return;
   }
   if(L.sensor){g.textContent="Bidik duvara gelince dönmeli. “Eğer önü kapalı” bloğuyla kural yaz.";return}
-  g.textContent=(L.coins.length?"Posta kutularına uğra. ":"")+`${DESTS[DEST].yon[0].toLocaleUpperCase("tr")}${DESTS[DEST].yon.slice(1)} ulaş.`+(L.rel?" Sağ ve sol Bidik'e göredir.":"")+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":"");
+  g.textContent=(L.coins.length?"Posta kutularına uğra. ":"")+`${DESTS[DEST].yon[0].toLocaleUpperCase("tr")}${DESTS[DEST].yon.slice(1)} ulaş.`+(L.chi%2===1||L.chi>2?" Yer az, akıllı kullan!":"");
 }
-const used=()=>prog.main.length+prog.fn.length;
+const used=()=>Blok.count(prog.main)+Blok.count(prog.fn);
 function statsK(){$("kTries").textContent="Deneme: "+tries;$("kHints").textContent="İpucu: "+hints;$("kBlocks").textContent=`Blok: ${used()} · En iyi: ${L.ideal}`}
 function cellXY(i){return [(i%L.N)*100,((i/L.N)|0)*100]}
 function renderBoard(){
@@ -1794,75 +1963,55 @@ function renderBoard(){
   });
   g+=`<polyline id="kTrail" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 16" opacity=".85" points=""/>`;
   g+=`<rect id="kFail" x="3" y="3" width="94" height="94" rx="14" fill="none" stroke="var(--red)" stroke-width="6" stroke-dasharray="10 6" style="display:none"/>`;
-  const badges="";
-  g+=`<g id="kGuess"></g><g id="kCar"><g class="carbody">${CAR}</g>${badges}</g>`;
+  g+=`<g id="kGuess"></g><g id="kCar"><g class="carbody">${CAR}</g></g>`;
   s.innerHTML=`<g id="kWorld">${g}</g>`; placeCar(startState());
 }
 function startState(){const N=L.N;return {x:L.start%N,y:(L.start/N)|0,ang:L.d0*90-90}}
-function placeCar(st){
-  $("kCar").setAttribute("transform",`translate(${st.x*100+50} ${st.y*100+50}) rotate(${st.ang}) scale(1.45)`);
-  const c=L.N*50, w=$("kWorld");
-}
+function placeCar(st){ $("kCar").setAttribute("transform",`translate(${st.x*100+50} ${st.y*100+50}) rotate(${st.ang}) scale(1.45)`) }
 function blink(dir){const c=$("kCar"); if(!c) return; c.classList.remove("blink-L","blink-R"); void c.getBBox; c.classList.add("blink-"+dir); clearTimeout(blink.t); blink.t=setTimeout(()=>c.classList.remove("blink-"+dir),900)}
 function renderProg(){
-  const box=$("kProg"); box.innerHTML="";
-  const rows=[["main","Ana program"]]; if(L.pal.includes("P")) rows.push(["fn","Fonksiyon (F)"]);
-  rows.forEach(([row,label])=>{
-    const lim=L.limits[row];
-    const d=document.createElement("div"); d.className="row"+(active===row?" active":""); d.id="krow-"+row;
-    d.innerHTML=`<div class="row-head"><b>${label}</b><span>${prog[row].length} / ${lim}</span></div><div class="slots"></div>`;
-    const sl=d.querySelector(".slots");
-    for(let i=0;i<lim;i++){
-      const b=document.createElement("button"); const t=prog[row][i];
-      b.className="slot"+(t?" filled":""); b.dataset.row=row; b.dataset.i=i;
-      b.setAttribute("aria-label",t?`${BLK[t].name}, silmek için dokun`:"Boş yer");
-      b.innerHTML=t?blkHTML(t):"";
-      b.onclick=e=>{e.stopPropagation(); if(anim) return; if(t){prog[row].splice(i,1);sfx.erase();resetSess()} active=row; renderProg(); statsK()};
-      sl.appendChild(b);
-    }
-    d.onclick=()=>{active=row;renderProg()};
-    box.appendChild(d);
-  });
+  const rows=[{id:"main",label:"Ana program",lim:L.limits.main}]; if(L.pal.includes("P")) rows.push({id:"fn",label:"Fonksiyon (F)",lim:L.limits.fn});
+  Blok.render(box(),ed,{rows,counts:[2,3,4],conds:L.conds,elseOk:L.elseOk,locked:()=>!!anim,
+    canAdd:(row,n)=>{ if(Blok.count(prog[row])+n>L.limits[row]){ full(row); return false } return true },
+    onChange:changed=>{ if(changed) resetSess(); goal(); renderProg(); statsK() }});
 }
+function full(row){ goal(row==="main"?"Ana programda yer kalmadı. Döngü, fonksiyon ya da koşulla kısaltabilir misin?":"Fonksiyonda yer kalmadı.","bad"); sfx.no(); const r=box().querySelector(`.row[data-row="${row}"]`); if(r){ r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake") } }
 function renderPal(){
-  const p=$("kPal"); p.innerHTML=""; p.style.gridTemplateColumns=`repeat(${Math.min(7,Math.max(5,L.pal.length))},1fr)`;
+  const p=$("kPal"); p.innerHTML=""; p.style.gridTemplateColumns=`repeat(${innerWidth<=480?Math.min(5,Math.max(4,L.pal.length)):Math.min(7,Math.max(5,L.pal.length))},minmax(0,1fr))`;
   L.pal.forEach(t=>{
-    const b=document.createElement("button"); b.className="palbtn";
-    b.innerHTML=blkHTML(t)+`<span>${BLK[t].name}</span>`;
+    const b=document.createElement("button"); b.className="palbtn"; b.setAttribute("aria-label",BLK[t].name);
+    b.innerHTML=Blok.palHTML(t);
     b.onclick=()=>{
-      if(anim) return;
-      if(t==="P"&&active==="fn"){goal("Fonksiyonun içine F konmaz. Ana programa ekle.","bad");sfx.no();return}
-      if(prog[active].length>=L.limits[active]){goal(active==="main"?"Ana programda yer kalmadı. Döngü, fonksiyon ya da koşulla kısaltabilir misin?":"Fonksiyonda yer kalmadı.","bad");sfx.no();const r=$("krow-"+active);r.classList.remove("shake");void r.offsetWidth;r.classList.add("shake");return}
-      prog[active].push(t); sfx.click(); resetSess(); goal(); renderProg(); statsK();
+      if(anim) return; const row=ed.cur.row;
+      if(t==="P"&&row==="fn"){goal("Fonksiyonun içine F konmaz. Ana programa ekle.","bad");sfx.no();return}
+      if(Blok.count(prog[row])>=L.limits[row]){ full(row); return }
+      Blok.insert(ed,t); sfx.click(); resetSess(); goal(); renderProg(); statsK();
     };
     p.appendChild(b);
   });
 }
-function highlight(src,cls){
-  document.querySelectorAll("#kProg .slot.on,#kProg .slot.err").forEach(e=>e.classList.remove("on","err"));
-  (src||[]).forEach(s=>{const el=document.querySelector(`#kProg .slot[data-row="${s.row}"][data-i="${s.i}"]`); if(!el) return; const t=prog[s.row][s.i]; el.classList.add(cls==="err"&&(t==="F"||t==="L"||t==="R")?"err":"on")});
-}
 function setNow(s){
   const el=$("kNow"); if(!el) return;
   if(!s){ el.className="nowbar idle"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="txt">Çalıştır'a bas: Bidik hareket ederken o an çalışan blok burada görünecek.</span>`; return }
-  const inFn=s.src&&s.src.some(x=>x.row==="fn");
-  const label= s.check? `${BLK[s.op].name}? <b style="color:${s.val?"var(--green)":"var(--red)"}">${s.val?"Evet":"Hayır"}</b>` : BLK[s.op].name;
-  el.className="nowbar"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="nb">${blkHTML(s.op)}</span><span class="txt">${label}${inFn?"<small>Fonksiyonun içinde</small>":""}</span>`;
+  const inFn=s.path&&s.path.includes("fn");
+  el.className="nowbar"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="nb">${blkHTML(Blok.stepTok(s))}</span><span class="txt">${Blok.stepLabel(s)}${inFn?"<small>Fonksiyonun içinde</small>":""}</span>`;
 }
-function resetSess(){if(predicting)setPredict(false);$("kProg").classList.remove("running");setNow(null);sess=null;$("kFail").style.display="none";$("kTrail").setAttribute("points","");placeCar(startState());document.querySelectorAll("#kBoard [data-coin]").forEach(e=>e.setAttribute("opacity",1));highlight([])}
+function resetSess(){if(predicting)setPredict(false);box().classList.remove("running");setNow(null);sess=null;$("kFail").style.display="none";$("kTrail").setAttribute("points","");placeCar(startState());document.querySelectorAll("#kBoard [data-coin]").forEach(e=>e.setAttribute("opacity",1));Blok.hl(box(),null);if(box().querySelector(".cnt")) renderProg()}
 function stop(){ if(anim){cancelAnimationFrame(anim.raf);clearTimeout(anim.to);anim=null} sess=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); if(L&&$("kTrail")) resetSess() }
 function ensureSess(){
   if(sess) return sess;
   resetSess(); const res=execute(L,prog);
   sess={steps:res.steps,res,idx:0,trail:[[res.states[0].x,res.states[0].y]]}; return sess;
 }
-const condText=s=>`${BLK[s.op].name}? ${s.val?"Evet":"Hayır"}`;
+const condText=s=>`Eğer ${Blok.COND[s.c].name}? ${s.val?"Evet":"Hayır"}`;
 function animateTo(i,then){
   const a=sess.res.states[i], b=sess.res.states[i+1], s=sess.steps[i];
   const base=(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches?80:380)/getSpeed();
-  $("kProg").classList.add("running"); setNow(s);
-  highlight(s.src);
-  if(s.check){ highlight(s.src); goal(condText(s), s.val?"good":""); anim={to:setTimeout(then,base*.7)}; return }
+  box().classList.add("running"); setNow(s); Blok.hl(box(),s);
+  if(s.kind==="iter"){ Blok.counter(box(),s); anim={to:setTimeout(then,base*.45)}; return }
+  if(s.kind==="call"){ anim={to:setTimeout(then,base*.35)}; return }
+  if(s.kind==="check"){ goal(condText(s), s.val?"good":""); anim={to:setTimeout(then,base*.7)}; return }
+  if(s.op==="S"){ goal("Dur: program burada durdu.","good"); anim={to:setTimeout(then,base*.6)}; return }
   if(!b){ then(); return }
   if(s.op==="L"||s.op==="R"){ blink(s.op); sfx.turn(); }
   let t0=null;
@@ -1879,13 +2028,13 @@ function animateTo(i,then){
   anim={raf:requestAnimationFrame(fr)};
 }
 function finish(){
-  anim=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); $("kProg").classList.remove("running");
+  anim=null; ["kRun","kStep"].forEach(id=>$(id).disabled=false); box().classList.remove("running");
   const res=sess.res;
   let gtxt="";
   if(guess&&guessRes==null){ const f=res.states[res.states.length-1]; guessRes=f.x===guess.x&&f.y===guess.y; bidGuess(guessRes); gtxt=guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. " }
   if(res.ok){sfx.win();win();return}
   if(sess.steps.length) tries++; statsK(); sfx.fail();
-  if(res.fail>=0&&sess.steps[res.fail]) highlight(sess.steps[res.fail].src,"err");
+  if(res.fail>=0&&sess.steps[res.fail]) Blok.hl(box(),sess.steps[res.fail],"err");
   if(res.cell!=null){const [x,y]=cellXY(res.cell);const f=$("kFail");f.setAttribute("x",x+3);f.setAttribute("y",y+3);f.style.display=""}
   goal(gtxt+res.why+(res.fail>=0?" Kırmızı blok hatanın olduğu yer.":""),"bad",res.say?gtxt+res.say+(res.fail>=0?" Kırmızı blok hatanın olduğu yer.":""):null);
   sess.done=true;
@@ -1909,7 +2058,7 @@ $("kRun").onclick=()=>{
   const end=lastIndex();
   if(end<0){finish();return}
   ["kRun","kStep"].forEach(id=>$(id).disabled=true);
-  const go=()=>{ if(sess.idx>end){finish();return} const i=sess.idx++; if(!sess.res.crash||i<end) animateTo(i,go); else {highlight(sess.steps[i].src);finish()} };
+  const go=()=>{ if(sess.idx>end){finish();return} const i=sess.idx++; if(!sess.res.crash||i<end) animateTo(i,go); else {Blok.hl(box(),sess.steps[i]);finish()} };
   go();
 };
 $("kStep").onclick=()=>{
@@ -1920,32 +2069,29 @@ $("kStep").onclick=()=>{
   if(end<0){finish();return}
   const i=sess.idx;
   if(i>end){finish();return}
-  if(sess.res.crash&&i===end){highlight(sess.steps[i].src);finish();return}
+  if(sess.res.crash&&i===end){Blok.hl(box(),sess.steps[i]);finish();return}
   sess.idx++;
   const s=sess.steps[i];
-  if(!s.check) goal(`Adım ${i+1}: ${BLK[s.op].name}`,"quiet");
+  if(s.kind!=="check") goal(`Adım ${i+1}: ${Blok.stepLabel(s).replace(/<[^>]+>/g,"")}`,"quiet");
   animateTo(i,()=>{anim=null; if(sess.idx>end) finish()});
 };
 $("kStop").onclick=()=>{stop();goal()};
 
-$("kClear").onclick=()=>{ if(anim) return; prog=L.pre?{main:L.pre.main.slice(),fn:L.pre.fn.slice()}:{main:[],fn:[]}; resetSess(); goal(); renderProg(); statsK() };
+$("kClear").onclick=()=>{ if(anim) return; freshProg(); resetSess(); goal(); renderProg(); statsK() };
 $("kBack").onclick=()=>{ stop(); isDaily?goHome():backToLevels("kod") };
 $("kHint").onclick=()=>{
   if(anim) return;
   hints++; statsK();
-  if(L.bug){ highlight([L.bugAt]); goal(`İpucu: ${L.bugAt.row==="fn"?"Fonksiyondaki":"Ana programdaki"} ${L.bugAt.i+1}. bloğa bak.`); return }
+  if(L.bug){ const b=byPath(prog,L.bugPath); if(b) Blok.hl(box(),{bid:b.id}); goal("İpucu: işaretli bloğa bak, hata orada.",null,"İpucu: işaretli blok başka bir blok olabilir."); return }
   for(const row of ["main","fn"]){
-    const want=L.seed[row], have=prog[row];
-    for(let i=0;i<want.length;i++) if(have[i]!==want[i]){
-      goal(`İpucu: ${row==="fn"?"Fonksiyonun":"Ana programın"} ${i+1}. bloğu “${BLK[want[i]].name}” olabilir.`,null,"İpucu: işaretli blok başka bir blok olabilir.");
-      return;
-    }
+    const r=diff(prog[row],L.seed[row],row==="fn"?"Fonksiyonun":"Ana programın");
+    if(r){ if(r.bid) Blok.hl(box(),{bid:r.bid}); goal(`İpucu: ${r.msg}`,null,"İpucu: işaretli blok başka bir blok olabilir."); return }
   }
   goal("Programın örnek çözümle aynı. Çalıştır'a bas!","good");
 };
 function win(){
   if(demo){ demo=false; document.querySelectorAll("#kBoard .finish").forEach(e=>e.classList.add("bloom")); goal("Çözüm gösterildi.","good");
-    demoDoneCard("kod",L.n,()=>{prog=L.pre?{main:L.pre.main.slice(),fn:L.pre.fn.slice()}:{main:[],fn:[]}; resetSess(); goal(); renderProg(); statsK()}); return }
+    demoDoneCard("kod",L.n,()=>{freshProg(); resetSess(); goal(); renderProg(); statsK()}); return }
   const first=tries===0&&hints===0, u=used(), minimal=u<=L.ideal, n=L.n;
   const stars=1+(first?1:0)+(minimal?1:0);
   if(isDaily){ const d=P(), key=todayKey(); d.daily[key]=Math.max(d.daily[key]||0,stars); save(); }
@@ -1958,12 +2104,12 @@ function win(){
 }
 $("kSolve").onclick=()=>{
   if(anim) return;
-  stop(); prog={main:L.seed.main.slice(),fn:L.seed.fn.slice()}; hints++; demo=true;
+  stop(); prog={main:Blok.clone(L.seed.main),fn:Blok.clone(L.seed.fn)}; ed=Blok.editor(prog); hints++; demo=true;
   renderProg(); statsK(); goal("Çözüm adım adım gösteriliyor…");
   setTimeout(()=>$("kRun").click(),350);
 };
 $("kTalk").onclick=()=>{ if(!anim) openTalk("kod",L.n) };
-return {start,CH,TOTAL,isBug,makeLevel,execute,BUG,SENSOR_INTRO};
+return {start,CH,TOTAL,isBug,makeLevel,execute,BUG,SENSOR_INTRO,ELSE_INTRO,EXPLICIT_INTRO};
 })();
 
 // =====================================================================
@@ -2517,7 +2663,34 @@ const SES_METIN={
 "bidik pembe karelerde sağa, sarı karelerde sola dönmeli. eğer ve ∞ bloklarıyla tek bir kural yaz.": "fb-bidik-pembe-saga-sari-sola",
 "tarla neden susuz kaldı? suyu boşa harcamadan nasıl sularız?": "fb-pitir-tarla-neden-susuz-kaldi",
 "bütün fidelere uğramak için hangi yoldan gittin? daha kısa bir yol var mı?": "fb-pitir-butun-fidelere-ugramak",
-"kodları karşılaştıralım. bir blok farklı.": "fb-pitir-kodlari-karsilastiralim"
+"kodları karşılaştıralım. bir blok farklı.": "fb-pitir-kodlari-karsilastiralim",
+"bidik, bee-bot gibi çalışır. ileri bloğu bidik'i yüzünün baktığı yöne bir kare götürür. geri bloğu bir kare geri götürür. sola dön ve sağa dön, bidik'i yerinde çeyrek tur döndürür. antenlerine bak: mavi anten sol, pembe anten sağ. bloğa dokun, programa eklenir; programdaki bir bloğu silmek için ona iki kez dokun.": "kod-giris-0b",
+"döngü: tekrarla. aynı blokları üst üste koymak yerine turuncu tekrarla bloğunun içine koy. üstündeki sayıya dokun: kaç kez tekrarlanacağını seçersin. içine birden çok blok da koyabilirsin. programda yer az, döngü kullanmak zorundasın.": "kod-giris-2b",
+"fonksiyon: kendi bloğun. tekrar eden bir hareket grubunu mor fonksiyon satırına bir kez yaz. ana programdaki f bloğu o satırın tamamını çalıştırır. f bloğunu tekrarla bloğunun içine koyarsan fonksiyon üç kez de çalışır.": "kod-giris-3b",
+"eğer: duruma göre karar. eğer pembe kare bloğunun içindeki bloklar sadece bidik pembe karedeyken çalışır. sürekli tekrarla bloğu içindekileri bidik bitişe varana kadar tekrar tekrar çalıştırır. tek bir akıllı kural bütün yolu çözer.": "kod-giris-4b",
+"eğer: duruma göre karar. eğer pembe kare bloğunun içindeki bloklar sadece bidik pembe karedeyken çalışır. sürekli tekrarla bloğu içindekileri durmadan tekrar eder; bidik bitişe gelince durması için içine eğer bitişte: dur koy. tek bir akıllı kural bütün yolu çözer.": "kod-giris-4c",
+"eğer önü kapalı. artık renkli kare yok. bidik önüne bakar: önünde engel ya da duvar varsa bu bloğun içindekiler çalışır. gerçek robot süpürgeler de böyle düşünür.": "kod-giris-sensor-b",
+"değilse. eğer bloğuna bir değilse kolu ekleyebilirsin: koşul doğruysa üst kol, değilse alt kol çalışır. eğer önü kapalı ise sağa dön, değilse ileri git bütün koridoru tek kuralla gezer.": "kod-giris-else",
+"hepsi bir arada. döngüleri ve fonksiyonları birlikte kullan; tekrarla bloğunun içine fonksiyon ve dönüş de koyabilirsin. yer çok az: en kısa programı bulan kazanır. büyükler için de zor.": "kod-giris-5b",
+"tekrarla. kısa bir kodu tekrarla bloğunun içine yaz; üstündeki sayıya dokunup kaç kez tekrar edeceğini seç. ileri ve sağa dön bloklarını dört kere tekrarla: kare olur.": "giris-kalem-5b",
+"çiçekler susadı. arılar azalınca çiçekler tozlaşamıyor. bidik'i bütün solgun çiçeklere götür, polen taşısın. aynı hareket tekrar ediyorsa tekrarla bloğunu dene.": "giris-cicek-1b",
+"tekrarla bloğu. turuncu tekrarla bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. sayıya dokununca değişir. ileri, ileri, ileri yerine tekrarla 3: ileri.|Kurbağa Kuki": "giris-golet-6b",
+"tekrarla bloğu. turuncu tekrarla bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. sayıya dokununca değişir. ileri, ileri, ileri yerine tekrarla 3: ileri.|Arı Bal": "giris-cicek-6b",
+"tekrarla bloğu. turuncu tekrarla bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. sayıya dokununca değişir. ileri, ileri, ileri yerine tekrarla 3: ileri.|Sincap Fındık": "giris-orman-6b",
+"tekrarla bloğu. turuncu tekrarla bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. sayıya dokununca değişir. ileri, ileri, ileri yerine tekrarla 3: ileri.|Karga Kara": "giris-donusum-6b",
+"tekrarla bloğu. turuncu tekrarla bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. sayıya dokununca değişir. ileri, ileri, ileri yerine tekrarla 3: ileri.|Ateşböceği Işıl": "giris-gece-6b",
+"tekrarla bloğu. turuncu tekrarla bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. sayıya dokununca değişir. ileri, ileri, ileri yerine tekrarla 3: ileri.": "giris-golet-6b",
+"eğer pembe kare? evet": "fb-bidik-eger-pembe-kare-evet",
+"eğer pembe kare? hayır": "fb-bidik-eger-pembe-kare-hayir",
+"eğer sarı kare? evet": "fb-bidik-eger-sari-kare-evet",
+"eğer sarı kare? hayır": "fb-bidik-eger-sari-kare-hayir",
+"eğer önü kapalı? evet": "fb-bidik-eger-onu-kapali-evet",
+"eğer önü kapalı? hayır": "fb-bidik-eger-onu-kapali-hayir",
+"eğer bitişte? evet": "fb-bidik-eger-bitiste-evet",
+"eğer bitişte? hayır": "fb-bidik-eger-bitiste-hayir",
+"bidik bitişe geldi ama durmadı. döngünün içine eğer bitişte: dur koy.": "fb-bidik-bitise-geldi-ama-durmadi",
+"bidik bitişe uğradı ama orada durmadı. programı kısalt ya da dur bloğu kullan.": "fb-bidik-bitise-ugradi-ama-durmadi",
+"dur: program burada durdu.": "fb-bidik-dur-program-burada-durdu"
 };
 const SES_DOSYA=new Set(["bolge-1-bilgi", "bolge-1-sorun", "bolge-2-bilgi", "bolge-2-sorun", "bolge-3-bilgi", "bolge-3-sorun", "bolge-4-bilgi", "bolge-4-sorun", "bolge-5-bilgi", "bolge-5-sorun", "bolge-6-bilgi", "bolge-6-sorun", "bolge-7-bilgi", "bolge-7-sorun", "fb-bal-bidik-tahmin-ettigin-karede", "fb-bal-bidik-tarlanin-disina-cikti", "fb-bal-caliya-takildi", "fb-bal-cozum-adim-adim-gosteriliyor", "fb-bal-kirmizi-blok-hatanin-oldugu", "fb-bal-olmadi-bir-daha-dene", "fb-bal-once-program-yaz", "fb-bal-once-tahmin-et-bidik-en-son", "fb-bal-program-bitti-ama-gorev-bitm", "fb-bal-programda-yer-kalmadi-daha-k", "fb-bal-programda-yer-kalmadi-tekrar", "fb-bal-tahminin-dogru-bidik-tam-o-k", "fb-bal-tebrikler", "fb-bal-tekrar-blogundan-sonra-bir-h", "fb-bidik-banka-carpti", "fb-bidik-bidik-duvara-gelince-donmeli", "fb-bidik-bidik-meydanin-disina-cikti", "fb-bidik-bidik-suya-dustu-nehirden-ko", "fb-bidik-bidik-tahmin-ettigin-karede", "fb-bidik-bidik-tahtanin-disina-cikti", "fb-bidik-bitise-yanlis-taraftan-gelin", "fb-bidik-bu-parca-dogru-yone-bakmiyor", "fb-bidik-burada-saksi-yok", "fb-bidik-cozum-adim-adim-gosteriliyor", "fb-bidik-cozum-adim-adim-kuruluyor", "fb-bidik-cozum-gosterildi", "fb-bidik-dongu-hic-bitmiyor-bidik-bit", "fb-bidik-dongunun-ici-bos-bidik-hic-h", "fb-bidik-enerji-bitti-daha-kisa-bir-y", "fb-bidik-fonksiyonun-icine-f-konmaz-a", "fb-bidik-harika-bidik-hastaneye-ulast", "fb-bidik-harika-bidik-kutuphaneye-ula", "fb-bidik-harika-bidik-okula-ulasti", "fb-bidik-harika-bidik-parka-ulasti", "fb-bidik-harika-bidik-pazara-ulasti", "fb-bidik-harika-program-calisti-bidik", "fb-bidik-harika-program-calisti-bidik-2", "fb-bidik-harika-program-calisti-bidik-3", "fb-bidik-harika-program-calisti-bidik-4", "fb-bidik-harika-program-calisti-bidik-5", "fb-bidik-ipucu-ana-1", "fb-bidik-ipucu-ana-10", "fb-bidik-ipucu-ana-2", "fb-bidik-ipucu-ana-3", "fb-bidik-ipucu-ana-4", "fb-bidik-ipucu-ana-5", "fb-bidik-ipucu-ana-6", "fb-bidik-ipucu-ana-7", "fb-bidik-ipucu-ana-8", "fb-bidik-ipucu-ana-9", "fb-bidik-ipucu-bir-parca-kilitlendi", "fb-bidik-ipucu-fn-1", "fb-bidik-ipucu-fn-10", "fb-bidik-ipucu-fn-2", "fb-bidik-ipucu-fn-3", "fb-bidik-ipucu-fn-4", "fb-bidik-ipucu-fn-5", "fb-bidik-ipucu-fn-6", "fb-bidik-ipucu-fn-7", "fb-bidik-ipucu-fn-8", "fb-bidik-ipucu-fn-9", "fb-bidik-ipucu-isaretli-blok-baska-bi", "fb-bidik-kapi-kilitli-once-anahtarin", "fb-bidik-kapi-ve-tabelalar-sabittir", "fb-bidik-kavsak-her-yone-acik-dondurm", "fb-bidik-kilitli-parcalar-ipucudur-de", "fb-bidik-kirmizi-blok-hatanin-oldugu", "fb-bidik-kopru-sadece-suyun-ustune-ko", "fb-bidik-kurdugun-yol-cozumle-ayni-ca", "fb-bidik-olmadi-bir-daha-dene", "fb-bidik-once-program-yaz", "fb-bidik-once-tahmin-et-bidik-en-son", "fb-bidik-program-bitti-ama-atiklar-ha", "fb-bidik-program-bitti-ama-gorev-bitm", "fb-bidik-program-bos-once-asagidan-bl", "fb-bidik-programda-yer-kalmadi-daha-k", "fb-bidik-programda-yer-kalmadi-tekrar", "fb-bidik-programin-ornek-cozumle-ayni", "fb-bidik-suyun-ustune-sadece-kopru-ko", "fb-bidik-tahminin-dogru-bidik-tam-o-k", "fb-bidik-tebrikler", "fb-bidik-tek-yon-bu-yoldan-okun-tersi", "fb-bidik-tekrar-blogundan-sonra-bir-h", "fb-bidik-tunele-yandan-girilmez-agzin", "fb-bidik-yanlis-kutu-atigin-rengine-b", "fb-bidik-yol-burada-bitiyor-bir-parca", "fb-bidik-yol-cok-karisik", "fb-findik-bidik-kagittan-cikti-kodu-ko", "fb-findik-bidik-ormanin-disina-cikti", "fb-findik-bidik-tahmin-ettigin-karede", "fb-findik-burada-cukur-yok-fidan-dikil", "fb-findik-buyuk-kare-biciminde-orman-k", "fb-findik-cizgi-biciminde-fidan-dik-ke", "fb-findik-cozum-adim-adim-gosteriliyor", "fb-findik-fidanlar-desene-uymadi-kesik", "fb-findik-kapi-biciminde-orman-kisa-bi", "fb-findik-kare-biciminde-fidan-dik-kes", "fb-findik-kirmizi-blok-hatanin-oldugu", "fb-findik-kopru-biciminde-fidan-dik-ke", "fb-findik-kucuk-kare-biciminde-orman-k", "fb-findik-kutuge-carpti", "fb-findik-l-harfi-biciminde-fidan-dik", "fb-findik-merdiven-biciminde-orman-kis", "fb-findik-olmadi-bir-daha-dene", "fb-findik-once-program-yaz", "fb-findik-once-tahmin-et-bidik-en-son", "fb-findik-program-bitti-ama-gorev-bitm", "fb-findik-programda-yer-kalmadi-daha-k", "fb-findik-programda-yer-kalmadi-tekrar", "fb-findik-programda-yer-kalmadi-tekrar-2", "fb-findik-tahminin-dogru-bidik-tam-o-k", "fb-findik-tebrikler", "fb-findik-tekrar-blogundan-sonra-bir-h", "fb-findik-tekrarla-2", "fb-findik-tekrarla-3", "fb-findik-tekrarla-4", "fb-isil-banka-carpti", "fb-isil-bidik-sokaktan-cikti", "fb-isil-bidik-tahmin-ettigin-karede", "fb-isil-cozum-adim-adim-gosteriliyor", "fb-isil-enerji-bitti-daha-kisa-bir-y", "fb-isil-kirmizi-blok-hatanin-oldugu", "fb-isil-olmadi-bir-daha-dene", "fb-isil-once-program-yaz", "fb-isil-once-tahmin-et-bidik-en-son", "fb-isil-program-bitti-ama-gorev-bitm", "fb-isil-programda-yer-kalmadi-daha-k", "fb-isil-programda-yer-kalmadi-tekrar", "fb-isil-tahminin-dogru-bidik-tam-o-k", "fb-isil-tebrikler", "fb-isil-tekrar-blogundan-sonra-bir-h", "fb-kara-bidik-alanin-disina-cikti", "fb-kara-bidik-tahmin-ettigin-karede", "fb-kara-cozum-adim-adim-gosteriliyor", "fb-kara-kirmizi-blok-hatanin-oldugu", "fb-kara-kolilere-carpti", "fb-kara-olmadi-bir-daha-dene", "fb-kara-once-program-yaz", "fb-kara-once-tahmin-et-bidik-en-son", "fb-kara-program-bitti-ama-atiklar-ha", "fb-kara-program-bitti-ama-gorev-bitm", "fb-kara-programda-yer-kalmadi-daha-k", "fb-kara-programda-yer-kalmadi-tekrar", "fb-kara-tahminin-dogru-bidik-tam-o-k", "fb-kara-tebrikler", "fb-kara-tekrar-blogundan-sonra-bir-h", "fb-kara-yanlis-kutu-atigin-rengine-b", "fb-kiko-tebrikler", "fb-kuki-bidik-golun-disina-cikti", "fb-kuki-bidik-tahmin-ettigin-karede", "fb-kuki-cozum-adim-adim-gosteriliyor", "fb-kuki-kirmizi-blok-hatanin-oldugu", "fb-kuki-olmadi-bir-daha-dene", "fb-kuki-once-program-yaz", "fb-kuki-once-tahmin-et-bidik-en-son", "fb-kuki-program-bitti-ama-gorev-bitm", "fb-kuki-programda-yer-kalmadi-daha-k", "fb-kuki-programda-yer-kalmadi-tekrar", "fb-kuki-tahminin-dogru-bidik-tam-o-k", "fb-kuki-tasa-carpti", "fb-kuki-tebrikler", "fb-kuki-tekrar-blogundan-sonra-bir-h", "fb-pitir-bidik-tahmin-ettigin-karede", "fb-pitir-blok-hatali-1", "fb-pitir-blok-hatali-10", "fb-pitir-blok-hatali-2", "fb-pitir-blok-hatali-3", "fb-pitir-blok-hatali-4", "fb-pitir-blok-hatali-5", "fb-pitir-blok-hatali-6", "fb-pitir-blok-hatali-7", "fb-pitir-blok-hatali-8", "fb-pitir-blok-hatali-9", "fb-pitir-bu-blogun-yerine-hangisi-gel", "fb-pitir-bu-blok-dogru-gorunuyor-iki", "fb-pitir-cozum-adim-adim-gosteriliyor", "fb-pitir-farkli-1", "fb-pitir-farkli-2", "fb-pitir-farkli-3", "fb-pitir-farkli-4", "fb-pitir-farkli-5", "fb-pitir-farkli-6", "fb-pitir-farkli-7", "fb-pitir-farkli-8", "fb-pitir-geri-olmaz-robot-a-nin-kodun", "fb-pitir-geri-olmaz-robot-b-nin-kodun", "fb-pitir-hangi-robot-kuru-fideye-ulas", "fb-pitir-iki-robot-da-kuru-fideye-ula", "fb-pitir-ileri-olmaz-robot-a-nin-kodu", "fb-pitir-ileri-olmaz-robot-b-nin-kodu", "fb-pitir-kirmizi-blok-hatanin-oldugu", "fb-pitir-olmadi-bir-daha-dene", "fb-pitir-once-degistirmek-istedigin-b", "fb-pitir-once-program-yaz", "fb-pitir-once-tahmin-et-bidik-en-son", "fb-pitir-program-bitti-ama-gorev-bitm", "fb-pitir-programda-yer-kalmadi-daha-k", "fb-pitir-programda-yer-kalmadi-tekrar", "fb-pitir-robot-a-blok-1", "fb-pitir-robot-a-blok-2", "fb-pitir-robot-a-blok-3", "fb-pitir-robot-a-blok-4", "fb-pitir-robot-a-blok-5", "fb-pitir-robot-a-blok-6", "fb-pitir-robot-a-blok-7", "fb-pitir-robot-a-blok-8", "fb-pitir-robot-a-kuru-fideye-ulasti-o", "fb-pitir-robot-a-takildi-kodunda-hata", "fb-pitir-robot-a-takildi-tahmin-tutma", "fb-pitir-robot-b-blok-1", "fb-pitir-robot-b-blok-2", "fb-pitir-robot-b-blok-3", "fb-pitir-robot-b-blok-4", "fb-pitir-robot-b-blok-5", "fb-pitir-robot-b-blok-6", "fb-pitir-robot-b-blok-7", "fb-pitir-robot-b-blok-8", "fb-pitir-robot-b-kuru-fideye-ulasti-o", "fb-pitir-robot-b-takildi-kodunda-hata", "fb-pitir-robot-b-takildi-tahmin-tutma", "fb-pitir-robot-tarlanin-disina-cikti", "fb-pitir-saga-don-olmaz-robot-a-nin-k", "fb-pitir-saga-don-olmaz-robot-b-nin-k", "fb-pitir-sola-don-olmaz-robot-a-nin-k", "fb-pitir-sola-don-olmaz-robot-b-nin-k", "fb-pitir-tahminin-dogru-bidik-tam-o-k", "fb-pitir-tahminin-dogru-robot-a-takil", "fb-pitir-tahminin-dogru-robot-b-takil", "fb-pitir-tasa-carpti", "fb-pitir-tebrikler", "fb-pitir-tekrar-blogundan-sonra-bir-h", "fb-pitir-yaris-basladi", "film-1-gorev", "film-1-katki", "film-1-sorun", "film-2-gorev", "film-2-katki", "film-2-sorun", "film-3-gorev", "film-3-katki", "film-3-sorun", "film-4-gorev", "film-4-katki", "film-4-sorun", "film-5-gorev", "film-5-katki", "film-5-sorun", "film-6-gorev", "film-6-katki", "film-6-sorun", "film-7-gorev", "film-7-katki", "film-7-sorun", "final-senlik", "genel-hosgeldin", "genel-oyna", "geri-basari-1", "geri-basari-2", "geri-basari-3", "geri-hata-carpti", "geri-hata-cukur", "geri-hata-disari", "geri-hata-eksik", "geri-hata-enerji", "geri-hata-tekrar", "geri-hata-yanlis-kutu", "geri-tekrar-1", "geri-tekrar-2", "giris-cicek-1", "giris-cicek-6", "giris-donusum-1", "giris-donusum-6", "giris-gece-1", "giris-gece-6", "giris-golet-1", "giris-golet-6", "giris-kalem-1", "giris-kalem-5", "giris-orman-1", "giris-orman-6", "giris-senlik-1", "giris-senlik-2", "giris-senlik-3", "giris-senlik-4", "giris-senlik-5", "giris-tarla-1", "giris-tarla-4", "giris-yaris-1", "gorev-cicek", "gorev-donusum", "gorev-gece", "gorev-golet", "gorev-orman", "gorev-senlik-1", "gorev-senlik-2", "gorev-senlik-3", "gorev-senlik-4", "gorev-senlik-5", "gorev-tarla", "gorev-tarla-sula", "kod-ek-goreli", "kod-ek-posta", "kod-ek-yer", "kod-giris-0", "kod-giris-1", "kod-giris-2", "kod-giris-3", "kod-giris-4", "kod-giris-5", "kod-giris-hata", "kod-giris-sensor", "kod-hedef-hastane", "kod-hedef-kutuphane", "kod-hedef-okul", "kod-hedef-park", "kod-hedef-pazar", "konus-cicek", "konus-donusum", "konus-gece", "konus-golet", "konus-hata", "konus-kalem-1", "konus-kalem-2", "konus-kod-1", "konus-kod-2", "konus-kod-3", "konus-kod-4", "konus-kod-5", "konus-kod-6", "konus-orman", "konus-senlik-1", "konus-senlik-2", "konus-senlik-3", "konus-senlik-4", "konus-senlik-5", "konus-tarla", "konus-yaris", "konus-yol-1", "konus-yol-2", "konus-yol-3", "konus-yol-4", "tahmin-dogru", "tahmin-sor", "tahmin-yanlis", "tesekkur-1", "tesekkur-2", "tesekkur-3", "tesekkur-4", "tesekkur-5", "tesekkur-6", "tesekkur-7", "yol-ek-anahtar", "yol-ek-kopru", "yol-ek-posta", "yol-ek-tekyon", "yol-ek-tunel", "yol-giris-1", "yol-giris-14", "yol-giris-18", "yol-giris-23", "yol-giris-28", "yol-giris-4", "yol-giris-6", "yol-giris-8", "yol-hedef-hastane", "yol-hedef-kutuphane", "yol-hedef-okul", "yol-hedef-park", "yol-hedef-pazar"]);
 function sesAnahtar(t){ return String(t||"").replace(/<[^>]+>/g,"").replace(/\s*\([^)]*\)/g,"").replace(/[\u2010\u2011\u2012\u2013]/g,"-").replace(/[“”"]/g,"").replace(/…/g,"...").replace(/×/g," kere ").replace(/\b2 kere/g,"iki kere").replace(/\b3 kere/g,"üç kere").replace(/\b4 kere/g,"dört kere").toLocaleLowerCase("tr").replace(/!/g,".").replace(/\s+([,.;:!?])/g,"$1").replace(/\s+/g," ").trim() }
@@ -3018,7 +3191,7 @@ const FILM={
      blocks:["F","F","R"],props:["sise","teneke","poset"]},
   3:{gorev:"Görevin: Bidik'i bütün solgun çiçeklere götür, arılar için polen taşısın.",
      katki:"Çiçeklere polen taşırsan arılar mutlu olacak, bahçelerde meyve ve sebze yetişecek. Böylece herkesin sofrasına yiyecek gelmesine yardım etmiş olacaksın!",
-     blocks:["F","3","F"],props:["solcicek","solcicek","solcicek"]},
+     blocks:["F","3[F]"],props:["solcicek","solcicek","solcicek"]},
   4:{gorev:"Görevin: Bidik'i çukurlara götür ve Fidan dik bloğuyla ağaç dik.",
      katki:"Diktiğin her fidan büyüyüp ağaç olacak, havamızı temizleyecek, hayvanlara yuva olacak. Böylece dünyamızı korumuş olacaksın!",
      blocks:["F","D","R"],props:["kutuk","kutuk","kutuk"]},
@@ -3027,7 +3200,7 @@ const FILM={
      blocks:["F","R","F"],props:["w:sari","w:mavi","w:yesil"]},
   6:{gorev:"Görevin: En kısa yoldan git, boşuna yanan lambaları söndür, enerjiyi koru.",
      katki:"Boşuna yanan lambaları söndürürsen enerji boşa gitmeyecek. Böylece dünyamızın havasını korumuş olacaksın!",
-     blocks:["F","L","2"],props:["lamba","lamba","lamba"]},
+     blocks:["F","L","2[F]"],props:["lamba","lamba","lamba"]},
   7:{gorev:"Görevin: Sulama programındaki hatayı bul, düzelt ve tarlayı sula.",
      katki:"Tarlayı doğru sularsan su boşa gitmeyecek, sebzeler büyüyecek. Böylece hem suyu korumuş hem de herkese yiyecek yetiştirmiş olacaksın!",
      blocks:["F","R","F"],props:["kuru","kuru","kuru"]}
@@ -3067,7 +3240,7 @@ function propArt(k){
 function filmBlock(t){
   if(t==="yol-duz") return `<span class="blk" style="background:#6b7685"><svg viewBox="0 0 24 24"><path d="M12 3v18" stroke="#fff" stroke-width="2.4" stroke-dasharray="3 3"/></svg></span>`;
   if(t==="yol-viraj") return `<span class="blk" style="background:#6b7685"><svg viewBox="0 0 24 24" fill="none"><path d="M12 22 A10 10 0 0 1 22 12" stroke="#fff" stroke-width="2.4" stroke-dasharray="3 3"/></svg></span>`;
-  if(t==="D") return window.__gorev&&window.__gorev.bH?window.__gorev.bH("D"):blkHTML("F");
+  if(t.includes("[")) return Blok.html(Blok.parse(t),false);
   return blkHTML(t);
 }
 const SKA_COCUK={2:"Herkese yiyecek",6:"Temiz su",7:"Temiz enerji",9:"Güvenli yollar",11:"Güzel şehirler",12:"Atıkları azalt",13:"İklimi koru",14:"Sudaki canlılar",15:"Karadaki canlılar",17:"Hep birlikte"};
@@ -3116,7 +3289,7 @@ function playFilm(no,then){
       <div class="fprops">${F.props.map((p,i)=>`<svg viewBox="0 0 100 100" style="--i:${i}">${propArt(p)}</svg>`).join("")}</div>
       <div class="ffriend" style="background:${w.land}">${animalSVG(no)}</div>
       <div class="fbidik"><svg viewBox="-50 -50 100 100"><g transform="rotate(0) scale(1.3)">${ROBOT}</g></svg></div>
-      <div class="fprog">${F.blocks.map((t,i)=>`<span class="fb" style="--i:${i}">${filmBlock(t)}</span>`).join("")}</div>
+      <div class="fprog">${F.blocks.map((t,i)=>`<span class="fb${t.includes("[")?" wide":""}" style="--i:${i}">${filmBlock(t)}</span>`).join("")}</div>
       <div class="fska">${nums.map(skaBadge).join("")}</div>
       <div class="fspark">${Array.from({length:14},(_,i)=>`<i style="--x:${(i*37)%100}%;--y:${(i*53)%80+5}%;--d:${(i%7)*.18}s"></i>`).join("")}</div>
     </div>
@@ -3275,38 +3448,48 @@ regAct("yaris",{
   }
 });
 })();
-// ===== Kalem Bidik (Avrupa · Baykuş Bilge) =====
+// ===== Kalem Bidik (Orman · Sincap Fındık): Fidanlarla Desen =====
 (function(){
 const DX=[0,1,0,-1], DY=[-1,0,1,0];
-const B={F:["İleri","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>']};
-const bHTML=t=>`<span class="blk ${B[t][1]}" aria-label="${B[t][0]}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${B[t][2]}</svg></span>`;
 const LV={
   1:{name:"Çizgi",sol:"FFF",x:1,s:[2,4]},2:{name:"L harfi",sol:"FFRFF",x:1,s:[1,4]},3:{name:"Köprü",sol:"FFRFFRFF",x:1,s:[1,4]},
   4:{name:"Kare",sol:"FFRFFRFFRFF",x:1,s:[1,4]},5:{name:"Küçük kare",sol:"FR",x:4,s:[2,3],rep:true},6:{name:"Büyük kare",sol:"FFR",x:4,s:[1,4],rep:true},
   7:{name:"Merdiven",sol:"FRFL",x:3,s:[0,5],rep:true},8:{name:"Kapı",sol:"FFFRFR",x:2,s:[1,5],rep:true}
 };
-const NP=6, CS=80, PAD=40;
-function run(L,prog,x){
-  let px=L.s[0],py=L.s[1],d=0; const segs=[], steps=[[px,py,d]];
-  for(let k=0;k<x;k++) for(const c of prog){
+const NP=6, CS=80, PAD=40, LIM=12;
+// hedef desen: düz komut dizisi x kez
+function runFlat(L,cmds,x){
+  let px=L.s[0],py=L.s[1],d=0; const segs=[];
+  for(let k=0;k<x;k++) for(const c of cmds){
     if(c==="L") d=(d+3)%4; else if(c==="R") d=(d+1)%4;
-    else { const nx=px+DX[d], ny=py+DY[d]; if(nx<0||ny<0||nx>=NP||ny>=NP) return {segs,steps,out:true}; segs.push([px,py,nx,ny]); px=nx; py=ny }
-    steps.push([px,py,d]);
+    else { const nx=px+DX[d], ny=py+DY[d]; if(nx<0||ny<0||nx>=NP||ny>=NP) return {segs,out:true}; segs.push([px,py,nx,ny]); px=nx; py=ny }
   }
-  return {segs,steps,out:false};
+  return {segs,out:false};
+}
+// çocuğun programı (blok ağacı): adım listesi + çizilen parçalar
+function runT(L,main){
+  let px=L.s[0],py=L.s[1],d=0; const segs=[], pts=[[px,py,d]]; let out=false;
+  const env={max:400,cond:()=>false,op:c=>{ if(c==="L") d=(d+3)%4; else if(c==="R") d=(d+1)%4; else { const nx=px+DX[d], ny=py+DY[d]; if(nx<0||ny<0||nx>=NP||ny>=NP){ out=true; return "out" } segs.push([px,py,nx,ny]); px=nx; py=ny } return null },after:()=>pts.push([px,py,d])};
+  const r=Blok.run(main,env);
+  return {segs,steps:r.steps,pts,out};
 }
 const key=s=>{ const a=[s[0],s[1]].join(","), b=[s[2],s[3]].join(","); return a<b?a+"|"+b:b+"|"+a };
+const inner=st=>st.frame?st.frame.k:st.main;      // çocuğun yazdığı kod (Tekrarla içi)
+const used=st=>Blok.count(st.main)-(st.frame?1:0);
+function resetDraw(st){ st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; st.cur=null }
 regAct("kalem",{
   title:"Fidanlarla Desen", durak:4, N:8, speed:true,
   parts:[{name:"Fidan Sırası",sub:"Bidik yürüdüğü yere fidan diker",from:1,to:4},{name:"Tekrarla Orman Kur",sub:"Kısa kod, tekrar sayısı: büyük orman deseni",from:5,to:8}],
   doneText:"Orman deseni tamam",
   talk:n=> n<=4?"Kare biçiminde orman kurmak için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi? Ağaçlar kasabaya ne kazandırır?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık nasıl bir desen çıkardı? (İklim eylemi)",
   intro:n=> n===1?{key:"p1",kicker:"Orman",title:"Fidanlarla desen",art:`<path d="M30 80 V30 H70" stroke="#a8693d" stroke-width="8" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Sincap Fındık Bidik'e fidan dolu bir çanta verdi! Bidik <b>İleri</b> gidince geçtiği yere sıra sıra fidan diker. Kesikli çizgideki orman desenini kuracak kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
-        : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrar",art:`<rect x="30" y="30" width="40" height="40" fill="none" stroke="#e0457b" stroke-width="6"/>`,text:"Kısa bir kod yaz, kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını dört kere tekrarla: kare olur!"}:null,
-  setup(n){ const L=LV[n], tg=run(L,L.sol.split(""),L.x); return {n,L,runAt:-1,target:new Set(tg.segs.map(key)),tsegs:tg.segs,prog:[],x:L.rep?1:1,drawn:[],pos:[L.s[0],L.s[1],0],running:false,err:null} },
-  goal(st){ return st.L.rep?`${st.L.name} biçiminde orman: kısa bir kod yaz, tekrar sayısını seç.`:`${st.L.name} biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.` },
+        : n===5?{key:"p2",kicker:"Yeni blok",title:"Tekrarla",ex:"4[F R]",text:"Kısa bir kodu Tekrarla bloğunun içine yaz; üstündeki sayıya dokunup kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını dört kere tekrarla: kare olur!"}:null,
+  setup(n){ const L=LV[n], tg=runFlat(L,L.sol.split(""),L.x);
+    const frame=L.rep?Blok.mk("rep",{n:1,k:[]}):null, main=frame?[frame]:[], ed=Blok.editor({main}); if(frame) ed.cur={row:"main",list:frame.k,i:0};
+    return {n,L,target:new Set(tg.segs.map(key)),tsegs:tg.segs,main,frame,ed,drawn:[],pos:[L.s[0],L.s[1],0],cur:null,running:false} },
+  goal(st){ return st.L.rep?`${st.L.name} biçiminde orman: Tekrarla bloğunun içine kısa bir kod yaz, sayısına dokunup tekrar sayısını seç.`:`${st.L.name} biçiminde fidan dik: kesikli çizgiyi izleyecek kodu yaz.` },
   checkLabel(){ return "Çiz" },
-  info(st){ return `Blok: ${st.prog.length}` },
+  info(st){ return `Blok: ${used(st)}` },
   render(st){
     const W=PAD*2+(NP-1)*CS, P=v=>PAD+v*CS;
     let s=`<svg class="board agrid kalemb" viewBox="0 0 ${W} ${W}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${W}" rx="22" fill="#a8dc8a"/><rect x="6" y="6" width="${W-12}" height="${W-12}" rx="18" fill="none" stroke="#8cc56e" stroke-width="3" stroke-dasharray="2 10"/>`;
@@ -3318,58 +3501,56 @@ regAct("kalem",{
     s+=`<circle cx="${P(st.L.s[0])}" cy="${P(st.L.s[1])}" r="12" fill="none" stroke="#7a5eb0" stroke-width="3" stroke-dasharray="4 4"/>`;
     s+=`<g transform="translate(${P(st.pos[0])} ${P(st.pos[1])}) rotate(${st.pos[2]*90-90}) scale(1.15)">${ROBOT}</g></svg>`;
     let h=s;
-    const cur=st.runAt>=0?st.prog[st.runAt]:null;
-    h+=cur?`<div class="nowbar"><span class="lbl">Şimdi çalışan</span><span class="nb">${bHTML(cur)}</span><span class="txt">${B[cur][0]}${st.L.rep&&st.x>1?`<small>${st.x} kez tekrar</small>`:""}</span></div>`:`<div class="nowbar idle"><span class="lbl">Şimdi çalışan</span><span class="txt">Çiz'e bas: Bidik yürürken o an çalışan blok burada görünecek.</span></div>`;
-    let sl=""; for(let i=0;i<12;i++){ const t=st.prog[i]; sl+=`<button class="slot${t?" filled":""}${st.runAt===i?" on":""}" data-i="${i}" aria-label="${t?B[t][0]+", silmek için dokun":"Boş yer"}">${t?bHTML(t):""}</button>` }
-    h+=`<div class="prog${st.runAt>=0?" running":""}" id="kalProg"><div class="row active" id="kalRow"><div class="row-head"><b>${st.L.rep?"Tekrarlanacak kod":"Ana program"}</b><span>${st.prog.length} / 12</span></div><div class="slots">${sl}</div>${st.L.rep?`<div class="row-head"><b>Kaç kez tekrar?</b><span class="xsel">${[1,2,3,4].map(x=>`<button class="xbtn" data-x="${x}" aria-pressed="${st.x===x}">${x}</button>`).join("")}</span></div>`:""}</div></div>`;
-    h+=`<div class="palette" style="grid-template-columns:repeat(5,1fr)">${Object.keys(B).map(t=>`<button class="palbtn" data-t="${t}" aria-label="${B[t][0]}">${bHTML(t)}<span>${B[t][0]}</span></button>`).join("")}</div>`;
+    const cur=st.cur;
+    h+=cur?`<div class="nowbar"><span class="lbl">Şimdi çalışan</span><span class="nb">${blkHTML(Blok.stepTok(cur))}</span><span class="txt">${Blok.stepLabel(cur)}</span></div>`:`<div class="nowbar idle"><span class="lbl">Şimdi çalışan</span><span class="txt">Çiz'e bas: Bidik yürürken o an çalışan blok burada görünecek.</span></div>`;
+    h+=`<div class="prog${st.running?" running":""}" id="kalProg"></div>`;
+    h+=`<div class="palette" style="grid-template-columns:repeat(5,1fr)">${["F","L","R"].map(t=>`<button class="palbtn" data-t="${t}" aria-label="${BLK[t].name}">${Blok.palHTML(t)}</button>`).join("")}</div>`;
     const body=$("aBody"); body.innerHTML=h;
+    const keep=st.frame?new Set([st.frame.id]):null;
+    Blok.render($("kalProg"),st.ed,{rows:[{id:"main",label:st.L.rep?"Tekrarlanacak kod":"Ana program",lim:LIM}],counts:[1,2,3,4],keep,outer:!st.frame,locked:()=>A.busy||A.won,
+      onChange:changed=>{ if(changed) resetDraw(st); aGoal(); aRefresh() }});
+    if(st.cur) Blok.hl($("kalProg"),st.cur);
     body.querySelectorAll(".palbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
-      if(st.prog.length>=12){ aGoal("Programda yer kalmadı. Tekrar kullanmayı dene!","bad"); sfx.no(); const r=$("kalRow"); if(r){r.classList.remove("shake");void r.offsetWidth;r.classList.add("shake")} return }
-      st.prog.push(t); st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.click(); aGoal(); aRefresh() });
-    body.querySelectorAll("#kalProg .slot").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.i; if(i>=st.prog.length) return;
-      st.prog.splice(i,1); st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.erase(); aGoal(); aRefresh() });
-    body.querySelectorAll(".xbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; st.x=+b.dataset.x; st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; sfx.click(); aRefresh() });
+      if(used(st)>=LIM){ aGoal("Programda yer kalmadı. Tekrar kullanmayı dene!","bad"); sfx.no(); const r=$("kalProg").querySelector(".row"); if(r){r.classList.remove("shake");void r.offsetWidth;r.classList.add("shake")} return }
+      Blok.insert(st.ed,t); resetDraw(st); sfx.click(); aGoal(); aRefresh() });
   },
   check(st){
-    if(!st.prog.length) return "Önce kod yaz.";
+    if(!inner(st).length) return "Önce kod yaz.";
     this.play(st).then(r=>{
       if(r.out) aBad("Bidik kâğıttan çıktı! Kodu kontrol et.");
-      else if(r.ok) aWin({stars:A.tries===0&&A.hints===0&&st.prog.length<=st.L.sol.length?3:A.tries<=2?2:1,
-        checks:[[true,"Orman deseni tamam"],[A.tries===0,"İlk denemede"],[st.prog.length<=st.L.sol.length,`En kısa kodla (${st.prog.length} / ${st.L.sol.length} blok)`]]});
+      else if(r.ok) aWin({stars:A.tries===0&&A.hints===0&&used(st)<=st.L.sol.length?3:A.tries<=2?2:1,
+        checks:[[true,"Orman deseni tamam"],[A.tries===0,"İlk denemede"],[used(st)<=st.L.sol.length,`En kısa kodla (${used(st)} / ${st.L.sol.length} blok)`]]});
       else aBad("Fidanlar desene uymadı. Kesikli çizgiyi parmağınla izle, Bidik'in yönünü düşün.");
     });
     return null;
   },
   async play(st){
-    A.busy=true; const r=run(st.L,st.prog,st.x); st.drawn=[]; st.pos=[st.L.s[0],st.L.s[1],0]; aRefresh();
-    let si=0;
-    for(let k=1;k<r.steps.length;k++){ const p=r.steps[k], q=r.steps[k-1];
-      st.runAt=(k-1)%st.prog.length;
-      if(p[0]!==q[0]||p[1]!==q[1]){ st.drawn.push(r.segs[si++]); sfx.step() } else sfx.turn();
-      st.pos=p; aRefresh(); await aWait(420) }
-    st.runAt=-1; A.busy=false; aRefresh();
+    A.busy=true; const r=runT(st.L,st.main); resetDraw(st); st.running=true; aRefresh();
+    let si=0, pi=0;
+    for(const step of r.steps){
+      st.cur=step;
+      if(step.kind==="op"){ const p=r.pts[++pi], q=r.pts[pi-1]; if(step.fail){ aRefresh(); await aWait(300); break } if(p[0]!==q[0]||p[1]!==q[1]){ st.drawn.push(r.segs[si++]); sfx.step() } else sfx.turn(); st.pos=p; aRefresh(); await aWait(420) }
+      else { aRefresh(); if(step.kind==="iter") Blok.counter($("kalProg"),step); await aWait(200) }
+    }
+    st.cur=null; st.running=false; A.busy=false; aRefresh();
     const got=new Set(r.segs.map(key));
     return {out:r.out, ok:!r.out&&got.size===st.target.size&&[...st.target].every(k=>got.has(k))};
   },
-  solved(st){ const r=run(st.L,st.prog,st.x), got=new Set(r.segs.map(key)); return !r.out&&got.size===st.target.size&&[...st.target].every(k=>got.has(k)) },
-  auto(st){ st.prog=st.L.sol.split(""); st.x=st.L.x; return true },
+  solved(st){ const r=runT(st.L,st.main), got=new Set(r.segs.map(key)); return !r.out&&got.size===st.target.size&&[...st.target].every(k=>got.has(k)) },
+  auto(st){ const k=inner(st); k.splice(0,k.length,...st.L.sol.split("").map(c=>Blok.mk(c))); if(st.frame) st.frame.n=st.L.x; return true },
   async solve(st){
-    for(const t of st.L.sol){ st.prog.push(t); sfx.click(); aRefresh(); aGoal(`Kod: ${st.prog.length} blok`,"quiet"); await aWait(450) }
-    if(st.L.rep){ st.x=st.L.x; aGoal(`Bu kodu ${st.L.x} kez tekrarla`); aRefresh(); await aWait(900) }
+    const k=inner(st); k.length=0; st.ed.cur={row:"main",list:k,i:0};
+    for(const t of st.L.sol){ k.push(Blok.mk(t)); st.ed.cur.i=k.length; sfx.click(); aRefresh(); aGoal(`Kod: ${k.length} blok`,"quiet"); await aWait(450) }
+    if(st.L.rep){ st.frame.n=st.L.x; aGoal(`Bu kodu ${st.L.x} kez tekrarla`); aRefresh(); await aWait(900) }
     await this.play(st); A.busy=true;
   }
 });
 })();
 // ===== Görevli Kodla Sür: kasabanın 6 bölgesi için ortak oyun motoru =====
-// Aynı tahta, aynı bloklar (İleri, Geri, Sola dön, Sağa dön, 2×/3×/4×); her bölge kendi nesnesini ve görevini getirir.
+// Aynı tahta, aynı bloklar (İleri, Geri, Sola dön, Sağa dön, Tekrarla çerçevesi); her bölge kendi nesnesini ve görevini getirir.
 (function(){
 const DX=[0,1,0,-1], DY=[-1,0,1,0];
-const BL={F:["İleri","g",'<path d="M12 20V5M6 11l6-6 6 6"/>'],G:["Geri","gd",'<path d="M12 4v16M6 14l6 6 6-6"/>'],L:["Sola dön","b",'<path d="M18 20v-7a5 5 0 0 0-5-5H5M9 4L5 8l4 4"/>'],R:["Sağa dön","r",'<path d="M6 20v-7a5 5 0 0 1 5-5h8M15 4l4 4-4 4"/>'],
-  D:["Fidan dik","g",'<path d="M12 21v-8"/><path d="M12 14c-4 0-6-3-6-6 3 0 6 2 6 6zM12 12c0-4 2-7 6-7 0 4-2 7-6 7z" fill="currentColor"/>'],
-  "2":["2 kez","o","2×"],"3":["3 kez","o","3×"],"4":["4 kez","o","4×"]};
-const isPre=t=>t==="2"||t==="3"||t==="4";
-const bH=t=>{ const b=BL[t]; return `<span class="blk ${b[1]}" aria-label="${b[0]}">${isPre(t)?b[2]:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${b[2]}</svg>`}</span>` };
+const BL=BLK, bH=blkHTML;
 const TIER=[null, // N, nesne, engel, en kısa program aralığı, dönüş gerekli mi
   {N:3,k:1,o:0,min:2,max:3,turn:0},{N:3,k:1,o:0,min:3,max:5,turn:1},{N:3,k:2,o:1,min:4,max:6,turn:1},
   {N:4,k:2,o:1,min:5,max:8,turn:1},{N:4,k:3,o:2,min:6,max:9,turn:1},{N:4,k:3,o:2,min:7,max:11,turn:2},
@@ -3385,7 +3566,7 @@ const REG={
     talk:"Bu çöpler göle nasıl gelmiş olabilir? Göletin temiz kalması için biz ne yapabiliriz? (Temiz su, sudaki yaşam)"},
   cicek:{title:"Polen Yolu",durak:3,kind:"cicek",mode:"collect",tile:["#c8eab0","#bfe4a4"],edge:"#5a9a46",obs:"cali",item:["solcicek"],done:"Bütün çiçeklere uğrandı",
     goal:"Arı Bal ile bütün solgun çiçeklere uğra. Uğradığın çiçek açar!",fail:{out:"Bidik tarlanın dışına çıktı!",obs:"Çalıya takıldı!"},
-    intro:{title:"Çiçekler susadı",text:"Arılar azalınca çiçekler tozlaşamıyor. Bidik'i bütün solgun çiçeklere götür, polen taşısın. Aynı hareket tekrar ediyorsa <b>2×, 3×, 4×</b> bloklarını dene!"},
+    intro:{title:"Çiçekler susadı",text:"Arılar azalınca çiçekler tozlaşamıyor. Bidik'i bütün solgun çiçeklere götür, polen taşısın. Aynı hareket tekrar ediyorsa <b>Tekrarla</b> bloğunu dene!"},
     talk:"Arılar olmasaydı meyve ve sebzelerimize ne olurdu? Aynı hareketi tekrarladığın yerleri kısaltabildin mi? (Karadaki yaşam, açlığa son)"},
   orman:{title:"Fidan Dik",durak:4,kind:"fidan",mode:"plant",tile:["#d9c08f","#ceb47f"],edge:"#8a6a3a",obs:"kutuk",item:["cukur"],done:"Bütün fidanlar dikildi",
     goal:"Her çukura git ve Fidan dik bloğunu kullan.",fail:{out:"Bidik ormanın dışına çıktı!",obs:"Kütüğe çarptı!",plant:"Burada çukur yok, fidan dikilemez!"},
@@ -3465,7 +3646,6 @@ const BINICON={
   yesil:`<rect x="38" y="44" width="24" height="7" rx="2" fill="#fff"/><path d="M39 53 h22 v20 a6 6 0 0 1 -6 6 h-10 a6 6 0 0 1 -6 -6z" fill="#fff"/>`};
 function wasteArt(c){ return c==="sari"?ART.sise.replace("#cdeefa","#ffe9a3").replace('fill="#2f7fd8" stroke','fill="#d99a00" stroke').replace('fill="#2f7fd8" opacity','fill="#d99a00" opacity'):c==="mavi"?`<g transform="rotate(-8 50 50)"><rect x="24" y="26" width="52" height="50" rx="4" fill="#dcebfa" stroke="${INK}" stroke-width="2.6"/><path d="M32 40 H68 M32 50 H68 M32 60 H56" stroke="#2f7fd8" stroke-width="3.5" stroke-linecap="round"/></g>`:`<path d="M42 16 H58 V30 C70 36 72 44 72 54 V80 a6 6 0 0 1 -6 6 H34 a6 6 0 0 1 -6 -6 V54 C28 44 30 36 42 30Z" fill="#bfe8c9" stroke="${INK}" stroke-width="2.6"/><path d="M36 48 V74" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".6"/>` }
 // ---- kural motoru ----
-function expand(prog){ const out=[], map=[]; for(let i=0;i<prog.length;i++){ const t=prog[i]; if(isPre(t)){ const nx=prog[i+1]; if(!nx||isPre(nx)) return {err:"Tekrar bloğundan (2×, 3×, 4×) sonra bir hareket bloğu koy."}; for(let k=0;k<+t;k++){ out.push(nx); map.push(i+1) } i++ } else { out.push(t); map.push(i) } } return {cmds:out,map} }
 function initState(L){ return {x:L.sx,y:L.sy,d:L.sd,got:new Set(),carry:-1,used:0} }
 function key(x,y){ return x+","+y }
 function stepRun(L,s,c){
@@ -3488,7 +3668,8 @@ function stepRun(L,s,c){
   return null;
 }
 const isDone=(L,s)=>s.got.size===L.items.length;
-function simulate(L,prog){ const e=expand(prog); if(e.err) return {err:e.err}; const s=initState(L); for(const c of e.cmds){ const f=stepRun(L,s,c); if(f) return {fail:f,s} } return {ok:isDone(L,s),s} }
+// programı (blok ağacı) baştan sona koştur: adım listesi + son durum
+function simulate(L,prog){ const s=initState(L); let fail=null; const env={max:300,cond:()=>false,op:c=>{ const f=stepRun(L,s,c); if(f) fail=f; return f }}; const r=Blok.run(prog,env); return {ok:!fail&&r.halt==="end"&&isDone(L,s),fail,s,steps:r.steps,halt:r.halt} }
 // en kısa komut dizisi (BFS) — çözülebilirlik ve “en az blok” için
 function bfs(L,allowG){
   const cmds=["F","L","R"].concat(allowG?["G"]:[]).concat(L.mode==="plant"?["D"]:[]);
@@ -3497,7 +3678,8 @@ function bfs(L,allowG){
   while(q.length){ const nq=[]; for(const [s,path] of q){ for(const c of cmds){ const n={x:s.x,y:s.y,d:s.d,got:new Set(s.got),carry:s.carry,used:0}; if(stepRun({...L,energy:false},n,c)) continue; const k=enc(n); if(seen.has(k)) continue; seen.set(k,1); const p=path.concat(c); if(isDone(L,n)) return p; nq.push([n,p]) } } q=nq; if(q.length>40000) return null }
   return null;
 }
-function compress(p){ const out=[]; for(let i=0;i<p.length;){ let j=i; while(j<p.length&&p[j]===p[i]&&j-i<4) j++; const k=j-i; if(k>=2&&p[i]!=="D") out.push(String(k),p[i]); else for(let t=0;t<k;t++) out.push(p[i]); i=j } return out }
+const compress=p=>Blok.compress(p); // en az blokla ağaç (Tekrarla çerçeveleri)
+const flatT=p=>p.map(c=>Blok.mk(c));
 function gen(id,n){
   const R=cfg(id,n), T=TIER[R.t];
   for(let seed=0;seed<6000;seed++){
@@ -3518,13 +3700,13 @@ function gen(id,n){
     if(!sol) continue;
     const moves=sol.length, turns=sol.filter(c=>c==="L"||c==="R").length;
     if(moves<T.min||moves>T.max||turns<T.turn) continue;
-    L.sol=sol; L.t=R.t; L.C=R; L.ideal=R.t>=LOOPS_FROM?compress(sol).length:sol.length;
+    L.sol=sol; L.t=R.t; L.C=R; L.ideal=R.t>=LOOPS_FROM?Blok.count(compress(sol)):sol.length;
     if(R.energy) L.budget=moves+(R.t<=5?3:R.t<=8?1:0);
     if(R.debug){
       // 1-2 bloğu boz: program başarısız olmalı
       let bad=null; for(let g=0;g<40&&!bad;g++){ const p=sol.slice(); const cnt=R.t>=8?2:1; const idx=new Set(); while(idx.size<cnt) idx.add(ri(p.length));
         idx.forEach(i=>{ const alt=["F","L","R"].filter(c=>c!==p[i]); p[i]=alt[ri(alt.length)] }); if(!simulate(L,p).ok) bad=p }
-      if(!bad) continue; L.pre=bad;
+      if(!bad) continue; L.pre=bad; // düz komut dizisi; setup'ta ağaca çevrilir
     }
     return L;
   }
@@ -3535,16 +3717,16 @@ function reg(id){
   const R=REG[id];
   regAct(id,{
     title:R.title, durak:R.durak, N:R.N||12, speed:true, finaleLabel:R.finale?"Şenlik başlasın!":null, finale:R.finale?()=>openFestival():null,
-    parts:R.parts||[{name:"Kolay",sub:"Okul öncesi",from:1,to:5},{name:"Orta",sub:"1-2. sınıf · 2×, 3×, 4× tekrar blokları",from:6,to:10},{name:"Usta",sub:"3-4. sınıf · büyük tahta",from:11,to:12}],
+    parts:R.parts||[{name:"Kolay",sub:"Okul öncesi",from:1,to:5},{name:"Orta",sub:"1-2. sınıf · Tekrarla bloğu",from:6,to:10},{name:"Usta",sub:"3-4. sınıf · büyük tahta",from:11,to:12}],
     doneText:R.done, talk:n=>cfg(id,n).talk,
     intro:n=> cfg(id,n).li?{key:"s"+n,kicker:R.finale?"Kasaba Şenliği · "+n+" / 5":WORLD[R.durak].kita,title:cfg(id,n).li.title,art:R.finale?FLOWER:`<g>${ANIMALS[WORLD[R.durak].anim]}</g>`,text:cfg(id,n).li.text}
       : n===1?{key:"g1",kicker:WORLD[R.durak].kita,title:R.intro.title,art:`<g transform="translate(0 0)">${ANIMALS[WORLD[R.durak].anim]}</g>`,text:R.intro.text}
-      : n===LOOPS_FROM&&!cfg(id,n).debug?{key:"g2",kicker:"Yeni blok",title:"Tekrar blokları",art:`<rect x="14" y="30" width="34" height="40" rx="8" fill="#f08a24"/><text x="31" y="60" text-anchor="middle" font-size="22" font-weight="800" fill="#fff">3×</text><rect x="54" y="30" width="34" height="40" rx="8" fill="#22a165"/><path d="M71 62V40M64 47l7-7 7 7" stroke="#fff" stroke-width="4" fill="none"/>`,text:"<b>3×</b> bloğunu bir hareketin önüne koy: o hareket 3 kez yapılır. İleri, İleri, İleri yerine 3× İleri!"}:null,
+      : n===LOOPS_FROM&&!cfg(id,n).debug?{key:"g2",kicker:"Yeni blok",title:"Tekrarla bloğu",ex:"3[F]",text:"Turuncu <b>Tekrarla</b> bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. Sayıya dokununca değişir. İleri, İleri, İleri yerine Tekrarla 3: İleri!"}:null,
     setup(n){ const L=CACHE[id+n]||(CACHE[id+n]=gen(id,n)); const lim=L.C.debug?L.pre.length:L.ideal+(L.t<=5?3:L.t<=10?2:1);
-      return {n,L,lim,prog:L.C.debug?L.pre.slice():[],sel:-1,run:null,runAt:-1,fail:null,errAt:-1,built:false} },
+      const prog=L.C.debug?flatT(L.pre):[]; return {n,L,lim,prog,ed:Blok.editor({main:prog}),run:null,fail:null,errStep:null,built:false} },
     goal(st){ return st.L.C.goal },
     checkLabel(st){ return st&&st.predicting?"Tahminsiz çalıştır":"Çalıştır" },
-    info(st){ return `Blok: ${st.prog.length} · En iyi: ${st.L.C.debug?st.L.pre.length:st.L.ideal}`+(st.L.energy?` · Enerji: ${st.L.budget}`:"") },
+    info(st){ return `Blok: ${Blok.count(st.prog)} · En iyi: ${st.L.C.debug?st.L.pre.length:st.L.ideal}`+(st.L.energy?` · Enerji: ${st.L.budget}`:"") },
     render(st){
       const L=st.L, C=L.C;
       if(!st.built||!$("gBoard")){
@@ -3559,13 +3741,12 @@ function reg(id){
     clearRun(st){ clearRun(st) },
     check(st){
       if(!st.prog.length) return "Önce program yaz.";
-      const e=expand(st.prog); if(e.err) return e.err;
       if(st.predicting){ setPredict(st,false) }
       else if(predictOn()&&!st.guessAsked&&A.tries===0&&!A.demo){ st.guessAsked=true; setPredict(st,true); aGoal("Önce tahmin et: Bidik en son hangi karede duracak? O kareye dokun."); return null }
       const C=st.L.C; play(st).then(res=>{
         const gt=st.guessRes==null||st.guessShown?"":(st.guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. "); st.guessShown=true;
         const gc=st.guessRes!=null?[[st.guessRes,st.guessRes?"Tahminin doğru çıktı":"Tahmin: bir dahakine"]]:[];
-        if(res.ok){ const used=st.prog.length, best=st.L.ideal;
+        if(res.ok){ const used=Blok.count(st.prog), best=st.L.ideal;
           aWin(C.debug?(gc.length?{checks:[[true,C.done],[A.tries===0,"İlk denemede"],[A.hints===0,"Yardım almadan"]].concat(gc)}:null):{stars:A.tries===0&&A.hints===0&&used<=best?3:A.tries<=2?2:1,
             checks:[[true,C.done],[A.tries===0,"İlk denemede"],[used<=best,`En az blokla (${used} / ${best})`]].concat(gc),
             msg:used<=best?"Harika, en kısa program!":"Daha kısa bir program yazabilir misin?"+(st.L.t>=LOOPS_FROM?" Tekrar bloklarını dene.":"")}) }
@@ -3575,13 +3756,14 @@ function reg(id){
     },
     play(st){ return play(st) },
     solved(st){ return !!simulate(st.L,st.prog).ok },
-    auto(st){ st.prog=st.L.t>=LOOPS_FROM?compress(st.L.sol):st.L.sol.slice(); return true },
+    auto(st){ setProg(st,st.L.t>=LOOPS_FROM?compress(st.L.sol):flatT(st.L.sol)); return true },
     async solve(st){
-      if(st.L.C.debug){ const sol=st.L.sol; for(let i=0;i<sol.length;i++) if(st.prog[i]!==sol[i]){ st.sel=i; aRefresh(); aGoal(`${i+1}. blok hatalı: ${BL[st.prog[i]][0]} yerine ${BL[sol[i]][0]}`,null,`${i+1}. blok hatalı.`); await aWait(1100); st.prog[i]=sol[i]; st.sel=-1; sfx.place(); aRefresh(); await aWait(600) } }
-      else { const p=st.L.t>=LOOPS_FROM?compress(st.L.sol):st.L.sol; st.prog=[]; for(const t of p){ st.prog.push(t); sfx.click(); aRefresh(); await aWait(300) } }
+      if(st.L.C.debug){ const sol=st.L.sol; for(let i=0;i<sol.length;i++) if(st.prog[i].t!==sol[i]){ st.ed.sel=st.prog[i].id; aRefresh(); aGoal(`${i+1}. blok hatalı: ${BL[st.prog[i].t].name} yerine ${BL[sol[i]].name}`,null,`${i+1}. blok hatalı.`); await aWait(1100); st.prog[i].t=sol[i]; st.ed.sel=null; sfx.place(); aRefresh(); await aWait(600) } }
+      else { const p=st.L.t>=LOOPS_FROM?compress(st.L.sol):flatT(st.L.sol); setProg(st,[]); for(const b of p){ st.prog.push(b); st.ed.cur.i=st.prog.length; sfx.click(); aRefresh(); await aWait(300) } }
       await play(st); A.busy=true;
     }
   });
+  function setProg(st,list){ st.prog.splice(0,st.prog.length,...list); Blok.reset(st.ed,"main") }
   function L_left(st){ const n=st.L.items.length-(st.run?st.run.got.size:0); return st.L.mode==="deliver"?`Program bitti ama atıklar hâlâ kutusunda değil. (${n} atık)`:`Program bitti ama görev bitmedi. Programı uzat ya da yolu değiştir. (${n} görev kaldı)` }
 }
 // ---- Kodla Sür ile aynı arayüz: sabit tahta, akıcı hareket, program kutuları, şimdi çalışan ----
@@ -3635,56 +3817,54 @@ function setItems(st,s){
 function setEnergy(st,used){ const L=st.L; if(!L.energy) return; const i=$("gEnI"), b=$("gEnB"); if(!i) return; const left=Math.max(0,L.budget-used); i.style.width=left/L.budget*100+"%"; b.textContent=left }
 function setTrail(pts){ const t=$("gTrail"); if(t) t.setAttribute("points",pts.map(p=>`${p[0]*CS+50},${p[1]*CS+50}`).join(" ")) }
 function failAt(x,y){ const f=$("gFail"); if(!f) return; f.setAttribute("x",x*CS+3); f.setAttribute("y",y*CS+3); f.style.display="" }
-function setNow(c,pre){
+function setNow(s){
   const el=$("gNow"); if(!el) return;
-  if(!c){ el.className="nowbar idle"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="txt">Çalıştır'a bas: Bidik hareket ederken o an çalışan blok burada görünecek.</span>`; return }
-  el.className="nowbar"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="nb">${bH(c)}</span><span class="txt">${BL[c][0]}${pre?`<small>${pre} kez tekrar</small>`:""}</span>`;
+  if(!s){ el.className="nowbar idle"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="txt">Çalıştır'a bas: Bidik hareket ederken o an çalışan blok burada görünecek.</span>`; return }
+  el.className="nowbar"; el.innerHTML=`<span class="lbl">Şimdi çalışan</span><span class="nb">${blkHTML(Blok.stepTok(s))}</span><span class="txt">${Blok.stepLabel(s)}${s.kind==="op"&&s.path&&s.path.length?`<small>Tekrarla bloğunun içinde</small>`:""}</span>`;
 }
-function hl(idx){ document.querySelectorAll("#gProg .slot.on").forEach(e=>e.classList.remove("on")); idx.forEach(i=>{ if(i<0) return; const e=document.querySelector(`#gProg .slot[data-i="${i}"]`); if(e) e.classList.add("on") }) }
 function blink(dir){ const c=$("gCar"); if(!c) return; c.classList.remove("blink-L","blink-R"); void c.getBBox; c.classList.add("blink-"+dir); clearTimeout(blink.t); blink.t=setTimeout(()=>c.classList.remove("blink-"+dir),900) }
 function resetVis(st){
   const L=st.L;
   placeCar(L.sx,L.sy,L.sd*90-90); setItems(st,initState(L)); setTrail([]); setEnergy(st,0); setNow(null);
-  const f=$("gFail"); if(f) f.style.display="none"; const p=$("gProg"); if(p) p.classList.remove("running");
+  const f=$("gFail"); if(f) f.style.display="none"; const p=$("gProg"); if(p){ p.classList.remove("running"); Blok.hl(p,null) }
 }
-function clearRun(st,keepGuess){ st.run=null; st.fail=null; st.runAt=-1; st.errAt=-1; if(st.built&&$("gBoard")) resetVis(st); if(!keepGuess&&st.guessShown&&$("gGuess")) $("gGuess").innerHTML=""; if(!keepGuess&&st.predicting) setPredict(st,false) }
+function clearRun(st,keepGuess){ st.run=null; st.fail=null; st.errStep=null; if(st.built&&$("gBoard")) resetVis(st); if(!keepGuess&&st.guessShown&&$("gGuess")) $("gGuess").innerHTML=""; if(!keepGuess&&st.predicting) setPredict(st,false) }
 function renderProg(st){
   const box=$("gProg"); if(!box) return; const L=st.L, dbg=!!L.C.debug;
-  let sl=""; for(let i=0;i<st.lim;i++){ const t=st.prog[i];
-    sl+=`<button class="slot${t?" filled":""}${st.sel===i?" sel":""}${st.errAt===i?" err":""}${st.runAt===i?" on":""}" data-i="${i}" aria-label="${t?BL[t][0]+(dbg?", değiştirmek için dokun":", silmek için dokun"):"Boş yer"}">${t?bH(t):""}</button>` }
-  box.innerHTML=`<div class="row active" id="gRow"><div class="row-head"><b>Ana program</b><span>${st.prog.length} / ${st.lim}</span></div><div class="slots">${sl}</div></div>`;
-  box.querySelectorAll(".slot").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const i=+b.dataset.i; if(i>=st.prog.length) return;
-    if(dbg){ st.sel=st.sel===i?-1:i; sfx.click() } else { st.prog.splice(i,1); st.sel=-1; sfx.erase() }
-    clearRun(st); aGoal(); aRefresh() });
+  Blok.render(box,st.ed,{rows:[{id:"main",label:"Ana program",lim:st.lim}],replace:dbg,counts:[2,3,4],locked:()=>A.busy||A.won,
+    onChange:changed=>{ if(changed) clearRun(st); aGoal(); aRefresh() }});
+  if(st.errStep) Blok.hl(box,st.errStep,"err");
 }
 function renderPal(st){
-  const L=st.L, p=$("gPal"); if(!p) return;
-  const pal=["F","L","R"].concat(L.t>=BACK_FROM?["G"]:[]).concat(L.mode==="plant"?["D"]:[]).concat(L.t>=LOOPS_FROM?["2","3","4"]:[]);
-  p.style.gridTemplateColumns=`repeat(${Math.min(8,Math.max(5,pal.length))},1fr)`;
-  p.innerHTML=pal.map(t=>`<button class="palbtn" data-t="${t}" aria-label="${BL[t][0]}">${bH(t)}<span>${BL[t][0]}</span></button>`).join("");
-  p.querySelectorAll(".palbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t;
-    if(st.sel>=0){ st.prog[st.sel]=t; st.sel=-1; sfx.place() }
-    else if(L.C.debug){ aGoal("Önce değiştirmek istediğin bloğa dokun.","bad"); sfx.no(); return }
-    else if(st.prog.length>=st.lim){ aGoal(L.t>=LOOPS_FROM?"Programda yer kalmadı. Tekrar bloklarıyla (2×, 3×, 4×) kısaltabilir misin?":"Programda yer kalmadı. Daha kısa bir yol dene.","bad"); sfx.no(); const r=$("gRow"); if(r){ r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake") } return }
-    else { st.prog.push(t); sfx.click() }
+  const L=st.L, p=$("gPal"); if(!p) return; const dbg=!!L.C.debug;
+  const pal=["F","L","R"].concat(L.t>=BACK_FROM?["G"]:[]).concat(L.mode==="plant"?["D"]:[]).concat(L.t>=LOOPS_FROM&&!dbg?["rep"]:[]);
+  p.style.gridTemplateColumns=`repeat(${innerWidth<=480?Math.min(5,Math.max(4,pal.length)):Math.min(8,Math.max(5,pal.length))},minmax(0,1fr))`;
+  p.innerHTML=pal.map(t=>`<button class="palbtn" data-t="${t}" aria-label="${BLK[t].name}">${Blok.palHTML(t)}</button>`).join("");
+  p.querySelectorAll(".palbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t, ed=st.ed;
+    if(dbg){ const r=ed.sel!=null?Blok.find(ed,ed.sel):null; if(!r){ aGoal("Önce değiştirmek istediğin bloğa dokun.","bad"); sfx.no(); return } r.b.t=t; ed.sel=null; sfx.place() }
+    else if(Blok.count(st.prog)>=st.lim){ aGoal(L.t>=LOOPS_FROM?"Programda yer kalmadı. Tekrar bloklarıyla kısaltabilir misin?":"Programda yer kalmadı. Daha kısa bir yol dene.","bad"); sfx.no(); const r=$("gProg").querySelector(".row"); if(r){ r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake") } return }
+    else { Blok.insert(ed,t); sfx.click() }
     clearRun(st); aGoal(); aRefresh() });
 }
 const dur=()=>((window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)?80:380)/getSpeed();
 function tween(a,b,ms){ return new Promise(res=>{ let t0=null; const fr=ts=>{ if(t0==null) t0=ts; const t=Math.min(1,(ts-t0)/ms), e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
   placeCar(a.x+(b.x-a.x)*e,a.y+(b.y-a.y)*e,a.ang+(b.ang-a.ang)*e); if(t<1&&$("gCar")) requestAnimationFrame(fr); else res() }; requestAnimationFrame(fr) }) }
 async function play(st){
-  A.busy=true; clearRun(st,true); const e=expand(st.prog), L=st.L, s=initState(L); st.run=s;
+  A.busy=true; clearRun(st,true); const L=st.L, s=initState(L); st.run=s;
+  const sim=simulate(L,st.prog); // adım listesi (çalışan blok, tur sayacı); durum aşağıda yeniden oynatılır
   const pg=$("gProg"); if(pg) pg.classList.add("running");
   let ang=L.sd*90-90, fail=null; const trail=[[s.x,s.y]];
   await aWait(120);
-  for(let k=0;k<e.cmds.length;k++){
-    const c=e.cmds[k], i=e.map[k], pi=i>0&&isPre(st.prog[i-1])?i-1:-1;
-    st.runAt=i; hl([i,pi]); setNow(c,pi>=0?st.prog[pi]:null);
+  for(const step of sim.steps){
+    Blok.hl(pg,step); setNow(step);
+    if(step.kind==="iter"){ Blok.counter(pg,step); await aWait(170); continue }
+    if(step.kind!=="op"){ await aWait(120); continue }
+    const c=step.op;
     const a={x:s.x,y:s.y,ang}, before=s.got.size, bc=s.carry;
     fail=stepRun(L,s,c);
     if(fail==="out"||fail==="obs"){ const m=c==="G"?-1:1, b={x:a.x+DX[s.d]*m*.3,y:a.y+DY[s.d]*m*.3,ang}; await tween(a,b,dur()*.5); await tween(b,a,dur()*.4) }
     else if(fail&&fail!=="energy") await tween(a,{x:s.x,y:s.y,ang},dur());
-    if(fail){ st.fail=fail; st.errAt=i; if(fail==="obs") failAt(s.x+DX[s.d]*(c==="G"?-1:1),s.y+DY[s.d]*(c==="G"?-1:1)); else failAt(s.x,s.y); sfx.fail(); break }
+    if(fail){ st.fail=fail; st.errStep=step; if(fail==="obs") failAt(s.x+DX[s.d]*(c==="G"?-1:1),s.y+DY[s.d]*(c==="G"?-1:1)); else failAt(s.x,s.y); sfx.fail(); break }
     if(c==="L"){ ang-=90; blink("L"); sfx.turn() } else if(c==="R"){ ang+=90; blink("R"); sfx.turn() }
     await tween(a,{x:s.x,y:s.y,ang},c==="D"?dur()*.6:dur());
     const moved=s.x!==a.x||s.y!==a.y;
@@ -3693,7 +3873,7 @@ async function play(st){
     setEnergy(st,s.used);
   }
   if(st.guess&&st.guessRes==null){ st.guessRes=s.x===st.guess.x&&s.y===st.guess.y; if(!A.demo) bidGuess(st.guessRes) }
-  st.runAt=-1; hl([]); if(pg) pg.classList.remove("running"); A.busy=false; aRefresh();
+  if(pg) pg.classList.remove("running"); A.busy=false; aRefresh();
   return {fail, ok:!fail&&isDone(L,s)};
 }
 Object.keys(REG).forEach(reg);
@@ -4142,8 +4322,8 @@ const DURAKS=[
    {t:"Kodla Sür: İlk Adımlar",d:"Bee-Bot gibi: İleri, Geri, Sola dön, Sağa dön. Bidik'i adım adım kodla.",lvl:"●",age:"4-6 yaş",open:()=>openLevels("kod",{ch:[0]}),prog:(d=P())=>lvlProg("kod",1,10,d),play:{mode:"kod",from:1,to:10}},
    {t:"Kodla Sür: Dönüşler",d:"Bidik her yöne bakar. Onun yerine geç, sağı solu Bidik'e göre düşün.",lvl:"●●",age:"5-7 yaş",open:()=>openLevels("kod",{ch:[1]}),prog:(d=P())=>lvlProg("kod",11,20,d),play:{mode:"kod",from:11,to:20}}]},
  {no:3,name:"Çiçek Tarlası",kid:"Ne tekrar ediyor?",code:"B2 · Örüntü",color:"#c4507f",acts:[
-   {t:"Polen Yolu",d:"Arı Bal ile bütün solgun çiçeklere uğra, çiçekler açsın. Tekrar eden adımları 2×, 3×, 4× ile kısalt.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("cicek"),prog:(d=P())=>actProgL("cicek",d),play:{mode:"cicek",from:1,to:12}},
-   {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları 2×, 3×, 4× bloklarıyla kısalt. Arı gibi her çiçeğe aynı düzenle uğra.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>lvlProg("kod",21,30,d),play:{mode:"kod",from:21,to:30}}]},
+   {t:"Polen Yolu",d:"Arı Bal ile bütün solgun çiçeklere uğra, çiçekler açsın. Tekrar eden adımları Tekrarla bloğuyla kısalt.",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("cicek"),prog:(d=P())=>actProgL("cicek",d),play:{mode:"cicek",from:1,to:12}},
+   {t:"Kodla Sür: Döngüler",d:"Tekrar eden adımları Tekrarla bloğuyla kısalt. Arı gibi her çiçeğe aynı düzenle uğra.",lvl:"●●",age:"6-8 yaş",open:()=>openLevels("kod",{ch:[2]}),prog:(d=P())=>lvlProg("kod",21,30,d),play:{mode:"kod",from:21,to:30}}]},
  {no:4,name:"Orman",kid:"Tekrar eden parçaya ad ver.",code:"B3 · Soyutlama",color:"#3d8a4a",acts:[
    {t:"Fidan Dik",d:"Çukurlara git, Fidan dik bloğuyla orman kur. Yanlış yerde dikilmez!",lvl:"● ●● ●●●",age:"4-10 yaş",open:()=>openActLevels("orman"),prog:(d=P())=>actProgL("orman",d),play:{mode:"orman",from:1,to:12}},
    {t:"Fidanlarla Desen",d:"Bidik yürüdüğü yere fidan diker: kodla sıra, kare, merdiven biçiminde orman kur. Tekrarla büyük desenler yap.",lvl:"●●",age:"6-9 yaş",open:()=>openActLevels("kalem"),prog:(d=P())=>actProgL("kalem",d),play:{mode:"kalem",from:1,to:8}},
@@ -4378,7 +4558,7 @@ window.bidikBack=function(){
   if(!$("home").hidden) return false;
   goHome(); return true;
 };
-window.__bidik={Yol,Kod,Daily,ACT,Voice,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DOSYA,db:()=>db,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
+window.__bidik={Yol,Kod,Blok,Daily,ACT,Voice,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DOSYA,db:()=>db,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
   actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS, save:()=>save(), allowed, openLevels,
