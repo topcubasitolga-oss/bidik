@@ -3837,8 +3837,7 @@ function buildBoard(st){
   L.items.forEach((it,i)=>s+=`<g data-it="${i}"></g>`);
   s+=`<polyline id="gTrail" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 16" opacity=".85" points=""/>`;
   s+=`<rect id="gFail" x="3" y="3" width="94" height="94" rx="14" fill="none" stroke="#e8443a" stroke-width="6" stroke-dasharray="10 6" style="display:none"/>`;
-  const leaf=C.kind==="cop"?`<g transform="scale(1.25)">${ART.yaprak.replace('cx="50" cy="56"','cx="0" cy="4"').replace('M50 56 L82 40','M0 4 L32 -12')}</g>`:"";
-  s+=`<g id="gGuess"></g><g id="gCar">${leaf}<g id="gRot"><g transform="scale(1.45)">${ROBOT}</g></g><g id="gCarry"></g></g>`;
+  s+=`<g id="gGuess"></g><g id="gCar"><g id="gRot"><g transform="scale(1.45)">${ROBOT}</g></g><g id="gCarry"></g></g>`; // Bidik tek başına (gölette yaprak sandal çizimi kaldırıldı)
   svg.innerHTML=s;
   svg.onclick=e=>{ if(!st.predicting||A.busy) return;
     const pt=new DOMPoint(e.clientX,e.clientY).matrixTransform(svg.getScreenCTM().inverse()), x=Math.floor(pt.x/CS), y=Math.floor(pt.y/CS);
