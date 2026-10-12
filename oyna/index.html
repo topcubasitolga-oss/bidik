@@ -3676,7 +3676,7 @@ function fsDoc(doc){ const o={}, f=(doc&&doc.fields)||{}; for(const k in f) o[k]
 function fsFields(o){ const f={}; for(const k in o) f[k]=fsEnc(o[k]); return {fields:f} }
 async function fsReq(rol,method,path,body,query){
   const tok=await fbToken(rol);
-  const r=await fetch(FB.base()+path+(query||""),{method,headers:{"Authorization":"Bearer "+tok,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+  const r=await fetch(FB.base()+path+(query||""),{method,cache:"no-store",headers:{"Authorization":"Bearer "+tok,"Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
   if(r.status===404) return null;
   const j=await r.json().catch(()=>({}));
   if(!r.ok){ const e=new Error((j.error&&j.error.message)||("HTTP "+r.status)); e.status=r.status; e.code=(j.error&&j.error.status)||""; throw e }
