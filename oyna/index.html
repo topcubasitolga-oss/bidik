@@ -174,16 +174,17 @@ h1,h2,h3{text-wrap:balance}
 #film.s3 .fska{opacity:1}
 #film.s3 .skab{animation:fpop .6s cubic-bezier(.3,1.6,.5,1) both}
 #film.s3 .skab:nth-child(2){animation-delay:.35s}
-.skab{background:var(--c);color:#fff;border-radius:14px;padding:6px 12px 8px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 0 rgba(0,0,0,.18);max-width:240px}
-.skab b{font-family:var(--display);font-size:34px;line-height:1}
-.skab span{font-weight:800;font-size:13px;line-height:1.15}
+.skab{background:var(--c);color:#fff;border-radius:14px;padding:6px 12px 6px 8px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 0 rgba(0,0,0,.18);max-width:240px}
+.skab .skai{width:40px;height:40px;flex:none;background:rgba(255,255,255,.14);border-radius:10px;padding:3px}
+.skab span{font-weight:800;font-size:13px;line-height:1.15;display:flex;flex-direction:column;text-align:left}
+.skab span b{font-family:var(--display);font-size:22px;line-height:1}
 .fspark i{position:absolute;left:var(--x);top:var(--y);width:10px;height:10px;background:#fff6a8;border-radius:50%;opacity:0;box-shadow:0 0 12px #ffe14d}
 #film.s3 .fspark i{animation:fspk 1.6s ease-in-out infinite;animation-delay:var(--d)}
 @keyframes fspk{0%,100%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.2)}}
 .fcap{margin:0;min-height:3.2em;font-size:clamp(16px,2.3vw,21px);font-weight:700;line-height:1.35;color:var(--ink);text-align:center;text-wrap:balance}
 #film .btns{display:flex;gap:10px}#film .btns button{flex:1;height:52px;border-radius:16px;font-weight:800;font-size:17px}
 .filmbtn{background:var(--ink)!important;color:#fff!important}
-@media (max-width:520px){ .skab span{font-size:11px} .skab b{font-size:26px} .fska{gap:6px;width:94%;justify-content:center} }
+@media (max-width:520px){ .skab span{font-size:11px} .skab span b{font-size:18px} .skab .skai{width:32px;height:32px} .fska{gap:6px;width:94%;justify-content:center} }
 @media (prefers-reduced-motion:reduce){.balloon,.seedglow{animation:none}}
 .conts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 @media (min-width:700px){.conts{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -1011,12 +1012,20 @@ function overlay(html){const o=$("overlay");o.innerHTML=`<div class="card" role=
 function closeOverlay(){$("overlay").hidden=true}
 function winCard({stars,checks,msg,onAgain,onNext,nextLabel,talk}){
   const ck=(ok,txt)=>`<span class="${ok?"y":"n"}">${ok?"✓":"○"} ${txt}</span>`;
+  const talkShow=talkOnce(talk);
   overlay(`${typeof confettiHTML==="function"&&stars===3?confettiHTML(24):""}<h2>Tebrikler!</h2><div class="bigstars">${[0,1,2].map(i=>starSVG(i<stars)).join("")}</div>
-   <div class="checks">${checks.map(c=>ck(c[0],c[1])).join("")}</div><p style="font-size:14px">${msg}</p>${talk?`<div class="talkbox speakable" id="ovTalk"><b>KONUŞALIM</b>${talk}</div>`:""}
+   <div class="checks">${checks.map(c=>ck(c[0],c[1])).join("")}</div><p style="font-size:14px">${msg}</p>${talkShow?`<div class="talkbox speakable" id="ovTalk"><b>KONUŞALIM</b>${talk}</div>`:""}
    <div class="btns"><button class="btn-alt" id="ovAgain">Tekrar</button><button class="btn-main" id="ovNext">${nextLabel||"Sonraki"}</button></div>`);
-  if(talk){ const txt=String(talk).replace(/<[^>]+>/g,""); const say=f=>Voice.say(txt,f); setTimeout(()=>{ if($("ovTalk")) Voice.sayWhenFree(txt,false,()=>!!$("ovTalk")) },700); $("ovTalk").onclick=()=>say(true) }
+  // Önce tebrik (hedef cümlesi bitince), sonra varsa Konuşalım sorusu
+  const guard=()=>!$("overlay").hidden&&!!$("ovNext");
+  const txt=talkShow?String(talk).replace(/<[^>]+>/g,""):"";
+  setTimeout(()=>{ if(!guard()) return; Voice.sayWhenFree(TEBRIK,false,guard,()=>{ if(txt&&guard()) setTimeout(()=>Voice.sayWhenFree(txt,false,guard),300) }) },600);
+  if(talkShow){ $("ovTalk").onclick=()=>Voice.say(txt,true) }
   $("ovAgain").onclick=()=>{Voice.stop();onAgain()}; $("ovNext").onclick=()=>{Voice.stop();onNext()};
 }
+const TEBRIK="Tebrikler! Görevi başarıyla tamamladın.";
+// Konuşalım sorusu aynı etkinlikte her bölümde yinelenmesin: aynı soru bu oyuncuya bir kez gösterilir (Konuşalım düğmesinden her zaman açılabilir)
+function talkOnce(talk){ if(!talk) return false; const key="talk:"+String(talk).replace(/<[^>]+>/g,"").replace(/\s+/g," ").trim().slice(0,80); const d=P(); d.seen=d.seen||{}; if(d.seen[key]) return false; d.seen[key]=1; save(); return true }
 function introCard(c,then){
   overlay(`<span class="kicker">${c.kicker||"Yeni"}</span>${c.art?`<svg class="art" viewBox="0 0 100 100">${c.art}</svg>`:""}<h2>${c.title}</h2><p id="ovText" class="speakable">${c.text}</p>${c.ex&&c.ex.length?`<div class="ex">${c.ex.map(t=>blkHTML(t)).join("")}</div>`:""}<div class="btns"><button class="btn-main" id="ovOk">Anladım, başla</button></div>`);
   // kartı sesli oku (kayıt varsa karakterin sesiyle); metne dokununca yeniden okur
@@ -2609,7 +2618,7 @@ const Voice={
   // şu an bir kayıt ya da cihaz sesi çalıyor mu?
   busy(){ try{ return !!this.aud||(typeof speechSynthesis!=="undefined"&&speechSynthesis.speaking) }catch(e){ return !!this.aud } },
   // süren konuşma bitince söyle (önceki cümleyi kesmez); guard() false dönerse vazgeçer
-  sayWhenFree(text,force,guard){ const t0=Date.now(); const tick=()=>{ if(guard&&!guard()) return; if(!this.busy()||Date.now()-t0>20000) this.say(text,force); else setTimeout(tick,150) }; tick() }
+  sayWhenFree(text,force,guard,then){ const t0=Date.now(); const tick=()=>{ if(guard&&!guard()) return; if(!this.busy()||Date.now()-t0>20000){ const u=this.say(text,force); if(then){ if(u) u.onend=then; else then() } } else setTimeout(tick,150) }; tick() }
 };
 Voice.init();
 // görev yazıları değişince oku; yazıya dokununca tekrar oku
@@ -3044,7 +3053,20 @@ function filmBlock(t){
   return blkHTML(t);
 }
 const SKA_COCUK={2:"Herkese yiyecek",6:"Temiz su",7:"Temiz enerji",9:"Güvenli yollar",11:"Güzel şehirler",12:"Atıkları azalt",13:"İklimi koru",14:"Sudaki canlılar",15:"Karadaki canlılar",17:"Hep birlikte"};
-function skaBadge(n){ const s=SKA[n]; return `<div class="skab" style="--c:${s[1]}" title="Sürdürülebilir Kalkınma Amacı ${n}: ${s[0]}"><span>🌍</span><span>${SKA_COCUK[n]||s[0]}</span></div>` }
+// SKA rozeti: amacın resmi rengi, numarası ve amacı anlatan beyaz piktogram (Bidik'in kendi çizimi), çocuk diliyle kısa ad
+const SKA_IKON={
+  2:`<path d="M8 19 h16 a8 8 0 0 1 -16 0z" fill="#fff"/><path d="M12 15 q2 -4 0 -7 M16 15 q2 -4 0 -7 M20 15 q2 -4 0 -7" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+  6:`<path d="M16 5 C12 11 9 14 9 19 a7 7 0 0 0 14 0 c0 -5 -3 -8 -7 -14z" fill="#fff"/><path d="M13 20 a3 3 0 0 0 3 3" stroke="#26BDE2" stroke-width="1.8" fill="none" stroke-linecap="round"/>`,
+  7:`<circle cx="16" cy="16" r="5" fill="#fff"/>${[0,45,90,135,180,225,270,315].map(a=>`<path d="M16 5 V8" stroke="#fff" stroke-width="2.4" stroke-linecap="round" transform="rotate(${a} 16 16)"/>`).join("")}`,
+  9:`<path d="M4 24 h24" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><path d="M6 24 q10 -16 20 0" stroke="#fff" stroke-width="2.6" fill="none"/><path d="M10 24 v-4 M16 24 v-7 M22 24 v-4" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="13" y="6" width="6" height="5" rx="1" fill="#fff"/><path d="M16 11 v4" stroke="#fff" stroke-width="2"/>`,
+  11:`<path d="M4 26 h24" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><rect x="6" y="14" width="6" height="12" fill="#fff"/><rect x="14" y="8" width="7" height="18" fill="#fff"/><rect x="23" y="16" width="5" height="10" fill="#fff"/><path d="M16 11 h3 M16 15 h3 M16 19 h3 M8 17 h2 M8 21 h2" stroke="${"#FD9D24"}" stroke-width="1.6"/>`,
+  12:`<path d="M9 13 a7.5 7.5 0 0 1 14 -1" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M23 19 a7.5 7.5 0 0 1 -14 1" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M20 8 l4 4 -5 1z M12 24 l-4 -4 5 -1z" fill="#fff"/>`,
+  13:`<circle cx="16" cy="17" r="8" fill="none" stroke="#fff" stroke-width="2.4"/><path d="M8 17 h16 M16 9 c-4 4 -4 12 0 16 c4 -4 4 -12 0 -16" stroke="#fff" stroke-width="1.8" fill="none"/><path d="M23 6 q4 0 4 4 q-4 0 -4 -4z" fill="#fff"/>`,
+  14:`<path d="M6 16 c4 -6 12 -6 16 0 l4 -3 v6 l-4 -3 c-4 6 -12 6 -16 0z" fill="#fff"/><circle cx="11" cy="15" r="1.3" fill="#0A97D9"/><path d="M5 24 q4 -3 8 0 t8 0 t6 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+  15:`<rect x="14.5" y="18" width="3" height="8" fill="#fff"/><circle cx="16" cy="12" r="7" fill="#fff"/><circle cx="10" cy="16" r="4.5" fill="#fff"/><circle cx="22" cy="16" r="4.5" fill="#fff"/><path d="M4 26 h24" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>`,
+  17:`<circle cx="16" cy="16" r="8" fill="none" stroke="#fff" stroke-width="2.2" stroke-dasharray="3 3"/>${[0,72,144,216,288].map(a=>`<circle cx="16" cy="7" r="2.6" fill="#fff" transform="rotate(${a} 16 16)"/>`).join("")}<circle cx="16" cy="16" r="2.6" fill="#fff"/>`
+};
+function skaBadge(n){ const s=SKA[n]; return `<div class="skab" style="--c:${s[1]}" title="Sürdürülebilir Kalkınma Amacı ${n}: ${s[0]}"><svg class="skai" viewBox="0 0 32 32" aria-hidden="true">${SKA_IKON[n]||""}</svg><span><b>${n}</b>${SKA_COCUK[n]||s[0]}</span></div>` }
 // ilk "Oyna"da Bidik kendini tanıtır (oyuncu başına bir kez; ses kapalıysa atlanır)
 const HOSGELDIN="Merhaba! Ben Bidik. Kasabamızda yedi sorun var. Hadi, kodla birlikte çözelim!";
 function hello(then,force){
@@ -4335,7 +4357,7 @@ window.__bidik={Yol,Kod,Daily,ACT,Voice,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DO
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
   actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS, save:()=>save(), allowed, openLevels,
-  sceneSVG,regionArt,ART:()=>({ANIMALS,ROBOT,MASCOT_FRONT,homeArt,coinArt,keyArt,gateArt:Yol.gateArt||"",FLOWER,dest:[0,1,2,3,4].map(destArt),house:[0,1,2,3].map(k=>blockArt(0,k)),tree:blockArt(1,0),finish:finishArt(0),start:startArt,tunnel:Yol.tunnelArt?Yol.tunnelArt(0):"",water:waterArt(),ACT:(typeof ART!=="undefined"?ART:{}),bin:(typeof binArt==="function"?["sari","mavi","yesil"].map(binArt):[]),BLK:Object.fromEntries(["F","L","R","G","2","3","4"].map(t=>[t,blkHTML(t)]))})};
+  sceneSVG,regionArt,skaBadge:(n)=>skaBadge(n),ART:()=>({ANIMALS,ROBOT,MASCOT_FRONT,homeArt,coinArt,keyArt,gateArt:Yol.gateArt||"",FLOWER,dest:[0,1,2,3,4].map(destArt),house:[0,1,2,3].map(k=>blockArt(0,k)),tree:blockArt(1,0),finish:finishArt(0),start:startArt,tunnel:Yol.tunnelArt?Yol.tunnelArt(0):"",water:waterArt(),ACT:(typeof ART!=="undefined"?ART:{}),bin:(typeof binArt==="function"?["sari","mavi","yesil"].map(binArt):[]),BLK:Object.fromEntries(["F","L","R","G","2","3","4"].map(t=>[t,blkHTML(t)]))})};
 if($("miniBot")) $("miniBot").innerHTML=MASCOT;
 $("mascot").innerHTML=MASCOT_FRONT;
 goHome();
