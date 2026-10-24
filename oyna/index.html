@@ -4954,19 +4954,27 @@ const Ara=(()=>{
 })();
 // ==BAĞLANTI== Kitaptaki QR kodlar: ?ac=<mod>:<n> → ilgili bölümü doğrudan açar.
 // mod: kod | yol | <bölge id: golet, cicek, orman, donusum, gece, tarla, kalem, yaris> | ders (n: sira, donus, dongu, fonksiyon, eger, sensor, hata)
-// Yaş bandı seçilmemişse önce seçim ekranı kalır; seçim yapılınca bölüm açılır. Kilitli bölüm istenirse o etkinliğin listesi açılır.
+// Kitap ilerlemesi oyunun yaş bandından bağımsızdır: istenen bölüm varsa doğrudan açılır (yaş bandı kısıtı uygulanmaz),
+// yalnızca öğretmenin sınıf kilidi sayılır. Bölüm yoksa ya da kilitliyse o etkinliğin listesi açılır.
+// Yaş bandı seçilmemişse önce seçim ekranı kalır; seçim yapılınca bölüm açılır.
 try{
   const q=new URLSearchParams(location.search), ac=(q.get("ac")||"").trim();
   if(ac){
     history.replaceState(null,"",location.pathname+(location.hash||""));
     const [mod,arg]=ac.split(":"); const n=parseInt(arg,10);
     const ac_ok=()=>{ try{ return !!curLevel() }catch(e){ return false } };
+    const kilitOk=(m,k)=>{ try{ return typeof sinifKilitOk!=="function"||sinifKilitOk(m,k) }catch(e){ return true } };
     const git=()=>{
       try{
         if(typeof closeOverlay==="function") closeOverlay();
         if(mod==="ders"){ if(Kod.LESSON_NAMES[arg]) Kod.lesson(arg,()=>goHome()); return }
-        if(mod==="kod"||mod==="yol"){ if(!(n>=1)) return; if(allowed(mod,n)) (mod==="kod"?Kod:Yol).start(n); else openLevels(mod); return }
-        if(ACT[mod]){ if(n>=1&&allowed(mod,n)) startAct(mod,n); else openActLevels(mod) }
+        if(mod==="kod"||mod==="yol"){
+          const M=mod==="kod"?Kod:Yol;
+          if(n>=1&&n<=M.TOTAL&&kilitOk(mod,n)) M.start(n); else openLevels(mod);
+          return
+        }
+        const m=ACT[mod];
+        if(m){ const top=Math.max(...m.parts.map(p=>p.to)); if(n>=1&&n<=top&&kilitOk(mod,n)) startAct(mod,n); else openActLevels(mod) }
       }catch(e){}
     };
     let dene=0; const bekle=()=>{ if(ac_ok()){ git(); return } if(++dene<120) setTimeout(bekle,500) }; // yaş seçimi için en çok 60 sn bekle
