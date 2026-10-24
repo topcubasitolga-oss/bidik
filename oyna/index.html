@@ -5,6 +5,7 @@
 <meta name="theme-color" content="#2fae9f">
 <link rel="icon" href="../simgeler/simge-192.png">
 <link rel="apple-touch-icon" href="../simgeler/apple-touch-icon.png">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="a2bd2b28-1314-49b9-acba-813cbd034368" data-domains="bidik.tr,www.bidik.tr" data-exclude-search="true" data-exclude-hash="true"></script>
 <link rel="manifest" href="../manifest.webmanifest">
 <!doctype html><html lang='tr'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'></head><body><title>Bidik</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -3710,14 +3711,14 @@ function durakDoneCard(no,next){
     <h2>Durak tamam!</h2>
     <p class="speakable" id="ovGecis">${esc(say)}</p>
     <div class="btns"><button class="btn-alt" id="ovMap">Harita</button><button class="btn-main" id="ovGo">${esc(nw.kita)} ▶</button></div>`);
-  sfx.win&&sfx.win();
+  sfx.win&&sfx.win(); try{ Olcum.ev("durak-bitti",{durak:String(no)}) }catch(e){}
   setTimeout(()=>Voice.sayWhenFree(say,true,()=>!!$("ovGo")),700);
   $("ovGecis").onclick=()=>Voice.say(say,true);
   $("ovMap").onclick=()=>{ Voice.stop(); closeOverlay(); goHome() };
   $("ovGo").onclick=()=>{ Voice.stop(); sfx.click(); closeOverlay(); gotoDurak(next) };
 }
 function finalDoneCard(){
-  const say=DURAK_GECIS[7];
+  const say=DURAK_GECIS[7]; try{ Olcum.ev("oyun-bitti") }catch(e){}
   overlay(`${confettiHTML(28)}<span class="kicker">Yedi durak</span><div class="festsvg">${gardenSVG(DURAKS.map(dk=>hasSeed(dk)),seedCount(),false)}</div>
     <h2>Hepsi tamam!</h2><p class="speakable" id="ovGecis">${esc(say)}</p>
     <div class="btns"><button class="btn-alt" id="ovMap">Harita</button><button class="btn-main" id="ovGo">Meydan ▶</button></div>`);
@@ -4686,7 +4687,7 @@ async function sinifKatilBitir(btn){
     d.sinif={kod:t.kod,ad:t.ad,okul:t.okul||"",no:t.no,karakter:t.karakter,katilim:(d.sinif&&d.sinif.katilim)||now,kilit:{},dirty:1};
     if(t.seviye&&!d.level) d.level=t.seviye;
     p.name=`No ${t.no}`; p.karakter=t.karakter;
-    db.cur=p.id; saveCore();
+    db.cur=p.id; saveCore(); try{ Olcum.ev("sinif-katildi") }catch(e){}
     await sinifPull(d);
     await sinifPushOne(d);
     sinifTaslak=null; goHome();
@@ -4755,7 +4756,7 @@ function sinifOlustur(){
       }
       if(!kod) throw new Error("Kod üretilemedi, tekrar deneyin.");
       await fsReq("ogretmen","POST","/siniflar",fsFields({ad,okul,n,seviye,sahip:uid,kilit:{},olusturma:new Date().toISOString()}),"?documentId="+kod);
-      db.sinif={kod,ad,okul,n,seviye,anahtar,olusturma:Date.now()}; saveCore();
+      db.sinif={kod,ad,okul,n,seviye,anahtar,olusturma:Date.now()}; saveCore(); try{ Olcum.ev("sinif-olusturuldu") }catch(e){}
       sinifKodKart(true);
     }catch(err){ sHata(hataMetni(err)); sBekle(false) }
   };
@@ -4883,6 +4884,22 @@ if($("sinifBtn")) $("sinifBtn").onclick=()=>{ sfx.click(); sinifKatil() };
 if($("sinifTeachBtn")) $("sinifTeachBtn").onclick=()=>{ sfx.click(); sinifOgretmen() };
 // adres çubuğundan: ?ogretmen=sinif → doğrudan öğretmen sınıf ekranı
 try{ const q=new URLSearchParams(location.search); if(q.get("ogretmen")==="sinif"&&sinifOn()){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ closeOverlay(); sinifOgretmen() },500) } }catch(e){}
+// ==ÖLÇÜM== Çerezsiz kullanım sayımı (Umami). Sayfa görüntülemeleri Umami betiğince otomatik sayılır;
+// burada yalnızca seyrek, kişi tanımlamayan olaylar işaretlenir. Oyuncu adı, sınıf kodu, IP vb. hiçbir zaman gönderilmez.
+// Gönderilen alanlar: mod (yol/kod/act), yaş bandı ayarı (y4…s4), cihaz sınıfı (telefon/tablet/tahta/bilgisayar), öğretmen modu açık mı.
+const Olcum=(()=>{
+  const cihaz=()=>{ const w=Math.max(innerWidth,innerHeight), dokun=(navigator.maxTouchPoints||0)>0; return w>=1200?(dokun?"tahta":"bilgisayar"):w>=800?"tablet":"telefon" };
+  let basladi=false;
+  function ev(ad,veri){ try{ if(window.umami&&typeof umami.track==="function") umami.track(ad,veri||{}) }catch(e){} }
+  function ekran(id){
+    if(basladi||!(id==="yol"||id==="kod"||id==="act")) return; basladi=true;
+    let yas=""; try{ yas=String(curLevel()||"") }catch(e){}
+    let ogr="hayir"; try{ ogr=teacherOn()?"evet":"hayir" }catch(e){}
+    ev("oyun-basladi",{mod:id,yas,cihaz:cihaz(),ogretmen:ogr});
+  }
+  return {ev,ekran};
+})();
+{ const _show=show; show=function(id){ try{ Olcum.ekran(id) }catch(e){} return _show.apply(this,arguments) } }
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
