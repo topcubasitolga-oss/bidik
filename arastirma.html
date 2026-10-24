@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="tr"><head><meta charset="utf-8">
+<script>(function(){if(!/github\.io$/.test(location.hostname))return;var h="https://bidik.tr"+location.pathname.replace(/^\/bidik/,"")+location.search+location.hash;var go=function(){location.replace(h)};try{if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister()}))}).then(function(){return caches&&caches.keys?caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k)}))}):null}).then(go,go);setTimeout(go,2500)}else go()}catch(e){go()}})();</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2fae9f">
+<link rel="icon" href="simgeler/simge-192.png">
+<link rel="apple-touch-icon" href="simgeler/apple-touch-icon.png">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="a2bd2b28-1314-49b9-acba-813cbd034368" data-domains="bidik.tr,www.bidik.tr" data-exclude-search="true" data-exclude-hash="true"></script>
+<title>Bidik Araştırma</title>
+<meta name="description" content="Bidik anonim öğrenme verisi: yaş bandı, beceri, ilk deneme başarısı, hata türleri. Yalnızca araştırmacı girişiyle.">
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+:root{--ink:#16324a;--ink-soft:#466179;--sky:#dff4f1;--line:#cfe7e3;--green:#22a165;--red:#e8443a;--rail:#ffc93c;--display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;--body:"Nunito","Segoe UI",system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--body);line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0}h1{font-size:clamp(32px,5vw,46px);margin:8px 0 4px}h2{font-size:24px;margin-bottom:6px}
+.lead{font-size:17px;font-weight:600;color:var(--ink-soft);max-width:760px}
+.top{display:flex;gap:14px;flex-wrap:wrap;font-weight:800}.top a{color:var(--ink)}
+.kart{background:#fff;border-radius:20px;padding:16px 18px;margin-top:18px;border:2px solid var(--line)}
+.kart p{margin:6px 0 0;font-weight:600;color:var(--ink-soft)}
+label{font-weight:800;font-size:14px;display:block;margin-top:10px}
+input,select{font:inherit;font-weight:700;border:2px solid var(--line);border-radius:12px;padding:9px 12px;width:100%;max-width:360px;background:#fff;color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--rail);color:var(--ink);font-weight:800;border:0;border-radius:12px;padding:10px 18px;box-shadow:0 3px 0 #d99a00;cursor:pointer;font:inherit;font-weight:800;text-decoration:none}
+.btn.alt{background:#fff;border:2px solid var(--line);box-shadow:none}
+.btn:disabled{opacity:.5;cursor:default}
+.hata{color:var(--red);font-weight:800;margin-top:8px}
+.oz{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:12px}
+.oz div{background:var(--sky);border-radius:14px;padding:10px 12px}.oz b{display:block;font-family:var(--display);font-size:28px;line-height:1}.oz span{font-size:13px;font-weight:800;color:var(--ink-soft)}
+.suz{display:flex;gap:10px;flex-wrap:wrap;align-items:end}.suz label{margin:0}.suz input,.suz select{width:auto;min-width:120px}
+table{border-collapse:collapse;width:100%;margin-top:10px;font-size:14px}
+th{font-family:var(--display);text-align:left;border-bottom:3px solid var(--ink);padding:6px 8px;font-size:15px;white-space:nowrap}
+td{border-bottom:1px solid #e3ecef;padding:6px 8px;vertical-align:middle;white-space:nowrap}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.cub{display:inline-block;height:10px;background:var(--green);border-radius:5px;vertical-align:middle;margin-right:6px;min-width:2px}
+.cub.k{background:var(--red)}
+.not{font-size:13px;color:var(--ink-soft);font-weight:700;margin-top:6px}
+.sek{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.sek button{font:inherit;font-weight:800;border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--ink)}.sek button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tabwrap{overflow:auto}
+small.kucuk{color:var(--ink-soft);font-weight:700}
+#panel[hidden]{display:none}
+</style>
+</head><body>
+<div class="wrap">
+  <div class="top"><a href="index.html">← Bidik</a><a href="ogretmen.html">Öğretmen Odası</a><a href="oyna/index.html">Oyunu aç</a></div>
+  <h1>Araştırma</h1>
+  <p class="lead">Oyunun ürettiği anonim öğrenme kayıtları: oturum, yaş bandı ayarı, beceri, deneme sırası, sonuç, hata türü. Kimlik, ad, sınıf kodu ya da IP yoktur. Yalnızca araştırmacı hesabıyla açılır.</p>
+
+  <div class="kart" id="giris">
+    <h2>Araştırmacı girişi</h2>
+    <label>E-posta <input id="gE" type="email" autocomplete="username"></label>
+    <label>Şifre <input id="gP" type="password" autocomplete="current-password"></label>
+    <p style="margin-top:12px"><button class="btn" id="gBtn">Giriş yap</button> <span class="hata" id="gHata"></span></p>
+    <p class="not">Hesap Firebase Authentication'da (e-posta/şifre) açılır; okuma izni güvenlik kurallarında yalnızca bu e-postaya tanımlıdır.</p>
+  </div>
+
+  <div id="panel" hidden>
+    <div class="kart">
+      <div class="suz">
+        <label>Başlangıç <input type="date" id="fBas"></label>
+        <label>Bitiş <input type="date" id="fBit"></label>
+        <label>Yaş bandı <select id="fYas"><option value="">Hepsi</option><option>y4</option><option>y5</option><option>s1</option><option>s2</option><option>s3</option><option>s4</option></select></label>
+        <label>Cihaz <select id="fCihaz"><option value="">Hepsi</option><option>telefon</option><option>tablet</option><option>tahta</option><option>bilgisayar</option></select></label>
+        <label>Öğretmen modu <select id="fOgr"><option value="">Hepsi</option><option value="1">Açık</option><option value="0">Kapalı</option></select></label>
+        <label>Sınıf kodu <select id="fSinif"><option value="">Hepsi</option><option value="1">Var</option><option value="0">Yok</option></select></label>
+        <button class="btn alt" id="fUygula">Uygula</button>
+        <button class="btn alt" id="yenile">Yeniden yükle</button>
+        <button class="btn" id="csv">CSV indir</button>
+        <button class="btn alt" id="cikis">Çıkış</button>
+      </div>
+      <p class="not" id="durum">Yükleniyor…</p>
+      <div class="oz" id="ozet"></div>
+    </div>
+    <div class="kart"><h2>Beceri × yaş bandı: ilk denemede çözme oranı</h2><p>Her hücre: o beceride başlanan görevlerin yüzde kaçı ilk çalıştırmada çözüldü (parantez: görev sayısı). Görev = bir oturumda bir bölüm.</p><div class="tabwrap" id="t1"></div></div>
+    <div class="kart"><h2>Deneme sayısı dağılımı (yaş bandına göre)</h2><p>Çözülen görevlerde ilk başarıya kadar çalıştırma sayısı; "çözülmedi" başlanıp çözülmeyen görevler.</p><div class="tabwrap" id="t2"></div></div>
+    <div class="kart"><h2>Hata türleri (beceriye göre)</h2><p>Başarısız çalıştırmalarda tespit edilen hata türü. Kodla Sür: tur = yanlış blok türü, sayi = tekrar sayısı, kosul = yanlış koşul, fazla = fazla blok, takildi = engele takıldı, hedef = hedefe varmadı. Yol Kur: kopuk, yon, su, engel, kapi, tunel, parca-yon, tekyon, eksik-hedef.</p><div class="tabwrap" id="t3"></div></div>
+    <div class="kart"><h2>En çok takılınan bölümler</h2><p>En az 5 görev başlanan bölümler, çözülme oranına göre.</p><div class="tabwrap" id="t4"></div></div>
+    <div class="kart"><h2>Yardım kullanımı ve tahmin</h2><p>İpucu alınan ve çözüm gösterilen görevlerin payı; tahmin et modunda doğru tahmin oranı; öğretmen modunda atlanan ders sayısı.</p><div class="tabwrap" id="t5"></div></div>
+    <div class="kart"><h2>Cihaz ve oturumlar</h2><div class="tabwrap" id="t6"></div><div class="tabwrap" id="t7"></div></div>
+  </div>
+</div>
+<script>
+const CFG={"apiKey": "AIzaSyBgfIjNEWnD0ymyy07_453DilXXs_cImj4", "projectId": "bidik-sinif"};
+const BASE=()=>`https://firestore.googleapis.com/v1/projects/${CFG.projectId}/databases/(default)/documents`;
+const $=id=>document.getElementById(id);
+const YAS=["y4","y5","s1","s2","s3","s4"], YAS_AD={y4:"4 yaş",y5:"5 yaş",s1:"1. sınıf",s2:"2. sınıf",s3:"3. sınıf",s4:"4. sınıf","":"(seçilmemiş)"};
+const BECERI_AD={algoritma:"Algoritma (sıra)",yon:"Yön / perspektif",dongu:"Döngü",fonksiyon:"Fonksiyon",kosul:"Koşul",karma:"Karma (usta)","hata-ayiklama":"Hata ayıklama",yol:"Yol Kur (planlama)",act:"Bölge görevleri"};
+const BOLGE={golet:"Gölet",cicek:"Çiçek Tarlası",orman:"Orman",donusum:"Geri Dönüşüm",gece:"Gece Sokakları",tarla:"Tarla",mahalle:"Mahalle",yaris:"Yarış",kalem:"Kalem",senlik:"Şenlik",koord:"Koordinat",boncuk:"Boncuk",ikili:"İkili",kural:"Kural",piknik:"Piknik",sira:"Sıra",yavru:"Yavru"};
+const yerelGun=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; // yerel takvim günü (UTC değil)
+function dec(v){ if(!v) return null; if("stringValue" in v) return v.stringValue; if("integerValue" in v) return +v.integerValue; if("doubleValue" in v) return v.doubleValue; if("booleanValue" in v) return v.booleanValue; if("arrayValue" in v) return (v.arrayValue.values||[]).map(dec); if("mapValue" in v){ const o={}, f=v.mapValue.fields||{}; for(const k in f) o[k]=dec(f[k]); return o } return null }
+// ---- oturum ----
+const S={tok:null,docs:[]};
+function tokYukle(){ try{ const t=JSON.parse(sessionStorage.getItem("araTok")||"null"); if(t&&t.exp>Date.now()) S.tok=t }catch(e){} }
+async function giris(e,p){
+  const r=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(CFG.apiKey)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:e,password:p,returnSecureToken:true})});
+  const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error((j.error&&j.error.message)||"GİRİŞ");
+  S.tok={id:j.idToken,exp:Date.now()+((+j.expiresIn)||3600)*1000-60000,email:j.email}; sessionStorage.setItem("araTok",JSON.stringify(S.tok));
+}
+async function yukle(){
+  $("durum").textContent="Yükleniyor…"; const docs=[]; let token="";
+  do{
+    const r=await fetch(`${BASE()}/arastirma?pageSize=300${token?"&pageToken="+encodeURIComponent(token):""}`,{headers:{Authorization:"Bearer "+S.tok.id},cache:"no-store"});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){ const m=(j.error&&j.error.message)||("HTTP "+r.status); if(r.status===401||r.status===403){ cikis(); $("gHata").textContent="Bu hesabın okuma izni yok ya da oturum süresi doldu: "+m } throw new Error(m) }
+    for(const d of (j.documents||[])){ const o={}; for(const k in (d.fields||{})) o[k]=dec(d.fields[k]); o.oturum=d.name.split("/").pop(); o.zaman=new Date(o.t0||d.createTime); docs.push(o) }
+    token=j.nextPageToken||""; $("durum").textContent=`Yükleniyor… ${docs.length} oturum`;
+  }while(token);
+  S.docs=docs; $("durum").textContent=`${docs.length} oturum yüklendi · ${new Date().toLocaleTimeString("tr-TR")}`;
+  const ilk=docs.map(d=>d.zaman).sort((a,b)=>a-b)[0]; if(ilk&&!$("fBas").value) $("fBas").value=yerelGun(ilk);
+  if(!$("fBit").value) $("fBit").value=yerelGun(new Date());
+  hesapla();
+}
+function cikis(){ S.tok=null; sessionStorage.removeItem("araTok"); $("panel").hidden=true; $("giris").hidden=false }
+// ---- süzgeç ve görevler ----
+function suzulmus(){
+  const bas=$("fBas").value?new Date($("fBas").value+"T00:00:00"):null, bit=$("fBit").value?new Date($("fBit").value+"T23:59:59.999"):null; // yerel saat
+  const yas=$("fYas").value, cihaz=$("fCihaz").value, ogr=$("fOgr").value, sinif=$("fSinif").value;
+  return S.docs.filter(d=>(!bas||d.zaman>=bas)&&(!bit||d.zaman<=bit)&&(!yas||d.yas===yas)&&(!cihaz||d.cihaz===cihaz)&&(ogr===""||!!d.ogr===(ogr==="1"))&&(sinif===""||!!d.sinif===(sinif==="1")));
+}
+// görev = (oturum, m, n): ilk deneme sonucu, çözüme kadar deneme, ipucu, çözüm gösterme, terk
+function gorevler(docs){
+  const G=[];
+  for(const d of docs){
+    const map=new Map();
+    for(const r of (d.d||[])){ if(r.m==="ders") continue; const key=r.m+"#"+r.n; if(!map.has(key)) map.set(key,{oturum:d.oturum,yas:d.yas||"",cihaz:d.cihaz||"",ogr:!!d.ogr,sinif:!!d.sinif,m:r.m,n:r.n,b:null,den:[],ip:0,cozum:false,th:[],gun:!!r.gun}); const g=map.get(key);
+      if(r.b&&!g.b) g.b=r.b; if(r.ip>g.ip) g.ip=r.ip; if(r.s==="cozum") g.cozum=true; if(r.th!=null&&r.th!==undefined) g.th.push(+r.th);
+      if(r.s==="ok"||r.s==="hata") g.den.push({ok:r.s==="ok",h:r.h||null,k:r.k||g.den.length+1,t:r.t}) }
+    for(const g of map.values()){
+      g.beceri=g.m.startsWith("act:")?"act":(g.b||(g.m==="yol"?"yol":"?"));
+      g.basladi=true; const i=g.den.findIndex(x=>x.ok); g.cozuldu=i>=0; g.denemeSayisi=g.cozuldu?i+1:g.den.length; g.ilkOk=g.den.length>0&&g.den[0].ok; g.denendi=g.den.length>0;
+      g.hatalar=g.den.filter(x=>!x.ok&&x.h).map(x=>x.h); G.push(g);
+    }
+  }
+  return G;
+}
+const yuzde=(a,b)=>b?Math.round(100*a/b):null;
+function bar(p,k){ return p==null?"—":`<span class="cub${k?" k":""}" style="width:${Math.max(2,p*0.9)}px"></span>${p}%` }
+function tablo(id,basliklar,satirlar){ $(id).innerHTML=`<table><thead><tr>${basliklar.map((h,i)=>`<th${i?' class="n"':''}>${h}</th>`).join("")}</tr></thead><tbody>${satirlar.map(r=>`<tr>${r.map((c,i)=>`<td${i?' class="n"':''}>${c==null?"—":c}</td>`).join("")}</tr>`).join("")||`<tr><td colspan="${basliklar.length}">Veri yok</td></tr>`}</tbody></table>` }
+function hesapla(){
+  const docs=suzulmus(), G=gorevler(docs), D=G.filter(g=>g.denendi);
+  const satir=docs.reduce((a,d)=>a+((d.d||[]).length),0), sure=docs.map(d=>{ const t=(d.d||[]).map(r=>r.t||0); return t.length?Math.max(...t):0 });
+  const ortSure=docs.length?Math.round(sure.reduce((a,b)=>a+b,0)/docs.length/60):0;
+  $("ozet").innerHTML=[[docs.length,"oturum"],[G.length,"görev (bölüm denemesi)"],[satir,"kayıt satırı"],[ortSure+" dk","ortalama oturum"],[yuzde(D.filter(g=>g.ilkOk).length,D.length)==null?"—":yuzde(D.filter(g=>g.ilkOk).length,D.length)+"%","ilk denemede çözme"],[yuzde(G.filter(g=>!g.cozuldu).length,G.length)==null?"—":yuzde(G.filter(g=>!g.cozuldu).length,G.length)+"%","çözülmeden bırakılan"]].map(([b,s])=>`<div><b>${b}</b><span>${s}</span></div>`).join("");
+  // T1 beceri × yaş: ilk denemede çözme
+  const beceriler=[...new Set(D.map(g=>g.beceri))].sort((a,b)=>Object.keys(BECERI_AD).indexOf(a)-Object.keys(BECERI_AD).indexOf(b));
+  const yasKol=YAS.filter(y=>D.some(g=>g.yas===y)).concat(D.some(g=>!YAS.includes(g.yas))?[""]:[]);
+  tablo("t1",["Beceri",...yasKol.map(y=>YAS_AD[y]),"Toplam"],beceriler.map(b=>{ const row=D.filter(g=>g.beceri===b); return [BECERI_AD[b]||b,...yasKol.map(y=>{ const s=row.filter(g=>g.yas===y); return s.length?`${bar(yuzde(s.filter(g=>g.ilkOk).length,s.length))} <small class="kucuk">(${s.length})</small>`:"—" }),`${bar(yuzde(row.filter(g=>g.ilkOk).length,row.length))} <small class="kucuk">(${row.length})</small>`] }));
+  // T2 deneme dağılımı
+  const kutu=g=>!g.cozuldu?"çözülmedi":g.denemeSayisi===1?"1":g.denemeSayisi===2?"2":g.denemeSayisi===3?"3":g.denemeSayisi<=5?"4–5":"6+";
+  const KUT=["1","2","3","4–5","6+","çözülmedi"];
+  tablo("t2",["Yaş bandı",...KUT,"Görev"],yasKol.map(y=>{ const s=D.filter(g=>g.yas===y); return [YAS_AD[y],...KUT.map(k=>{ const c=s.filter(g=>kutu(g)===k).length; return s.length?`${yuzde(c,s.length)}% <small class="kucuk">(${c})</small>`:"—" }),s.length] }));
+  // T3 hata türleri
+  const hataTur=[...new Set(D.flatMap(g=>g.hatalar))];
+  tablo("t3",["Beceri",...hataTur,"Hatalı çalıştırma"],beceriler.map(b=>{ const hs=D.filter(g=>g.beceri===b).flatMap(g=>g.hatalar); return [BECERI_AD[b]||b,...hataTur.map(h=>{ const c=hs.filter(x=>x===h).length; return c?`${yuzde(c,hs.length)}% <small class="kucuk">(${c})</small>`:"" }),hs.length] }));
+  // T4 takılınan bölümler
+  const byLv=new Map(); for(const g of G){ const key=g.m+"#"+g.n; if(!byLv.has(key)) byLv.set(key,[]); byLv.get(key).push(g) }
+  const lvAd=m=>m==="yol"?"Yol Kur":m==="kod"?"Kodla Sür":("Bölge: "+(BOLGE[m.slice(4)]||m.slice(4)));
+  const zor=[...byLv.entries()].filter(([k,v])=>v.length>=5).map(([k,v])=>{ const den=v.filter(g=>g.denendi); const coz=v.filter(g=>g.cozuldu); return {k,v,den,coz,oran:yuzde(coz.length,v.length)} }).sort((a,b)=>a.oran-b.oran).slice(0,15);
+  tablo("t4",["Bölüm","Başlayan","Çözülme","İlk denemede","Ort. deneme","İpucu alan","Çözüm gösterilen"],zor.map(z=>{ const [m,n]=z.k.split("#"); const ort=z.coz.length?(z.coz.reduce((a,g)=>a+g.denemeSayisi,0)/z.coz.length).toFixed(1):"—"; return [`${lvAd(m)} · Bölüm ${n}`,z.v.length,bar(z.oran,z.oran<50),bar(yuzde(z.den.filter(g=>g.ilkOk).length,z.den.length)),ort,yuzde(z.v.filter(g=>g.ip>0).length,z.v.length)+"%",yuzde(z.v.filter(g=>g.cozum).length,z.v.length)+"%"] }));
+  // T5 yardım ve tahmin
+  const atla=docs.reduce((a,d)=>a+(d.d||[]).filter(r=>r.m==="ders"&&r.s==="atla").length,0);
+  tablo("t5",["Yaş bandı","İpucu alan görev","Çözüm gösterilen görev","Tahmin denemesi","Doğru tahmin"],yasKol.map(y=>{ const s=G.filter(g=>g.yas===y); const th=s.flatMap(g=>g.th); return [YAS_AD[y],yuzde(s.filter(g=>g.ip>0).length,s.length)+"%",yuzde(s.filter(g=>g.cozum).length,s.length)+"%",th.length,th.length?bar(yuzde(th.filter(x=>x===1).length,th.length)):"—"] }).concat([["Öğretmen modunda atlanan ders",atla,"","",""]]));
+  // T6 cihaz
+  const cihazlar=[...new Set(docs.map(d=>d.cihaz||"?"))];
+  tablo("t6",["Cihaz","Oturum","Görev","İlk denemede çözme","Ort. oturum (dk)"],cihazlar.map(c=>{ const ds=docs.filter(d=>(d.cihaz||"?")===c), gs=D.filter(g=>g.cihaz===c); const su=ds.map(d=>Math.max(0,...(d.d||[]).map(r=>r.t||0))); return [c,ds.length,gs.length,bar(yuzde(gs.filter(g=>g.ilkOk).length,gs.length)),ds.length?Math.round(su.reduce((a,b)=>a+b,0)/ds.length/60):"—"] }));
+  // T7 günlere göre oturum (son 30 gün)
+  const gun=new Map(); for(const d of docs){ const k=yerelGun(d.zaman); gun.set(k,(gun.get(k)||0)+1) }
+  const gunler=[...gun.entries()].sort((a,b)=>b[0].localeCompare(a[0])).slice(0,30);
+  tablo("t7",["Gün","Oturum","Öğretmen modu","Sınıf kodlu","Yaş bantları"],gunler.map(([k,c])=>{ const ds=docs.filter(d=>yerelGun(d.zaman)===k); const y={}; ds.forEach(d=>{ y[d.yas||"-"]=(y[d.yas||"-"]||0)+1 }); return [k,c,ds.filter(d=>d.ogr).length,ds.filter(d=>d.sinif).length,Object.entries(y).map(([a,b])=>`${a}:${b}`).join(" ")] }));
+}
+// ---- CSV ----
+function csv(){
+  const docs=suzulmus(); const kol=["oturum","t0","yas","cihaz","ogretmen","sinif","ekran","t","m","n","s","k","ip","h","b","u","i","th","oz","gun"];
+  const esc=v=>v==null?"":/[",;\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v);
+  const lines=[kol.join(";")];
+  for(const d of docs) for(const r of (d.d||[])) lines.push([d.oturum,d.t0,d.yas,d.cihaz,d.ogr?1:0,d.sinif?1:0,d.ekran,r.t,r.m,r.n,r.s,r.k,r.ip,r.h,r.b,r.u,r.i,r.th,r.oz,r.gun].map(esc).join(";"));
+  const blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`bidik-arastirma-${new Date().toISOString().slice(0,10)}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+// ---- olaylar ----
+$("gBtn").onclick=async()=>{ $("gHata").textContent=""; $("gBtn").disabled=true; try{ await giris($("gE").value.trim(),$("gP").value); $("giris").hidden=true; $("panel").hidden=false; await yukle() }catch(e){ $("gHata").textContent=/INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|EMAIL_NOT_FOUND/.test(e.message)?"E-posta ya da şifre yanlış.":("Olmadı: "+e.message) } $("gBtn").disabled=false };
+$("gP").addEventListener("keydown",e=>{ if(e.key==="Enter") $("gBtn").click() });
+$("fUygula").onclick=hesapla; $("yenile").onclick=()=>yukle().catch(e=>{ $("durum").textContent="Yüklenemedi: "+e.message }); $("csv").onclick=csv; $("cikis").onclick=cikis;
+tokYukle(); if(S.tok){ $("giris").hidden=true; $("panel").hidden=false; yukle().catch(e=>{ $("durum").textContent="Yüklenemedi: "+e.message }) }
+if(!CFG.apiKey){ $("gHata").textContent="Yapılandırma eksik (firebase.json)." }
+</script>
+
+</body></html>

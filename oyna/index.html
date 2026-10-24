@@ -1508,6 +1508,7 @@ function start(n,keep,daily){
   if(!keep){tries=0;hints=0}
   running=false;failCell=-1;tool="S";
   show("yol");
+  try{ Ara.kayit(Object.assign({m:"yol",n,s:"bas",b:"yol",oz:Ara.yolOz(L)},daily?{gun:1}:{})) }catch(e){}
   $("yTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n; $("ySub").textContent=`Yol Kur · ${L.tier.name} · ${L.N}×${L.N}`;
   demo=false; $("ySolve").hidden=!teacherOn()||!!daily;
   setFriend("yFriend","yol",n,daily); setGoal(); renderTray(); render(); stats(); renderSpeedBars();
@@ -1627,6 +1628,7 @@ function run(){
   }
   function done(){
     running=false; $("yRun").disabled=false;
+    try{ if(!demo&&!L.lesson) Ara.kayit(Object.assign({m:"yol",n:L.n,s:res.ok?"ok":"hata",k:tries,ip:hints,u:pieceCount(),i:L.best},res.ok?{}:{h:Ara.yolHata(res.why)},isDaily?{gun:1}:{})) }catch(e){}
     if(res.ok){ sfx.win(); win(); }
     else { sfx.fail(); failCell=res.fail; const tr=car.getAttribute("transform"); render(); const c2=$("yCar"); c2.style.display=""; c2.setAttribute("transform",tr); setGoal(res.why,"bad",res.say); }
   }
@@ -1649,6 +1651,7 @@ function win(){
 }
 $("ySolve").onclick=()=>{
   if(running) return;
+  try{ Ara.kayit({m:"yol",n:L.n,s:"cozum",k:tries,ip:hints}) }catch(e){}
   grid=L.cells.map(c=>({...c})); failCell=-1; hints++; render(); stats(); setGoal("Çözüm adım adım kuruluyor…");
   const ord=L.order.slice(); let i=0; running=true;
   const put=()=>{
@@ -1890,7 +1893,7 @@ const Ders=(()=>{
       <div class="dbub" role="dialog" aria-live="polite"><div class="dface"><svg viewBox="0 0 200 200">${MASCOT_FRONT}</svg></div><div class="dbody"><span class="dkick" id="dersKick">Bidik öğretiyor</span><p class="dtxt" id="dersTxt"></p><div class="dbtns"><button class="btn-alt" id="dersSkip" hidden>Atla</button><button class="btn-main" id="dersNext" hidden>Devam</button></div></div></div>`;
     document.body.appendChild(d);
     $("dersNext").onclick=()=>{ if(S&&S.step&&S.step.wait==="btn"){ sfx.click(); next() } };
-    $("dersSkip").onclick=()=>{ sfx.click(); end(true) };
+    $("dersSkip").onclick=()=>{ sfx.click(); try{ Ara.kayit({m:"ders",s:"atla",oz:String((S&&S.opts&&S.opts.seenKey)||"")}) }catch(e){} end(true) };
     addEventListener("resize",()=>{ if(S) mask(lastLit,S.step&&S.step.pad) });
     addEventListener("scroll",()=>{ if(S) mask(lastLit,S.step&&S.step.pad) },{passive:true});
     return d;
@@ -2163,6 +2166,7 @@ function start(n,daily){
   DEST=(n+(daily?2:0))%DESTS.length;
   freshProg(); tries=0; hints=0; stop();
   show("kod");
+  try{ Ara.kayit(Object.assign({m:"kod",n,s:"bas",b:Ara.beceriKod(n,L)},daily?{gun:1}:{})) }catch(e){}
   $("kTitle").textContent=daily?"Günün Bulmacası":"Bölüm "+n;
   $("kSub").textContent=`Kodla Sür · ${L.ch.name}`+(L.bug?" · Hata avcısı":"");
   demo=false; $("kSolve").hidden=!teacherOn()||!!daily;
@@ -2278,7 +2282,7 @@ function finish(){
   const res=sess.res;
   let gtxt="";
   if(guess&&guessRes==null){ const f=res.states[res.states.length-1]; guessRes=f.x===guess.x&&f.y===guess.y; bidGuess(guessRes); gtxt=guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. " }
-  if(res.ok){sfx.win();win();return}
+  if(res.ok){ try{ if(!demo&&!L.lesson) Ara.kayit(Object.assign({m:"kod",n:L.n,s:"ok",k:tries+1,ip:hints,u:used(),i:L.ideal,b:Ara.beceriKod(L.n,L)},guessRes!=null?{th:guessRes?1:0}:{},isDaily?{gun:1}:{})) }catch(e){} sfx.win();win();return}
   if(sess.steps.length) tries++; statsK(); sfx.fail();
   if(res.cell!=null){const [x,y]=cellXY(res.cell);const f=$("kFail");f.setAttribute("x",x+3);f.setAttribute("y",y+3);f.style.display=""}
   // Kırmızı işaret gerçekten hatalı bloğa: tek değişiklikle düzelen blok aranır (hata avcısında ilk koşuda cevap verilmez, Bidik'in takıldığı adım gösterilir)
@@ -2286,6 +2290,7 @@ function finish(){
   let tail="";
   if(cul){ Blok.hl(box(),{bid:cul.b.id,path:[]},"err"); tail=" "+Blok.CULPRIT_MSG[cul.kind] }
   else if(res.fail>=0&&sess.steps[res.fail]){ Blok.hl(box(),sess.steps[res.fail],"err"); tail=" "+Blok.STUCK_MSG }
+  try{ if(!demo&&!L.lesson&&sess.steps.length) Ara.kayit(Object.assign({m:"kod",n:L.n,s:"hata",k:tries,ip:hints,u:used(),i:L.ideal,b:Ara.beceriKod(L.n,L),h:Ara.kodHata(cul,res)},guessRes!=null?{th:guessRes?1:0}:{},isDaily?{gun:1}:{})) }catch(e){}
   goal(gtxt+res.why+tail,"bad",res.say?gtxt+res.say+tail:null);
   sess.done=true;
 }
@@ -2464,6 +2469,7 @@ function lesson(id,then){
 }
 $("kSolve").onclick=()=>{
   if(anim) return;
+  try{ Ara.kayit({m:"kod",n:L.n,s:"cozum",k:tries,ip:hints}) }catch(e){}
   stop(); prog={main:Blok.clone(L.seed.main),fn:Blok.clone(L.seed.fn)}; ed=Blok.editor(prog); hints++; demo=true;
   renderProg(); statsK(); goal("Çözüm adım adım gösteriliyor…");
   setTimeout(()=>$("kRun").click(),350);
@@ -2500,6 +2506,7 @@ function startAct(id,n){
   const m=ACT[id]; if(!m) return;
   A={id,n,m,st:null,tries:0,hints:0,demo:false,busy:false,won:false};
   show("act");
+  try{ Ara.kayit({m:"act:"+id,n,s:"bas",b:"act"}) }catch(e){}
   const part=actPart(m,n);
   $("aTitle").textContent=m.title;
   $("aSub").textContent=`Bölüm ${n} / ${m.N} · ${part.name}`;
@@ -2526,12 +2533,13 @@ function aRefresh(){
   $("aInfo").textContent=(m.info?m.info(st):"")+(A.tries?` · Deneme: ${A.tries}`:"");
 }
 function aGoal(txt,cls,say){ const g=$("aGoal"); g.className="goal"+(cls?" "+cls:""); if(say) g.dataset.say=say; else delete g.dataset.say; g.textContent=txt||(A&&A.m.goal?A.m.goal(A.st):""); fitBoard(document.querySelector("#aBody>svg.board"),$("aCheck")) }
-function aBad(msg){ A.tries++; sfx.no(); aGoal(msg||"Olmadı, bir daha dene.","bad"); aRefresh() }
+function aBad(msg){ A.tries++; sfx.no(); aGoal(msg||"Olmadı, bir daha dene.","bad"); aRefresh(); try{ if(!A.demo) Ara.kayit(Object.assign({m:"act:"+A.id,n:A.n,s:"hata",k:A.tries,ip:A.hints,b:"act"},A.ara||{})); A.ara=null }catch(e){} }
 function aGood(msg){ sfx.place(); aGoal(msg,"good") }
 function aWin(extra){
   if(!A||A.won) return; A.won=true;
   const {id,n,m}=A;
   sfx.win();
+  try{ if(!A.demo) Ara.kayit(Object.assign({m:"act:"+id,n,s:"ok",k:A.tries+1,ip:A.hints,b:"act"},A.ara||{})); A.ara=null }catch(e){}
   if(A.demo){ setTimeout(()=>demoDoneCard("act:"+id,n,()=>startAct(id,n)),500); return }
   const first=A.tries===0, nohint=A.hints===0;
   const stars=extra&&extra.stars!=null?extra.stars:(first&&nohint?3:A.tries<=2?2:1);
@@ -2548,6 +2556,7 @@ function aWin(extra){
 async function aSolveRun(){
   if(!A||A.busy) return;
   const {id,n,m}=A;
+  try{ Ara.kayit({m:"act:"+id,n,s:"cozum",k:A.tries,ip:A.hints}) }catch(e){}
   A.st=m.setup(n); A.demo=true; A.busy=true; aRefresh(); aGoal("Çözüm adım adım gösteriliyor…");
   try{ await m.solve(A.st) }catch(e){ console.error(e) }
   A.busy=false; aRefresh();
@@ -4334,6 +4343,7 @@ function reg(id){
       const C=st.L.C; play(st).then(res=>{
         const gt=st.guessRes==null||st.guessShown?"":(st.guessRes?"Tahminin doğru, Bidik tam o karede durdu! ":"Bidik tahmin ettiğin karede durmadı. "); st.guessShown=true;
         const gc=st.guessRes!=null?[[st.guessRes,st.guessRes?"Tahminin doğru çıktı":"Tahmin: bir dahakine"]]:[];
+        try{ A.ara={u:Blok.count(st.prog),i:st.L.ideal,oz:String(C.kind||"")+(C.debug?",hata":""),th:st.guessRes==null?undefined:(st.guessRes?1:0)}; if(A.ara.th===undefined) delete A.ara.th }catch(e){}
         if(res.ok){ const used=Blok.count(st.prog), best=st.L.ideal;
           aWin(C.debug?(gc.length?{checks:[[true,C.done],[A.tries===0,"İlk denemede"],[A.hints===0,"Yardım almadan"]].concat(gc)}:null):{stars:A.tries===0&&A.hints===0&&used<=best?3:A.tries<=2?2:1,
             checks:[[true,C.done],[A.tries===0,"İlk denemede"],[used<=best,`En az blokla (${used} / ${best})`]].concat(gc),
@@ -4341,6 +4351,7 @@ function reg(id){
         else { // kırmızı işaret gerçekten hatalı bloğa: tek değişiklikle düzelen blok (hata bulma görevinde ilk koşuda cevap verilmez)
           const types=["F","L","R"].concat(st.L.t>=BACK_FROM?["G"]:[]).concat(st.L.mode==="plant"?["D"]:[]);
           const cul=(!C.debug||A.tries>=1)?Blok.culprit({main:st.prog},()=>simulate(st.L,st.prog).ok,{types,counts:[2,3,4]}):null;
+          try{ A.ara=A.ara||{}; A.ara.h=cul?Ara.kodHata(cul,null):(res.fail?"takildi":"hedef") }catch(e){}
           const base=res.fail?(C.fail[res.fail]||"Olmadı, bir daha dene."):L_left(st);
           if(cul){ st.errStep=null; st.errBid=cul.b.id; renderProg(st); aBad(gt+base+" "+Blok.CULPRIT_MSG[cul.kind]) }
           else aBad(gt+base+(res.fail?" "+Blok.STUCK_MSG:"")) } });
@@ -4897,9 +4908,50 @@ const Olcum=(()=>{
     let ogr="hayir"; try{ ogr=teacherOn()?"evet":"hayir" }catch(e){}
     ev("oyun-basladi",{mod:id,yas,cihaz:cihaz(),ogretmen:ogr});
   }
-  return {ev,ekran};
+  return {ev,ekran,cihaz};
 })();
 { const _show=show; show=function(id){ try{ Olcum.ekran(id) }catch(e){} return _show.apply(this,arguments) } }
+// ==ARAŞTIRMA== Anonim öğrenme olayları → Firestore `arastirma/{oturum}` (oturum başına tek belge, denemeler dizi halinde).
+// Kişisel veri yok: oyuncu adı, sınıf kodu, IP, kalıcı cihaz kimliği gönderilmez. Oturum kimliği sayfa açılışında üretilir, saklanmaz.
+// Satır alanları: t (oturum başından saniye) · m (yol | kod | act:<bölge> | ders) · n (bölüm) · s (bas | ok | hata | cozum | atla)
+//   k (kaçıncı deneme) · ip (ipucu sayısı) · h (hata türü: tur/sayi/kosul/fazla/takildi/hedef | yol: kopuk/yon/su/engel/kapi/…)
+//   b (beceri: algoritma/yon/dongu/fonksiyon/kosul/karma/hata-ayiklama/yol/act) · u (kullanılan blok/parça) · i (ideal) · th (tahmin doğru mu) · oz (özellik) · gun (günün bulmacası)
+// Belge başlığı: v, t0 (dakikaya yuvarlı), yas (y4…s4), cihaz, ogr (öğretmen modu), sinif (sınıf kodu var mı), ekran, d (satırlar).
+const Ara=(()=>{
+  const SINIR=600; // oturum başına en çok satır (belge 1 MB sınırının çok altında kalır; keepalive gövdesi ~60 KB)
+  const aktif=()=>!!(window.__araTest||(SINIF_CFG.apiKey&&SINIF_CFG.projectId&&/(^|\.)bidik\.tr$/.test(location.hostname)));
+  const oturum=(()=>{ const a=new Uint8Array(8); try{ crypto.getRandomValues(a) }catch(e){ for(let i=0;i<8;i++) a[i]=(Math.random()*256)|0 } return Array.from(a,x=>x.toString(16).padStart(2,"0")).join("") })();
+  const t0=Date.now(); const D=[]; let gonderilen=0, zaman=null, mesgul=false, hata=0, bitti=false;
+  function baslik(){
+    let yas="",ogr=false,sinif=false; try{ yas=String(curLevel()||"") }catch(e){} try{ ogr=!!teacherOn() }catch(e){} try{ sinif=!!((P()&&P().sinif)||db.sinif) }catch(e){}
+    return {v:1,t0:new Date(Math.floor(t0/60000)*60000).toISOString(),yas,cihaz:(typeof Olcum!=="undefined"&&Olcum.cihaz)?Olcum.cihaz():"",ogr,sinif,ekran:innerWidth+"x"+innerHeight,d:D};
+  }
+  function kayit(o){
+    if(!aktif()||bitti) return; if(D.length>=SINIR){ bitti=true; gonder(); return }
+    const r={t:Math.round((Date.now()-t0)/1000)}; for(const k in o){ const v=o[k]; if(v===undefined||v===null||v==="") continue; r[k]=typeof v==="boolean"?(v?1:0):v }
+    D.push(r); planla();
+  }
+  function planla(){ if(D.length-gonderilen>=20) gonder(); else { clearTimeout(zaman); zaman=setTimeout(()=>gonder(),15000) } }
+  async function gonder(keepalive){
+    if(mesgul||gonderilen>=D.length||!navigator.onLine||hata>=5) return; mesgul=true; const n=D.length;
+    try{
+      const url=`${FB.base()}/arastirma/${oturum}?key=${encodeURIComponent(SINIF_CFG.apiKey)}`;
+      const r=await fetch(url,{method:"PATCH",keepalive:!!keepalive,cache:"no-store",headers:{"Content-Type":"application/json"},body:JSON.stringify(fsFields(baslik()))});
+      if(r.ok){ gonderilen=n; hata=0 } else hata++;
+    }catch(e){ hata++ }
+    mesgul=false; if(gonderilen<D.length&&hata<5) planla();
+  }
+  addEventListener("pagehide",()=>{ clearTimeout(zaman); gonder(true) });
+  document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden"){ clearTimeout(zaman); gonder(true) } });
+  // Kodla Sür bölümünün hedef becerisi (bölüm aralığına göre; hata avcısı ayrı)
+  function beceriKod(n,L){ if(L&&L.bug) return "hata-ayiklama"; return n<=10?"algoritma":n<=20?"yon":n<=30?"dongu":n<=40?"fonksiyon":n<=50?"kosul":"karma" }
+  // Kodla Sür hata türü: suçlu blok türü (Blok.culprit) ya da takılma
+  function kodHata(cul,res){ if(cul){ return {type:"tur",n:"sayi",c:"kosul",extra:"fazla"}[cul.kind]||String(cul.kind) } if(!res) return "diger"; return res.fail>=0?"takildi":"hedef" }
+  // Yol Kur hata türü: simulate() açıklamasından kod
+  function yolHata(why){ why=String(why||""); return /dışına/.test(why)?"disari":/yanlış taraftan/.test(why)?"yon":/uğramadın/.test(why)?"eksik-hedef":/Tünele/.test(why)?"tunel":/suya/.test(why)?"su":/engele/.test(why)?"engel":/burada bitiyor/.test(why)?"kopuk":/Kapı/.test(why)?"kapi":/doğru yöne bakmıyor/.test(why)?"parca-yon":/Tek yön/.test(why)?"tekyon":"diger" }
+  function yolOz(L){ try{ return [L.key!=null?"anahtar":"",L.cells.some(c=>c.kind==="tunnel")?"tunel":"",L.cells.some(c=>c.kind==="water")?"su":"",L.cells.some(c=>c.oneway!=null)?"tekyon":"",L.cells.some(c=>c.gate)?"kapi":""].filter(Boolean).join(",") }catch(e){ return "" } }
+  return {kayit,gonder,beceriKod,kodHata,yolHata,yolOz,oturum:()=>oturum,_d:()=>D,_g:()=>gonderilen};
+})();
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
@@ -5170,7 +5222,7 @@ window.bidikBack=function(){
   if(!$("home").hidden) return false;
   goHome(); return true;
 };
-window.__bidik={Yol,Kod,Blok,Daily,ACT,Voice,Ders,openActLevels,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DOSYA,db:()=>db,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
+window.__bidik={Yol,Kod,Blok,Daily,ACT,Voice,Ders,Ara,Olcum,openActLevels,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DOSYA,db:()=>db,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
   actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS, save:()=>save(), allowed, openLevels, talkFor:(m,n)=>talkFor(m,n),

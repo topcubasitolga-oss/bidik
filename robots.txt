@@ -1,3 +1,4 @@
 User-agent: *
+Disallow: /arastirma.html
 Allow: /
 Sitemap: https://bidik.tr/sitemap.xml
