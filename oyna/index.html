@@ -4952,6 +4952,27 @@ const Ara=(()=>{
   function yolOz(L){ try{ return [L.key!=null?"anahtar":"",L.cells.some(c=>c.kind==="tunnel")?"tunel":"",L.cells.some(c=>c.kind==="water")?"su":"",L.cells.some(c=>c.oneway!=null)?"tekyon":"",L.cells.some(c=>c.gate)?"kapi":""].filter(Boolean).join(",") }catch(e){ return "" } }
   return {kayit,gonder,beceriKod,kodHata,yolHata,yolOz,oturum:()=>oturum,_d:()=>D,_g:()=>gonderilen};
 })();
+// ==BAĞLANTI== Kitaptaki QR kodlar: ?ac=<mod>:<n> → ilgili bölümü doğrudan açar.
+// mod: kod | yol | <bölge id: golet, cicek, orman, donusum, gece, tarla, kalem, yaris> | ders (n: sira, donus, dongu, fonksiyon, eger, sensor, hata)
+// Yaş bandı seçilmemişse önce seçim ekranı kalır; seçim yapılınca bölüm açılır. Kilitli bölüm istenirse o etkinliğin listesi açılır.
+try{
+  const q=new URLSearchParams(location.search), ac=(q.get("ac")||"").trim();
+  if(ac){
+    history.replaceState(null,"",location.pathname+(location.hash||""));
+    const [mod,arg]=ac.split(":"); const n=parseInt(arg,10);
+    const ac_ok=()=>{ try{ return !!curLevel() }catch(e){ return false } };
+    const git=()=>{
+      try{
+        if(typeof closeOverlay==="function") closeOverlay();
+        if(mod==="ders"){ if(Kod.LESSON_NAMES[arg]) Kod.lesson(arg,()=>goHome()); return }
+        if(mod==="kod"||mod==="yol"){ if(!(n>=1)) return; if(allowed(mod,n)) (mod==="kod"?Kod:Yol).start(n); else openLevels(mod); return }
+        if(ACT[mod]){ if(n>=1&&allowed(mod,n)) startAct(mod,n); else openActLevels(mod) }
+      }catch(e){}
+    };
+    let dene=0; const bekle=()=>{ if(ac_ok()){ git(); return } if(++dene<120) setTimeout(bekle,500) }; // yaş seçimi için en çok 60 sn bekle
+    setTimeout(bekle,600);
+  }
+}catch(e){}
 // ==ETKİNLİKLER SONU==
 // MENÜLER
 // =====================================================================
@@ -5222,7 +5243,7 @@ window.bidikBack=function(){
   if(!$("home").hidden) return false;
   goHome(); return true;
 };
-window.__bidik={Yol,Kod,Blok,Daily,ACT,Voice,Ders,Ara,Olcum,openActLevels,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DOSYA,db:()=>db,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
+window.__bidik={Yol,Kod,Blok,Daily,ACT,Voice,Ders,Ara,Olcum,MASCOT_FRONT,ANIMALS,sceneSVG,gardenSVG,karakterSVG,levelObj,actState:()=>A,WORLD,openActLevels,sesBul:(t,w)=>sesBul(t,w),ses:()=>SES_DOSYA,db:()=>db,TEXTS:()=>({WORLD,THANKS,DESTS,TALK,DURAKS:DURAKS.map(d=>({no:d.no,code:d.code}))}),
   lvSummary(l){ const d=P(), old=d.level; d.level=l; const r=DURAKS.map(dk=>{ const m=isleStars(dk)[1]; return WORLD[dk.no].kita.slice(0,7)+":"+(m/3)+(m?"/"+seedNeed(m)+"★":"") }).join("  "); d.level=old; return r },
   actAuto(id,n){ const m=ACT[id], st=m.setup(n); return m.auto(st)&&m.solved(st) },
   actStart:startAct, setLevel(id){ P().level=id; save(); goHome() }, openDurak, continuePlay, openReport, P, DURAKS:()=>DURAKS, save:()=>save(), allowed, openLevels, talkFor:(m,n)=>talkFor(m,n),

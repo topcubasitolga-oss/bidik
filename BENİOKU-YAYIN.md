@@ -50,3 +50,9 @@ Yeni sürümü yüklediğinizde `sw.js` içindeki `CACHE` adı değiştiği içi
 - Olaylar: tanıtım sayfasında `hemen-oyna`, `ogretmen-rehberi`, `ogretmen-odasi` (data-umami-event); oyunda `oyun-basladi` (oturumda bir kez: mod, yaş bandı, cihaz sınıfı, öğretmen modu), `durak-bitti`, `oyun-bitti`, `sinif-katildi`, `sinif-olusturuldu` (acts/97-olcum.js, 05-world.js, 95-sinif.js).
 - Hobby planı sınırı 100 bin olay/ay; bu yüzden bölüm bazlı olaylar Umami'ye gönderilmez (öğrenme analitiği ayrı tasarlanacak).
 - Gizlilik metni (gizlilik.html) 25 Ekim 2026'da buna göre güncellendi; avukat kontrolü bekliyor.
+
+## Araştırma kaydı (öğrenme analitiği)
+- Oyun, anonim olay satırlarını Firestore `arastirma/{oturum}` belgesine yazar (acts/98-arastirma.js; kancalar: Yol/Kod start·done/finish·çözüm, acts/00-core.js aBad/aWin/startAct/aSolveRun, 80-gorev.js A.ara, ders atla). Yalnızca bidik.tr alanında etkin (`window.__araTest` ile yerelde test).
+- Kurallar `firestore.rules` (Firebase konsolundan yayınlanır): yazma şema denetimli ve kimliksiz; okuma yalnızca araştırmacı hesabı (topcubasitolga@gmail.com, UID yc71o5aAOYTlCiiZnRN9mhy5kUo1, e-posta/şifre sağlayıcısı).
+- Pano: https://bidik.tr/arastirma.html (arastirma.html; build.py ARA_CFG ile apiKey/projectId gömer; sitemap ve SW dışında, robots'ta Disallow). CSV indirme var.
+- Test: scratchpad/ara.js (olay üretimi + PATCH gövdesi), scratchpad/arapano.js (sahte veriyle pano).
