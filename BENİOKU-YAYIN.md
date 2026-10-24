@@ -43,3 +43,10 @@ Yeni sürümü yüklediğinizde `sw.js` içindeki `CACHE` adı değiştiği içi
 - **https://bidik.tr** — canlı site. GitHub Pages, depo: `topcubasitolga-oss/bidik-tr` (derlenmiş site + `CNAME`). DNS: Turkticaret panelinde A kayıtları 185.199.108/109/110/111.153, `www` CNAME → topcubasitolga-oss.github.io. HTTPS zorunlu.
 - `topcubasitolga-oss/bidik` — eski adres (topcubasitolga-oss.github.io/bidik). Sayfalar ziyaretçiyi otomatik bidik.tr'ye taşır ve eski çevrimdışı önbelleği temizler; eski bağlantılar çalışmaya devam eder.
 - Yayın: `bidik-src/yayinla.sh "mesaj"` — derler, iki depoya da gönderir (CNAME yalnızca bidik-tr'de).
+
+## Ziyaret sayımı (Umami)
+- Araç: Umami Cloud (AB bölgesi), hesap topcubasitolga@gmail.com, site "Bidik" (bidik.tr). Pano: https://cloud.umami.is/analytics/eu/websites/a2bd2b28-1314-49b9-acba-813cbd034368
+- Kod `build.py` içindeki `UMAMI` sabitiyle her sayfanın `<head>`'ine eklenir; `data-domains="bidik.tr,www.bidik.tr"` olduğu için yerel test ve github.io sayılmaz; adres satırındaki arama/hash kısmı gönderilmez.
+- Olaylar: tanıtım sayfasında `hemen-oyna`, `ogretmen-rehberi`, `ogretmen-odasi` (data-umami-event); oyunda `oyun-basladi` (oturumda bir kez: mod, yaş bandı, cihaz sınıfı, öğretmen modu), `durak-bitti`, `oyun-bitti`, `sinif-katildi`, `sinif-olusturuldu` (acts/97-olcum.js, 05-world.js, 95-sinif.js).
+- Hobby planı sınırı 100 bin olay/ay; bu yüzden bölüm bazlı olaylar Umami'ye gönderilmez (öğrenme analitiği ayrı tasarlanacak).
+- Gizlilik metni (gizlilik.html) 25 Ekim 2026'da buna göre güncellendi; avukat kontrolü bekliyor.
