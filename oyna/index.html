@@ -2519,7 +2519,7 @@ function startAct(id,n){
   aGoal();
   const intro=m.intro&&m.intro(n);
   // kavram dersi (Tekrarla vb.): bir kez, Kodla Sür ekranında; ders görüldüyse bu etkinliğin kartı da atlanır
-  if(intro&&intro.lesson&&!P().seen["act:"+id+":"+intro.key]){ if(dersGerekli(intro.lesson)){ Kod.lesson(intro.lesson,()=>startAct(id,n)); return } const d=P(); d.seen["act:"+id+":"+intro.key]=1; save(); return }
+  if(intro&&intro.lesson&&!P().seen["act:"+id+":"+intro.key]){ if(dersGerekli(intro.lesson)){ Kod.lesson(intro.lesson,()=>startAct(id,n)); return } if(intro.skipCard){ const d=P(); d.seen["act:"+id+":"+intro.key]=1; save(); return } }
   if(intro) seenOnce("act:"+id+":"+intro.key,intro);
 }
 function aRefresh(){
@@ -4069,7 +4069,7 @@ regAct("kalem",{
   doneText:"Orman deseni tamam",
   talk:n=> n<=4?"Kare biçiminde orman kurmak için kaç blok kullandın? Hangi blokların tekrar ettiğini fark ettin mi? Ağaçlar kasabaya ne kazandırır?":"“İleri, sağa dön” bloğunu 4 kez tekrarlayınca neden kare oldu? 3 kez tekrarlasaydık nasıl bir desen çıkardı? (İklim eylemi)",
   intro:n=> n===1?{key:"p1",kicker:"Orman",title:"Fidanlarla desen",art:`<path d="M30 80 V30 H70" stroke="#a8693d" stroke-width="8" fill="none" stroke-linecap="round"/><g transform="translate(70 30) rotate(90) scale(.5)">${ROBOT}</g>`,text:"Sincap Fındık Bidik'e fidan dolu bir çanta verdi! Bidik <b>İleri</b> gidince geçtiği yere sıra sıra fidan diker. Kesikli çizgideki orman desenini kuracak kodu yaz, sonra <b>Çiz</b>'e bas. Bidik başta yukarı bakıyor."}
-        : n===5?{key:"p2",lesson:"dongu",kicker:"Yeni blok",title:"Tekrarla",ex:"4[F R]",text:"Kısa bir kodu Tekrarla bloğunun içine yaz; üstündeki sayıya dokunup kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını dört kere tekrarla: kare olur!"}:null,
+        : n===5?{key:"p2",lesson:"dongu",skipCard:true,kicker:"Yeni blok",title:"Tekrarla",ex:"4[F R]",text:"Kısa bir kodu Tekrarla bloğunun içine yaz; üstündeki sayıya dokunup kaç kez tekrar edeceğini seç. İleri ve Sağa dön bloklarını dört kere tekrarla: kare olur!"}:null,
   setup(n){ const L=LV[n], tg=runFlat(L,L.sol.split(""),L.x);
     const frame=L.rep?Blok.mk("rep",{n:1,k:[]}):null, main=frame?[frame]:[], ed=Blok.editor({main}); if(frame) ed.cur={row:"main",list:frame.k,i:0};
     return {n,L,target:new Set(tg.segs.map(key)),tsegs:tg.segs,main,frame,ed,drawn:[],pos:[L.s[0],L.s[1],0],cur:null,running:false} },
@@ -4143,6 +4143,8 @@ const TIER=[null, // N, nesne, engel, en kısa program aralığı, dönüş gere
   {N:5,k:3,o:3,min:8,max:12,turn:2},{N:5,k:4,o:3,min:9,max:14,turn:2},{N:5,k:4,o:4,min:10,max:15,turn:3},
   {N:5,k:5,o:4,min:11,max:17,turn:3},{N:6,k:5,o:5,min:13,max:19,turn:3},{N:6,k:6,o:6,min:15,max:22,turn:4}];
 const LOOPS_FROM=6, BACK_FROM=7;
+// Tekrarla bloğu hangi bölümden itibaren: Polen Yolu (Çiçek Tarlası = "Ne tekrar ediyor?") 1. bölümden, diğerleri 6. bölümden
+const lf=C=>C&&C.id==="cicek"?1:LOOPS_FROM;
 // Bölüm ipucu: temel yönergeye bölümün yeni özelliğine göre kısa bir ek cümle (her dostun sesiyle kayıtlı). 1. bölümde ipucu yok.
 const HINTS={near:"Önce en yakındaki hedefe git.",turn:"Dönüşten sonra İleri bloğu gerekir.",loop:"Tekrar eden adımları Tekrarla bloğuyla kısalt.",energy:"Her blok enerji harcar: en kısa yolu bul.",deliver:"Önce atığı al, sonra kutusuna götür.",debug:"Önce çalıştır, nerede saptığını izle.",guess:"Çalıştırmadan önce Bidik'in nerede duracağını tahmin et.",step:"Adım düğmesiyle tek tek çalıştır."};
 const HINT_BY_T=[null,null,"turn","near","guess","step","loop","turn","loop","guess","near","loop","step"];
@@ -4297,7 +4299,7 @@ function gen(id,n){
     if(!sol) continue;
     const moves=sol.length, turns=sol.filter(c=>c==="L"||c==="R").length;
     if(moves<T.min||moves>T.max||turns<T.turn) continue;
-    L.sol=sol; L.t=R.t; L.C=R; L.ideal=R.t>=LOOPS_FROM?Blok.count(compress(sol)):sol.length;
+    L.sol=sol; L.t=R.t; L.C=R; L.ideal=R.t>=lf(R)?Blok.count(compress(sol)):sol.length;
     if(R.energy) L.budget=moves+(R.t<=5?3:R.t<=8?1:0);
     if(R.debug){
       // 1-2 bloğu boz: program başarısız olmalı
@@ -4316,9 +4318,11 @@ function reg(id){
     title:R.title, durak:R.durak, N:R.N||12, speed:true, finaleLabel:R.finale?"Şenlik başlasın!":null, finale:R.finale?()=>openFestival():null,
     parts:R.parts||[{name:"Kolay",sub:"Okul öncesi",from:1,to:5},{name:"Orta",sub:"1-2. sınıf · Tekrarla bloğu",from:6,to:10},{name:"Usta",sub:"3-4. sınıf · büyük tahta",from:11,to:12}],
     doneText:R.done, talk:n=>cfg(id,n).talk,
-    intro:n=> cfg(id,n).li?{key:"s"+n,kicker:R.finale?"Kasaba Şenliği · "+n+" / 5":WORLD[R.durak].kita,title:cfg(id,n).li.title,art:R.finale?FLOWER:`<g>${ANIMALS[WORLD[R.durak].anim]}</g>`,text:cfg(id,n).li.text}
-      : n===1?{key:"g1",kicker:WORLD[R.durak].kita,title:R.intro.title,art:`<g transform="translate(0 0)">${ANIMALS[WORLD[R.durak].anim]}</g>`,text:R.intro.text}
-      : n===LOOPS_FROM&&!cfg(id,n).debug?{key:"g2",lesson:"dongu",kicker:"Yeni blok",title:"Tekrarla bloğu",ex:"3[F]",text:"Turuncu <b>Tekrarla</b> bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. Sayıya dokununca değişir. İleri, İleri, İleri yerine Tekrarla 3: İleri!"}:null,
+    intro:n=>{ const c=cfg(id,n);
+      if(c.li) return {key:"s"+n,kicker:R.finale?"Kasaba Şenliği · "+n+" / 5":WORLD[R.durak].kita,title:c.li.title,art:R.finale?FLOWER:`<g>${ANIMALS[WORLD[R.durak].anim]}</g>`,text:c.li.text};
+      if(n===1){ const o={key:"g1",kicker:WORLD[R.durak].kita,title:R.intro.title,art:`<g transform="translate(0 0)">${ANIMALS[WORLD[R.durak].anim]}</g>`,text:R.intro.text}; if(lf(c)===1&&!c.debug) o.lesson="dongu"; return o }
+      if(n===lf(c)&&!c.debug) return {key:"g2",lesson:"dongu",skipCard:true,kicker:"Yeni blok",title:"Tekrarla bloğu",ex:"3[F]",text:"Turuncu <b>Tekrarla</b> bloğunun içine koyduğun hareketler, üstündeki sayı kadar tekrarlanır. Sayıya dokununca değişir. İleri, İleri, İleri yerine Tekrarla 3: İleri!"};
+      return null },
     setup(n){ const L=CACHE[id+n]||(CACHE[id+n]=gen(id,n)); const lim=L.C.debug?L.pre.length:L.ideal+(L.t<=5?3:L.t<=10?2:1);
       const prog=L.C.debug?flatT(L.pre):[]; return {n,L,lim,prog,ed:Blok.editor({main:prog}),run:null,fail:null,errStep:null,built:false} },
     goal(st){ const h=hintFor(st.L,st.n); return h?st.L.C.goal+" "+h:st.L.C.goal },
@@ -4347,7 +4351,7 @@ function reg(id){
         if(res.ok){ const used=Blok.count(st.prog), best=st.L.ideal;
           aWin(C.debug?(gc.length?{checks:[[true,C.done],[A.tries===0,"İlk denemede"],[A.hints===0,"Yardım almadan"]].concat(gc)}:null):{stars:A.tries===0&&A.hints===0&&used<=best?3:A.tries<=2?2:1,
             checks:[[true,C.done],[A.tries===0,"İlk denemede"],[used<=best,`En az blokla (${used} / ${best})`]].concat(gc),
-            msg:used<=best?"Harika, en kısa program!":"Daha kısa bir program yazabilir misin?"+(st.L.t>=LOOPS_FROM?" Tekrar bloklarını dene.":"")}) }
+            msg:used<=best?"Harika, en kısa program!":"Daha kısa bir program yazabilir misin?"+(st.L.t>=lf(st.L.C)?" Tekrar bloklarını dene.":"")}) }
         else { // kırmızı işaret gerçekten hatalı bloğa: tek değişiklikle düzelen blok (hata bulma görevinde ilk koşuda cevap verilmez)
           const types=["F","L","R"].concat(st.L.t>=BACK_FROM?["G"]:[]).concat(st.L.mode==="plant"?["D"]:[]);
           const cul=(!C.debug||A.tries>=1)?Blok.culprit({main:st.prog},()=>simulate(st.L,st.prog).ok,{types,counts:[2,3,4]}):null;
@@ -4359,10 +4363,10 @@ function reg(id){
     },
     play(st){ return play(st) },
     solved(st){ return !!simulate(st.L,st.prog).ok },
-    auto(st){ setProg(st,st.L.t>=LOOPS_FROM?compress(st.L.sol):flatT(st.L.sol)); return true },
+    auto(st){ setProg(st,st.L.t>=lf(st.L.C)?compress(st.L.sol):flatT(st.L.sol)); return true },
     async solve(st){
       if(st.L.C.debug){ const sol=st.L.sol; for(let i=0;i<sol.length;i++) if(st.prog[i].t!==sol[i]){ st.ed.sel=st.prog[i].id; aRefresh(); aGoal(`${i+1}. blok hatalı: ${BL[st.prog[i].t].name} yerine ${BL[sol[i]].name}`,null,`${i+1}. blok hatalı.`); await aWait(1100); st.prog[i].t=sol[i]; st.ed.sel=null; sfx.place(); aRefresh(); await aWait(600) } }
-      else { const p=st.L.t>=LOOPS_FROM?compress(st.L.sol):flatT(st.L.sol); setProg(st,[]); for(const b of p){ st.prog.push(b); st.ed.cur.i=st.prog.length; sfx.click(); aRefresh(); await aWait(300) } }
+      else { const p=st.L.t>=lf(st.L.C)?compress(st.L.sol):flatT(st.L.sol); setProg(st,[]); for(const b of p){ st.prog.push(b); st.ed.cur.i=st.prog.length; sfx.click(); aRefresh(); await aWait(300) } }
       await play(st); A.busy=true;
     }
   });
@@ -4439,12 +4443,12 @@ function renderProg(st){
 }
 function renderPal(st){
   const L=st.L, p=$("gPal"); if(!p) return; const dbg=!!L.C.debug;
-  const pal=["F","L","R"].concat(L.t>=BACK_FROM?["G"]:[]).concat(L.mode==="plant"?["D"]:[]).concat(L.t>=LOOPS_FROM&&!dbg?["rep"]:[]);
+  const pal=["F","L","R"].concat(L.t>=BACK_FROM?["G"]:[]).concat(L.mode==="plant"?["D"]:[]).concat(L.t>=lf(L.C)&&!dbg?["rep"]:[]);
   p.style.gridTemplateColumns=`repeat(${innerWidth<=480?Math.min(5,Math.max(4,pal.length)):Math.min(8,Math.max(5,pal.length))},minmax(0,1fr))`;
   p.innerHTML=pal.map(t=>`<button class="palbtn" data-t="${t}" aria-label="${BLK[t].name}">${Blok.palHTML(t)}</button>`).join("");
   p.querySelectorAll(".palbtn").forEach(b=>b.onclick=()=>{ if(A.busy||A.won) return; const t=b.dataset.t, ed=st.ed;
     if(dbg){ const r=ed.sel!=null?Blok.find(ed,ed.sel):null; if(!r){ aGoal("Önce değiştirmek istediğin bloğa dokun.","bad"); sfx.no(); return } r.b.t=t; ed.sel=null; sfx.place() }
-    else if(Blok.count(st.prog)>=st.lim){ aGoal(L.t>=LOOPS_FROM?"Programda yer kalmadı. Tekrar bloklarıyla kısaltabilir misin?":"Programda yer kalmadı. Daha kısa bir yol dene.","bad"); sfx.no(); const r=$("gProg").querySelector(".row"); if(r){ r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake") } return }
+    else if(Blok.count(st.prog)>=st.lim){ aGoal(L.t>=lf(L.C)?"Programda yer kalmadı. Tekrar bloklarıyla kısaltabilir misin?":"Programda yer kalmadı. Daha kısa bir yol dene.","bad"); sfx.no(); const r=$("gProg").querySelector(".row"); if(r){ r.classList.remove("shake"); void r.offsetWidth; r.classList.add("shake") } return }
     else { Blok.insert(ed,t); sfx.click() }
     clearRun(st); aGoal(); aRefresh() });
 }

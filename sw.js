@@ -1,5 +1,5 @@
 // Bidik çevrimdışı önbellek. Sürüm değişince eski önbellek silinir.
-const CACHE="bidik-2026-10-25-65";
+const CACHE="bidik-2026-10-25-66";
 const FILES=["./", "index.html", "rehber.html", "gizlilik.html", "kartlar.html", "ogretmen-cicek.html", "ogretmen-donusum.html", "ogretmen-gece.html", "ogretmen-golet.html", "ogretmen-mahalle.html", "ogretmen-orman.html", "ogretmen-tarla.html", "ogretmen.html", "oyna/index.html", "manifest.webmanifest", "simgeler/simge-192.png", "simgeler/simge-512.png", "simgeler/apple-touch-icon.png"];
 // Eski adres (github.io): bu service worker kendini kaldırır, önbelleği siler; sayfalar bidik.tr'ye geçer
 const ESKI=/github[.]io$/.test(self.location.hostname);
