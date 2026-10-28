@@ -56,3 +56,8 @@ Yeni sürümü yüklediğinizde `sw.js` içindeki `CACHE` adı değiştiği içi
 - Kurallar `firestore.rules` (Firebase konsolundan yayınlanır): yazma şema denetimli ve kimliksiz; okuma yalnızca araştırmacı hesabı (topcubasitolga@gmail.com, UID yc71o5aAOYTlCiiZnRN9mhy5kUo1, e-posta/şifre sağlayıcısı).
 - Pano: https://bidik.tr/arastirma.html (arastirma.html; build.py ARA_CFG ile apiKey/projectId gömer; sitemap ve SW dışında, robots'ta Disallow). CSV indirme var.
 - Test: scratchpad/ara.js (olay üretimi + PATCH gövdesi), scratchpad/arapano.js (sahte veriyle pano).
+
+## Öğretmen anahtarı (sınıf sistemi)
+- Anahtar, sınıfı açan cihazda `Sınıflarım` listesinde saklanır; aynı cihazda açılan bütün sınıflar aynı anahtarı kullanır (`db.ogretmenAnahtar`). "Sınıf değiştir" kaydı silmez; ✕ yalnızca cihazdaki kaydı kaldırır.
+- Öğretmen anahtarı kaybederse (başka cihaz, temizlenmiş tarayıcı): `oyun/derleme/anahtar-sifirla.sh KOD` (Mac, gcloud ile proje sahibi girişi). Betik okul/sınıf adını gösterir; öğretmenin e-postasıyla karşılaştırıp onaylayın, yeni anahtarı e-postayla gönderin. Öğrenci verisi değişmez.
+- Oyun içi "Anahtarımı unuttum" bağlantısı topcubasitolga@gmail.com adresine kod + okul bilgisiyle e-posta hazırlar.

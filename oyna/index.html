@@ -33,7 +33,7 @@
 html,body{height:100%}
 body{margin:0}
 [hidden]{display:none!important}
-*{box-sizing:border-box}
+*{box-sizing:border-box;touch-action:manipulation} /* iOS: hızlı art arda dokunuş sayfayı yakınlaştırmasın (iki parmakla büyütme ve kaydırma açık) */
 body{background:var(--sky);color:var(--ink);font-family:var(--body);font-size:16px;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;overflow-x:hidden}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
@@ -4587,6 +4587,13 @@ const maskOf=keys=>"?"+keys.map(k=>"updateMask.fieldPaths="+k).join("&");
 
 // ---- durum ----
 function ogretmenSinif(){ return db.sinif||null }
+// Bu cihazda kayıtlı öğretmen sınıfları: anahtarlar burada saklanır, sınıf değiştirince kaybolmaz. {kod:{kod,ad,okul,n,seviye,anahtar,olusturma}}
+function sinifKayitlar(){ if(!db.siniflar||typeof db.siniflar!=="object") db.siniflar={}; return db.siniflar }
+function sinifKaydet(s){ if(!s||!s.kod) return; const k=sinifKayitlar(); k[s.kod]={kod:s.kod,ad:s.ad||s.kod,okul:s.okul||"",n:s.n||30,seviye:s.seviye||null,anahtar:s.anahtar||"",olusturma:s.olusturma||Date.now()}; if(s.anahtar&&!db.ogretmenAnahtar) db.ogretmenAnahtar=s.anahtar; saveCore() }
+function sinifKayitSil(kod){ const k=sinifKayitlar(); delete k[kod]; saveCore() }
+function sinifListesi(){ return Object.values(sinifKayitlar()).sort((a,b)=>String(a.okul+a.ad).localeCompare(String(b.okul+b.ad),"tr")) }
+// öğretmen anahtarı: bu cihazda açılan bütün sınıflarda aynı (tek anahtar not edilir)
+function ogretmenAnahtar(){ if(!db.ogretmenAnahtar) db.ogretmenAnahtar=kodUret(8); return db.ogretmenAnahtar }
 function sinifTamAd(s){ return s?[s.okul,s.ad].filter(Boolean).join(" · "):"" }           // {kod,ad,n,seviye,anahtar}
 function ogrenciSinif(d){ d=d||P(); return d.sinif||null }  // {kod,ad,no,karakter,kilit,katilim,son,dirty,cek}
 // öğretmen kilidi: kilit[mode] = en çok açık bölüm (0 = kapalı); yoksa serbest
@@ -4605,6 +4612,7 @@ function veriCoz(s){ const d={yol:{},kod:{},daily:{},seen:{},act:{}}; try{ const
 let sinifZaman=null;
 const saveCore=save;
 save=function(){ saveCore(); try{ const d=db.data[db.cur]; if(d&&d.sinif&&sinifOn()){ d.sinif.dirty=1; clearTimeout(sinifZaman); sinifZaman=setTimeout(()=>sinifPushAll().catch(()=>{}),4000) } }catch(e){} };
+try{ if(db.sinif&&db.sinif.kod&&!sinifKayitlar()[db.sinif.kod]) sinifKaydet(db.sinif) }catch(e){}   // eski sürümden geçiş
 async function sinifPushOne(d){
   const s=d.sinif; if(!s||!sinifOn()||!navigator.onLine) return;
   const now=new Date().toISOString(), veri=JSON.stringify(veriPaketi(d));
@@ -4625,7 +4633,7 @@ function sinifHome(){
   const b=$("sinifBtn"); if(!b) return;
   const s=ogrenciSinif();
   b.hidden=!sinifOn();
-  const tb=$("sinifTeachBtn"); if(tb){ tb.hidden=!sinifOn(); tb.textContent=ogretmenSinif()?`Sınıfım: ${ogretmenSinif().ad}`:"Öğretmen: sınıf oluştur" }
+  const tb=$("sinifTeachBtn"); if(tb){ tb.hidden=!sinifOn(); tb.textContent=ogretmenSinif()?`Sınıfım: ${ogretmenSinif().ad}`:(sinifListesi().length?"Öğretmen: sınıflarım":"Öğretmen: sınıf oluştur") }
   b.innerHTML=s?`${karakterRozet(s.karakter,22)}<span>${esc(s.ad||s.kod)} · No ${s.no}</span>`:"Sınıf kodu";
   b.classList.toggle("on",!!s);
   if(s&&sinifOn()&&navigator.onLine&&(!s.cek||Date.now()-s.cek>5*60*1000)){ const d=P(); sinifPull(d).then(()=>{ if(!$("home").hidden) renderMap() }).catch(()=>{}); if(s.dirty) sinifPushAll().catch(()=>{}) }
@@ -4729,13 +4737,40 @@ function sinifOgretmen(){
   if(!sinifOn()){ overlay(`<h2>Sınıf sistemi hazır değil</h2><p>Bu sürümde sınıf kodu kullanılamıyor.</p><div class="btns"><button class="btn-main" id="ovOk3">Tamam</button></div>`); $("ovOk3").onclick=closeOverlay; return }
   closeOverlay();
   if(ogretmenSinif()){ sinifPanel(); return }
+  if(sinifListesi().length){ sinifSecim(); return }
   sinifEkran("Sınıfım","Öğretmen: sınıf kodu oluştur, öğrencileri izle",`
     <div class="menu">
       <button class="mi" id="sNew"><b>Yeni sınıf oluştur</b><small>Sınıf kodu ve öğretmen anahtarı alırsınız. Üyelik, e-posta, şifre yok.</small></button>
       <button class="mi" id="sCon"><b>Var olan sınıfa bağlan</b><small>Başka bir cihazda kurduğunuz sınıf: kod + öğretmen anahtarı</small></button>
     </div>
     <p class="note" style="text-align:left">Bulutta yalnızca sınıf adı, öğrenci numaraları, seçilen karakterler ve yıldızlar tutulur; öğrenci adı girilmez. Hangi numaranın kim olduğunu siz bilirsiniz.</p>`);
-  $("sNew").onclick=sinifOlustur; $("sCon").onclick=sinifBaglan;
+  $("sNew").onclick=sinifOlustur; $("sCon").onclick=()=>sinifBaglan();
+}
+// Bu cihazda kayıtlı sınıflar: birine dokununca saklı anahtarla bağlanır; birden çok sınıf tek anahtarla yönetilir
+function sinifSecim(){
+  const L=sinifListesi();
+  sinifEkran("Sınıflarım","Bu cihazda kayıtlı sınıflar; anahtarlar saklı",`
+    <div class="menu">${L.map(s=>`<div class="srow" style="gap:6px;align-items:stretch"><button class="mi" data-ac="${esc(s.kod)}" style="flex:1"><b>${esc(s.ad)}${s.okul?" · "+esc(s.okul):""}</b><small>Sınıf kodu ${esc(s.kod)} · ${s.n} öğrenci</small></button><button class="chip" data-sil="${esc(s.kod)}" title="Bu cihazdan kaldır" aria-label="${esc(s.ad)} sınıfını bu cihazdan kaldır">✕</button></div>`).join("")}
+      <button class="mi" id="sNew"><b>Yeni sınıf oluştur</b><small>Aynı öğretmen anahtarıyla bir sınıf daha</small></button>
+      <button class="mi" id="sCon"><b>Başka cihazda kurduğum sınıfa bağlan</b><small>Kod + öğretmen anahtarı</small></button>
+    </div>
+    <p class="serr" id="sErr" hidden></p>
+    <p class="note" style="text-align:left">Öğretmen anahtarınız: <b>${esc(db.ogretmenAnahtar||"–")}</b>. Bu cihazda açtığınız bütün sınıflar için aynıdır; başka bir cihazda sınıf kodu + bu anahtarla bağlanırsınız. ✕ yalnızca bu cihazdaki kaydı siler, sınıfı silmez.</p>`);
+  $("sBody").querySelectorAll("[data-ac]").forEach(b=>{ b.onclick=()=>sinifAc(b.dataset.ac) });
+  $("sBody").querySelectorAll("[data-sil]").forEach(b=>{ b.onclick=()=>{ if(!b.dataset.sure){ b.dataset.sure=1; b.textContent="Emin misin?"; return } sinifKayitSil(b.dataset.sil); sinifOgretmen() } });
+  $("sNew").onclick=sinifOlustur; $("sCon").onclick=()=>sinifBaglan();
+}
+async function sinifAc(kod){
+  const s=sinifKayitlar()[kod]; if(!s) return;
+  sHata("");
+  try{
+    const j=await FB.idp("signInWithPassword",{email:`sinif-${kod.toLowerCase()}@bidik.app`,password:s.anahtar,returnSecureToken:true});
+    const a=store.get("auth",{}); a.ogretmen=FB.tokenOf(j); store.set("auth",a);
+    db.sinif=Object.assign({},s); saveCore(); sinifPanel();
+  }catch(err){
+    if(/EMAIL_NOT_FOUND|INVALID_PASSWORD|INVALID_LOGIN_CREDENTIALS/.test(err.code||"")) { sHata("Bu sınıfın anahtarı değişmiş görünüyor. Kod ve yeni anahtarla yeniden bağlanın."); setTimeout(()=>sinifBaglan(kod),1200); return }
+    sHata(hataMetni(err));
+  }
 }
 function sinifOlustur(){
   const SINIFLAR=["Anasınıfı","1","2","3","4","5","6","7","8"];
@@ -4763,7 +4798,7 @@ function sinifOlustur(){
     const ad=`${sinif}-${sube}`;
     sHata(""); sBekle(true);
     try{
-      let kod="", anahtar=kodUret(8), uid="";
+      let kod="", anahtar=ogretmenAnahtar(), uid="";
       for(let deneme=0;deneme<6&&!kod;deneme++){
         const k=kodUret(6);
         try{ const j=await FB.idp("signUp",{email:`sinif-${k.toLowerCase()}@bidik.app`,password:anahtar,returnSecureToken:true}); const a=store.get("auth",{}); a.ogretmen=FB.tokenOf(j); store.set("auth",a); uid=j.localId; kod=k }
@@ -4771,21 +4806,28 @@ function sinifOlustur(){
       }
       if(!kod) throw new Error("Kod üretilemedi, tekrar deneyin.");
       await fsReq("ogretmen","POST","/siniflar",fsFields({ad,okul,n,seviye,sahip:uid,kilit:{},olusturma:new Date().toISOString()}),"?documentId="+kod);
-      db.sinif={kod,ad,okul,n,seviye,anahtar,olusturma:Date.now()}; saveCore(); try{ Olcum.ev("sinif-olusturuldu") }catch(e){}
+      db.sinif={kod,ad,okul,n,seviye,anahtar,olusturma:Date.now()}; sinifKaydet(db.sinif); try{ Olcum.ev("sinif-olusturuldu") }catch(e){}
       sinifKodKart(true);
     }catch(err){ sHata(hataMetni(err)); sBekle(false) }
   };
 }
-function sinifBaglan(){
+function sinifBaglan(kodOn){
+  const unuttum=`mailto:topcubasitolga@gmail.com?subject=${encodeURIComponent("Bidik öğretmen anahtarı")}&body=${encodeURIComponent("Merhaba, sınıfımın öğretmen anahtarını kaybettim.\nOkul: \nSınıf (örn. 3-A): \nSınıf kodu (öğrenci kartında / öğrencinin Sınıfım ekranında yazar): \n\nYeni anahtar tanımlayıp bu adrese göndermenizi rica ederim.")}`;
   sinifEkran("Sınıfa bağlan","Kod ve öğretmen anahtarı",`
     <form class="addform sform" id="sForm">
       <label for="sKod" style="font-weight:800">Sınıf kodu</label>
-      <input id="sKod" class="scode-in" maxlength="6" placeholder="ABC234" autocomplete="off" autocapitalize="characters" spellcheck="false">
+      <input id="sKod" class="scode-in" maxlength="6" placeholder="ABC234" autocomplete="off" autocapitalize="characters" spellcheck="false" value="${esc(kodOn||"")}">
       <label for="sKey" style="font-weight:800">Öğretmen anahtarı</label>
       <input id="sKey" class="scode-in" maxlength="8" placeholder="8 karakter" autocomplete="off" autocapitalize="characters" spellcheck="false">
       <p class="serr" id="sErr" hidden></p>
       <button class="btn main" type="submit" id="sGo">Bağlan</button>
-    </form>`,sinifOgretmen);
+    </form>
+    <details class="note" style="text-align:left;margin-top:10px"><summary style="cursor:pointer;font-weight:800">Anahtarımı unuttum</summary>
+      <ol style="padding-left:18px;margin:6px 0 0">
+        <li>Sınıfı kurduğunuz cihazda (akıllı tahta ya da bilgisayar) oyunu açın: <b>Öğretmen: sınıflarım → sınıf → Kod ve anahtar</b>. Anahtar o cihazda saklıdır.</li>
+        <li>Yazdırdığınız öğretmen kartına ya da kendinize gönderdiğiniz e-postaya bakın.</li>
+        <li>Bulamadıysanız <a href="${unuttum}">bize yazın</a>: okul adı, sınıf ve sınıf kodu yeterli; yeni anahtar tanımlayıp göndeririz. Öğrencilerin yıldızları kaybolmaz.</li>
+      </ol></details>`,sinifOgretmen);
   $("sKod").addEventListener("input",()=>{ $("sKod").value=kodTemiz($("sKod").value).slice(0,6) });
   $("sKey").addEventListener("input",()=>{ $("sKey").value=kodTemiz($("sKey").value).slice(0,8) });
   setTimeout(()=>$("sKod").focus(),100);
@@ -4797,7 +4839,7 @@ function sinifBaglan(){
       const j=await FB.idp("signInWithPassword",{email:`sinif-${kod.toLowerCase()}@bidik.app`,password:anahtar,returnSecureToken:true});
       const a=store.get("auth",{}); a.ogretmen=FB.tokenOf(j); store.set("auth",a);
       const c=await fsReq("ogretmen","GET",`/siniflar/${kod}`); if(!c) throw new Error("Sınıf bulunamadı.");
-      const o=fsDoc(c); db.sinif={kod,ad:o.ad||kod,okul:o.okul||"",n:o.n||30,seviye:o.seviye||null,anahtar,olusturma:Date.now()}; saveCore();
+      const o=fsDoc(c); db.sinif={kod,ad:o.ad||kod,okul:o.okul||"",n:o.n||30,seviye:o.seviye||null,anahtar,olusturma:Date.now()}; sinifKaydet(db.sinif);
       sinifPanel();
     }catch(err){ sHata(hataMetni(err)); sBekle(false) }
   };
@@ -4810,25 +4852,44 @@ function sinifKodKart(yeni){
       <p class="scode">${s.kod}</p>
       <p class="note">Öğretmen anahtarı (başka cihazda bağlanmak için; öğrencilere vermeyin)</p>
       <p class="skey">${s.anahtar||"–"}</p>
-      <p class="note" style="text-align:left"><b>Anahtarı bir yere not edin.</b> Bu cihazda saklanır ama cihaz değişirse yalnızca anahtarla bağlanabilirsiniz. Kaybolursa yeni sınıf açmanız gerekir.</p>
+      <div class="srow" style="justify-content:center;gap:6px"><button class="chip" id="sCopy">Kopyala</button><a class="chip" id="sMail" style="text-decoration:none" href="${esc(sinifAnahtarMail(s))}">Kendime e-posta gönder</a><button class="chip" id="sTCard">Öğretmen kartını yazdır</button></div>
+      <p class="note" style="text-align:left"><b>Anahtarı saklayın:</b> bu cihazda açtığınız bütün sınıflar için aynıdır ve <b>Sınıflarım</b> listesinde saklı kalır. Başka bir cihazda sınıf kodu + bu anahtarla bağlanırsınız. Kaybolursa bize yazın; yeni anahtar tanımlarız, öğrencilerin yıldızları kaybolmaz.</p>
     </div>
     <div class="menu">
       <button class="mi" id="sCards"><b>Sınıf kodu kartlarını yazdır</b><small>Her öğrenciye bir kart: kod, numara, adım adım katılma, QR</small></button>
       <button class="mi" id="sPanel"><b>Sınıf paneline git</b><small>Kim ne oynadı, hangi beceri gelişecek, kilitler</small></button>
     </div>`,sinifPanel);
-  $("sCards").onclick=()=>sinifKartYazdir(); $("sPanel").onclick=sinifPanel;
+  $("sCards").onclick=()=>sinifKartYazdir(); $("sPanel").onclick=sinifPanel; $("sTCard").onclick=()=>sinifOgretmenKartYazdir();
+  $("sCopy").onclick=async()=>{ const m=`Bidik · ${sinifTamAd(s)}\nSınıf kodu: ${s.kod}\nÖğretmen anahtarı: ${s.anahtar}\n${SINIF_URL}`; try{ await navigator.clipboard.writeText(m); $("sCopy").textContent="Kopyalandı ✓" }catch(e){ $("sCopy").textContent="Kopyalanamadı" } };
+}
+function sinifAnahtarMail(s){
+  const b=`Bidik sınıfım: ${sinifTamAd(s)}\nSınıf kodu (öğrenciler için): ${s.kod}\nÖğretmen anahtarı (yalnızca ben): ${s.anahtar}\n\nBaşka bir cihazda bağlanmak için: ${SINIF_URL} → Öğretmen → Başka cihazda kurduğum sınıfa bağlan → kod + anahtar.`;
+  return `mailto:?subject=${encodeURIComponent("Bidik sınıf kodu ve öğretmen anahtarı · "+(s.ad||s.kod))}&body=${encodeURIComponent(b)}`;
+}
+// Öğretmen kartı: tek kart, kod + anahtar (öğrenci kartlarından ayrı basılır)
+function sinifOgretmenKartYazdir(){
+  const s=ogretmenSinif(); if(!s) return;
+  const kisa=SINIF_URL.replace(/^https?:\/\//,"").replace(/\/$/,"");
+  const c=$("cert"); c.innerHTML=`<div class="kgrid"><div class="kkart">
+      <div class="kust"><svg viewBox="0 0 200 200" class="kmasc">${MASCOT_FRONT}</svg><div><b>${esc(s.okul?s.okul+" · ":"")}${esc(s.ad)}</b><small>Öğretmen kartı · öğrencilere vermeyin</small><strong class="kkod">${esc(s.kod)}</strong></div><div class="kqr">${sinifQR(SINIF_URL+"?ogretmen=sinif",88)}</div></div>
+      <div class="kalt"><div class="kno"><b>Öğretmen anahtarı</b><small style="font-size:18px;font-weight:900;letter-spacing:2px">${esc(s.anahtar||"–")}</small></div>
+      <ol><li><b>${esc(kisa)}</b> adresini açın → <b>Öğretmen</b>.</li><li><b>Başka cihazda kurduğum sınıfa bağlan</b>: sınıf kodu <b>${esc(s.kod)}</b> + bu anahtar.</li><li>Bu kartı saklayın; anahtar bu cihazda açtığınız bütün sınıflar için aynıdır.</li></ol></div>
+    </div></div>`;
+  closeOverlay();
+  document.body.classList.add("printing","printkart");
+  setTimeout(()=>{ try{ window.print() }catch(e){} setTimeout(()=>document.body.classList.remove("printing","printkart"),500) },200);
 }
 let sinifVeri=null; // son çekilen öğrenci listesi
 async function sinifPanel(){
   const s=ogretmenSinif(); if(!s){ sinifOgretmen(); return }
   sinifEkran(s.ad,`${s.okul?s.okul+" · ":""}Sınıf kodu ${s.kod} · ${s.n} öğrenci`,`
     <div class="srow">
-      <button class="chip" id="sRef">Yenile</button><button class="chip" id="sLock">Kilitler</button><button class="chip" id="sCards">Kartları yazdır</button><button class="chip" id="sKey">Kod ve anahtar</button><button class="chip" id="sOut">Ayrıl</button>
+      <button class="chip" id="sRef">Yenile</button><button class="chip" id="sLock">Kilitler</button><button class="chip" id="sCards">Kartları yazdır</button><button class="chip" id="sKey">Kod ve anahtar</button><button class="chip" id="sOut">Sınıf değiştir</button>
     </div>
     <p class="serr" id="sErr" hidden></p>
     <div class="list" id="sList"><p class="note">Öğrenciler yükleniyor…</p></div>`);
   $("sRef").onclick=sinifPanel; $("sLock").onclick=sinifKilitEkrani; $("sCards").onclick=()=>sinifKartYazdir(); $("sKey").onclick=()=>sinifKodKart(false);
-  $("sOut").onclick=()=>{ if(!$("sOut").dataset.sure){ $("sOut").dataset.sure=1; $("sOut").textContent="Emin misin?"; return } delete db.sinif; const a=store.get("auth",{}); delete a.ogretmen; store.set("auth",a); saveCore(); sinifOgretmen() };
+  $("sOut").onclick=()=>{ sinifKaydet(db.sinif); delete db.sinif; const a=store.get("auth",{}); delete a.ogretmen; store.set("auth",a); saveCore(); sinifOgretmen() };
   try{
     const c=await fsReq("ogretmen","GET",`/siniflar/${s.kod}`); if(c){ const o=fsDoc(c); s.ad=o.ad||s.ad; s.okul=o.okul||s.okul||""; s.n=o.n||s.n; s.kilit=o.kilit||{}; s.seviye=o.seviye||s.seviye; saveCore() }
     const L=await sinifListe("ogretmen",s.kod);
@@ -5248,10 +5309,16 @@ function bidGuess(ok){ try{ const d=P(); d.ev=d.ev||{g:0,ok:0}; d.ev.g++; if(ok)
 
 // Android geri tuşu (APK sarmalayıcısı çağırır)
 window.bidikBack=function(){
+  const vis=id=>{const e=$(id);return !!e&&!e.hidden};
+  // üstteki katmanlar önce: ebeveyn kapısı, ders, film/tanışma (yoksa ana ekranda sanılıp uygulama kapanıyordu)
+  if(vis("veliKapi")){$("veliKapiVazgec").click();return true}
+  if(vis("ders")){$("dersSkip").click();return true}
+  if(vis("film")){const g=vis("fGo")?$("fGo"):vis("hGo")?$("hGo"):$("fSkip");if(g)g.click();else $("film").hidden=true;return true}
   if(!$("overlay").hidden){closeOverlay();return true}
   if(!$("yol").hidden){$("yBack").click();return true}
   if(!$("kod").hidden){$("kBack").click();return true}
   if(!$("act").hidden){$("aBack").click();return true}
+  if(!$("sinif").hidden){$("sBack").click();return true}
   if(!$("home").hidden) return false;
   goHome(); return true;
 };
