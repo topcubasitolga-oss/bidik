@@ -62,7 +62,11 @@ Yeni sürümü yüklediğinizde `sw.js` içindeki `CACHE` adı değiştiği içi
 - Öğretmen anahtarı kaybederse (başka cihaz, temizlenmiş tarayıcı): `oyun/derleme/anahtar-sifirla.sh KOD` (Mac, gcloud ile proje sahibi girişi). Betik okul/sınıf adını gösterir; öğretmenin e-postasıyla karşılaştırıp onaylayın, yeni anahtarı e-postayla gönderin. Öğrenci verisi değişmez.
 - Oyun içi "Anahtarımı unuttum" bağlantısı topcubasitolga@gmail.com adresine kod + okul bilgisiyle e-posta hazırlar.
 
-## Akıllı tahta / USB paketi (çevrimdışı)
-- `build.py` her derlemede `indir/bidik-tahta.zip` üretir (≈43 MB): `Bidik/Bidik.html` (uygulama sürümüyle aynı oyun, ebeveyn kapısı yok) + `fonts/` + `ses/` + `NASIL-ACILIR.txt`. Bağlantı: `ogretmen.html` → "Tahtada açılmıyor mu?" kutusu.
-- Zip belirlenimcidir ve mp3/woff2 sıkıştırılmadan konur; böylece git ardışık sürümleri delta ile saklar (ölçüm: iki sürüm 39 MB pakette, ikinci sürümün push'u ≈120 KB). Yalnızca `bidik-tr` deposuna gider (`yayinla.sh` eski `bidik` deposundan `indir/` klasörünü siler).
-- Okul ağı filtresi: bidik.tr FortiGuard'da "Education" kategorisinde (13 Eki 2026). MEB/özel okul erişim talebi metni ve alan adları `ogretmen.html`'de. BTK Güvenli İnternet: guvenlinet.org.tr/sorgula üzerinden "görüş bildir" (Çocuk Profili izinli listesi; günlük incelenir).
+## Akıllı tahta / USB paketi (çevrimdışı) — bağlantısız, e-postayla verilir
+- `build.py` her derlemede `TAHTA_YOL` (şu an `indir/bidik-tahta.zip`, ≈43 MB) üretir: `Bidik/Bidik.html` (uygulama sürümüyle aynı oyun; ebeveyn kapısı yok) + `fonts/` + `ses/` + `NASIL-ACILIR.txt` (kurulum + kullanım hakkı notu).
+- **Sitede herkese açık bağlantısı yoktur** (karar: bağlantıyı isteyen öğretmene Tolga verir; `robots.txt` `/indir/` kapalı, arama motorlarında çıkmaz). ogretmen.html'deki kutu öğretmeni e-postaya yönlendirir.
+- **Geçerlilik:** `TAHTA_SON` (2027-06-30). Son 30 gün alt şerit uyarır; tarihten sonra "süresi doldu" ekranı (e-posta + bidik.tr/oyna). Yeni öğretim yılı için tarihi ileri alıp yeniden derleyin.
+- Zip belirlenimcidir; mp3/woff2 sıkıştırılmadan konur, git ardışık sürümleri delta ile saklar (ölçüm: iki sürüm 39 MB pakette, ikinci sürümün push'u ≈120 KB). Yalnızca `bidik-tr` deposuna gider (`yayinla.sh`, eski `bidik` deposundan `indir/` klasörünü siler).
+- Öğretmene gönderilecek e-posta (bağlantıyı siz verirsiniz):
+  > Merhaba, Bidik'in internetsiz USB paketi: https://bidik.tr/indir/bidik-tahta.zip (43 MB). Zip'i açın; çıkan "Bidik" klasörünü olduğu gibi USB belleğe kopyalayın; tahtada klasördeki Bidik.html'ye çift tıklayın (Pardus'ta sağ tık → Birlikte Aç → Firefox), F11 ile tam ekran. Ayrıntılar klasördeki NASIL-ACILIR.txt dosyasında. Paket 30 Haziran 2027'ye kadar geçerlidir ve yalnızca okulunuzun kullanımı içindir; lütfen başkalarıyla paylaşmayın, isteyen meslektaşlarınızı bize yönlendirin.
+- Okul ağı filtresi: bidik.tr FortiGuard'da "Education" (13 Eki 2026). BTK Güvenli İnternet: Aile Profili'nde "OYUN" kategorisinde, Çocuk Profili listesinde yok (30 Eki 2026 sorgusu); düzeltme talebi guvenlinet.org.tr/sorgula → görüş bildir. MEB/özel okul erişim talebi metni `ogretmen.html`'de.
