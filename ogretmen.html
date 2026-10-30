@@ -38,6 +38,23 @@ h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0}h1{font-size:clamp(
     <p style="margin:6px 0 0;font-weight:600">Üyelik, e-posta, şifre yok. Oyunda <b>Öğretmen / veli → Sınıf kodu oluştur</b> adımıyla 6 karakterlik bir sınıf kodu alırsınız; öğrenciler ana ekrandaki <b>Sınıf kodu</b> düğmesine kodu yazıp numarasını ve karakterini seçer. Panelde kim ne oynadı, hangi bilgi işlemsel düşünme boyutu desteklenmeli görünür; bölümleri kilitleyebilir, QR'lı kod kartlarını yazdırabilirsiniz. Bulutta öğrenci adı tutulmaz.</p>
     <ol><li>Oyunu açın, <b>Öğretmen: sınıf oluştur</b> düğmesine dokunun (ana ekranın altında, yeşil).</li><li>Sınıf adı ve öğrenci sayısını yazın → sınıf kodu ve öğretmen anahtarı gelir. Anahtar bu cihazda açtığınız bütün sınıflar için aynıdır ve <b>Sınıflarım</b> listesinde saklı kalır; yine de kendinize e-postayla gönderin ya da öğretmen kartını yazdırın (başka cihazdan bağlanırken gerekir).</li><li><b>Kartları yazdır</b> ile her öğrenciye bir kart dağıtın.</li></ol>
     <p style="margin:10px 0 0"><a class="btnk" href="oyna/index.html?ogretmen=sinif">Sınıf kodu oluştur →</a></p></div>
+  <div class="icerik" id="tahtada-acilmiyor" style="border-color:#c98f2c;background:#fff6e5"><h2>Tahtada açılmıyor mu? (okul ağı filtresi)</h2>
+    <p style="margin:6px 0 0;font-weight:600">Okul ağlarındaki içerik filtresi yeni siteleri bazen “oyun” ya da “sınıflandırılmamış” sayıp engeller; tahtada bu bir <b>güvenlik/sertifika hatası</b> gibi görünür. bidik.tr'nin geçerli bir güvenlik sertifikası vardır; sorun filtre ayarındadır ve okulun bilişim sorumlusu bir erişim talebiyle çözebilir.</p>
+    <ol><li><b>MEB okulları:</b> okulun BT öğretmeni ya da idaresi, MEB ağı için “site erişim talebi” açar (MEB Yardım Masası ya da il/ilçe FATİH koordinatörlüğü üzerinden; yol ile değişebilir).</li>
+    <li><b>Özel okullar:</b> okulun bilişim birimi güvenlik duvarında aşağıdaki alan adlarını açar.</li>
+    <li><b>Hemen çözüm · USB paketi:</b> <a href="indir/bidik-tahta.zip" download><b>bidik-tahta.zip</b></a> dosyasını (43 MB) evde ya da telefonda indirin, açın; çıkan <b>Bidik</b> klasörünü USB belleğe kopyalayın. Tahtada klasördeki <b>Bidik.html</b> dosyasına çift tıklayın (Pardus/ETAP: sağ tık → Birlikte Aç → Firefox). İnternet gerektirmez; oyunun tamamı, sesler ve yazı tipleri içindedir. İlerleme o tahtada saklanır; sınıf kodu özellikleri internet ister.</li>
+    <li>Açılana kadar ayrıca: <b>ekransız masa başı kartları</b> ile ders işlenebilir; Android tahtalar için <b>uygulama</b> yakında.</li></ol>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:800">Talep için hazır metin ve alan adları (kopyalayın)</summary>
+      <p style="margin:8px 0 4px;font-weight:600">Erişime açılması gereken alan adları:</p>
+      <ul style="margin:0 0 8px 22px;font-weight:600"><li><code>bidik.tr</code>, <code>www.bidik.tr</code> (zorunlu; oyun ve materyaller)</li>
+      <li><code>identitytoolkit.googleapis.com</code>, <code>securetoken.googleapis.com</code>, <code>firestore.googleapis.com</code> (yalnızca sınıf kodu ve öğretmen paneli için; isteğe bağlı)</li></ul>
+      <p style="margin:0;font-weight:600;white-space:pre-wrap;background:#fff;border-radius:12px;padding:10px 12px;border:1px solid #e6d3a8">Sayın Yetkili,
+Okulumuzda bilişim ve kodlama derslerinde kullandığımız bidik.tr adlı eğitim sitesi etkileşimli tahtalarımızda okul ağı filtresine takılmaktadır. Site, ilkokul çağı için ücretsiz bir bilgi işlemsel düşünme (kodlama) oyunu ve öğretmen materyalleri sunar; reklam, satın alma, sohbet içermez; çocuklardan kişisel veri toplamaz (gizlilik metni: bidik.tr/gizlilik.html). İçerik, İstanbul 29 Mayıs Üniversitesi öğretim üyesi Dr. Tolga Topçubaşı tarafından TT Robotics adıyla geliştirilmiştir.
+Aşağıdaki alan adlarının “eğitim” kategorisinde erişime açılmasını rica ederiz:
+bidik.tr, www.bidik.tr
+Sınıf kodu özelliği için (isteğe bağlı): identitytoolkit.googleapis.com, securetoken.googleapis.com, firestore.googleapis.com
+Teşekkür ederiz.</p></details>
+    <p style="margin:10px 0 0;font-weight:600">Takıldığınız yerde yazın: <a href="mailto:topcubasitolga@gmail.com?subject=Bidik%20tahtada%20a%C3%A7%C4%B1lm%C4%B1yor">topcubasitolga@gmail.com</a> — hata ekranının fotoğrafı ve tahtanın türü (Pardus / Android / Windows) yeterli.</p></div>
   <div class="grid"><article class="pk"><span class="dost" style="background:#f6c87a"><svg viewBox="0 0 100 100"><g stroke="#16324a" stroke-width="2.6" stroke-linejoin="round">
     <path d="M12 72 L8 58 L16 54 L10 42 L20 40 L18 28 L28 30 L30 18 L38 24 L42 12 L48 20 L54 10 L58 20 L66 12 L68 24 L76 18 L78 30 L86 28 L84 40 L92 42 L86 54 L92 60 L88 72 Z" fill="#8a5a2b"/>
     <ellipse cx="50" cy="62" rx="31" ry="27" fill="#f6dcbd"/></g>

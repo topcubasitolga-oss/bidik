@@ -61,3 +61,8 @@ Yeni sürümü yüklediğinizde `sw.js` içindeki `CACHE` adı değiştiği içi
 - Anahtar, sınıfı açan cihazda `Sınıflarım` listesinde saklanır; aynı cihazda açılan bütün sınıflar aynı anahtarı kullanır (`db.ogretmenAnahtar`). "Sınıf değiştir" kaydı silmez; ✕ yalnızca cihazdaki kaydı kaldırır.
 - Öğretmen anahtarı kaybederse (başka cihaz, temizlenmiş tarayıcı): `oyun/derleme/anahtar-sifirla.sh KOD` (Mac, gcloud ile proje sahibi girişi). Betik okul/sınıf adını gösterir; öğretmenin e-postasıyla karşılaştırıp onaylayın, yeni anahtarı e-postayla gönderin. Öğrenci verisi değişmez.
 - Oyun içi "Anahtarımı unuttum" bağlantısı topcubasitolga@gmail.com adresine kod + okul bilgisiyle e-posta hazırlar.
+
+## Akıllı tahta / USB paketi (çevrimdışı)
+- `build.py` her derlemede `indir/bidik-tahta.zip` üretir (≈43 MB): `Bidik/Bidik.html` (uygulama sürümüyle aynı oyun, ebeveyn kapısı yok) + `fonts/` + `ses/` + `NASIL-ACILIR.txt`. Bağlantı: `ogretmen.html` → "Tahtada açılmıyor mu?" kutusu.
+- Zip belirlenimcidir ve mp3/woff2 sıkıştırılmadan konur; böylece git ardışık sürümleri delta ile saklar (ölçüm: iki sürüm 39 MB pakette, ikinci sürümün push'u ≈120 KB). Yalnızca `bidik-tr` deposuna gider (`yayinla.sh` eski `bidik` deposundan `indir/` klasörünü siler).
+- Okul ağı filtresi: bidik.tr FortiGuard'da "Education" kategorisinde (13 Eki 2026). MEB/özel okul erişim talebi metni ve alan adları `ogretmen.html`'de. BTK Güvenli İnternet: guvenlinet.org.tr/sorgula üzerinden "görüş bildir" (Çocuk Profili izinli listesi; günlük incelenir).
