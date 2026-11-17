@@ -95,17 +95,35 @@ function tokYukle(){ try{ const t=JSON.parse(sessionStorage.getItem("araTok")||"
 async function giris(e,p){
   const r=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${encodeURIComponent(CFG.apiKey)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:e,password:p,returnSecureToken:true})});
   const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error((j.error&&j.error.message)||"GİRİŞ");
-  S.tok={id:j.idToken,exp:Date.now()+((+j.expiresIn)||3600)*1000-60000,email:j.email}; sessionStorage.setItem("araTok",JSON.stringify(S.tok));
+  S.tok={id:j.idToken,exp:Date.now()+((+j.expiresIn)||3600)*1000-60000,email:j.email,yenile:j.refreshToken}; sessionStorage.setItem("araTok",JSON.stringify(S.tok));
 }
+// Kimlik belirteci 1 saatte dolar; yenileme belirteciyle sessizce uzatılır (uzun yüklemelerde oturum düşmesin)
+async function tokTazele(){
+  if(!S.tok||!S.tok.yenile||S.tok.exp-Date.now()>5*60000) return;
+  const r=await fetch(`https://securetoken.googleapis.com/v1/token?key=${encodeURIComponent(CFG.apiKey)}`,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"grant_type=refresh_token&refresh_token="+encodeURIComponent(S.tok.yenile)});
+  const j=await r.json().catch(()=>({})); if(!r.ok||!j.id_token) return;
+  S.tok={id:j.id_token,exp:Date.now()+((+j.expires_in)||3600)*1000-60000,email:S.tok.email,yenile:j.refresh_token||S.tok.yenile}; sessionStorage.setItem("araTok",JSON.stringify(S.tok));
+}
+// Sayfalama: documents.list'in pageToken'ı Firestore REST'te aynı sayfayı döndürebiliyor (16 Kas 2026'da görüldü; sonsuz döngü günlük okuma
+// kotasını tüketti). Bu yüzden runQuery + __name__ sırası + imleç (startAt) kullanılır; her belge bir kez okunur. Üst sınır: EN_COK belge.
 async function yukle(){
-  $("durum").textContent="Yükleniyor…"; const docs=[]; let token="";
-  do{
-    const r=await fetch(`${BASE()}/arastirma?pageSize=300${token?"&pageToken="+encodeURIComponent(token):""}`,{headers:{Authorization:"Bearer "+S.tok.id},cache:"no-store"});
-    const j=await r.json().catch(()=>({}));
-    if(!r.ok){ const m=(j.error&&j.error.message)||("HTTP "+r.status); if(r.status===401||r.status===403){ cikis(); $("gHata").textContent="Bu hesabın okuma izni yok ya da oturum süresi doldu: "+m } throw new Error(m) }
-    for(const d of (j.documents||[])){ const o={}; for(const k in (d.fields||{})) o[k]=dec(d.fields[k]); o.oturum=d.name.split("/").pop(); o.zaman=new Date(o.t0||d.createTime); docs.push(o) }
-    token=j.nextPageToken||""; $("durum").textContent=`Yükleniyor… ${docs.length} oturum`;
-  }while(token);
+  $("durum").textContent="Yükleniyor…"; const docs=[]; let son=null; const SAYFA=500, EN_COK=100000;
+  for(;;){
+    const sq={from:[{collectionId:"arastirma"}],orderBy:[{field:{fieldPath:"__name__"},direction:"ASCENDING"}],limit:SAYFA};
+    if(son) sq.startAt={values:[{referenceValue:son}],before:false};
+    await tokTazele();
+    const r=await fetch(`${BASE()}:runQuery`,{method:"POST",headers:{Authorization:"Bearer "+S.tok.id,"Content-Type":"application/json"},body:JSON.stringify({structuredQuery:sq}),cache:"no-store"});
+    const j=await r.json().catch(()=>null);
+    if(!r.ok){ const e=(j&&(j.error||(j[0]&&j[0].error)))||{}; const m=e.message||("HTTP "+r.status);
+      if(r.status===401||r.status===403){ cikis(); $("gHata").textContent="Bu hesabın okuma izni yok ya da oturum süresi doldu: "+m }
+      if(r.status===429) throw new Error("Firestore günlük okuma kotası doldu (ücretsiz plan 50.000 okuma/gün). Kota Pasifik gece yarısında (İstanbul ~11:00) sıfırlanır; yarın yeniden deneyin.");
+      throw new Error(m) }
+    const sayfa=(Array.isArray(j)?j:[]).filter(x=>x.document).map(x=>x.document);
+    for(const d of sayfa){ const o={}; for(const k in (d.fields||{})) o[k]=dec(d.fields[k]); o.oturum=d.name.split("/").pop(); o.zaman=new Date(o.t0||d.createTime); docs.push(o) }
+    $("durum").textContent=`Yükleniyor… ${docs.length} oturum`;
+    if(sayfa.length<SAYFA||docs.length>=EN_COK) break;
+    son=sayfa[sayfa.length-1].name;
+  }
   S.docs=docs; $("durum").textContent=`${docs.length} oturum yüklendi · ${new Date().toLocaleTimeString("tr-TR")}`;
   const ilk=docs.map(d=>d.zaman).sort((a,b)=>a-b)[0]; if(ilk&&!$("fBas").value) $("fBas").value=yerelGun(ilk);
   if(!$("fBit").value) $("fBit").value=yerelGun(new Date());
